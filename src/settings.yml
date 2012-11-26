@@ -1,0 +1,42 @@
+Options:
+  ## Engine Mode, set to 0, 1 or 2. Check the plugin's description for more information.
+  EngineMode: 1
+  ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
+  UpdateRadius: 1
+
+Cache:
+  ## Enabled, if true, the cache system will be activated
+  Enabled: true
+  ## SizeLimit, set the size limit of the cache folder in MB
+  SizeLimit: 5120
+  ## WritesPerSec, set the number of files to be written per second
+  WritesPerSec: 10
+  
+Permissions:
+  ## OpHasPerm, if true, op players will have all permissions
+  OpHasPerm: true
+
+Updater:
+  ## Updater, if true, this plugin will check for updates automatically
+  Enabled: true
+
+Lists:
+  ## Random Blocks, list here, all the blocks used on engine mode 2
+  RandomBlocks:
+    - 15
+    - 56
+  ## Hidden Blocks, list here, all the blocks that will be obfuscated by engine mode 0 and 1
+  HiddenBlocks:
+    - 14
+    - 15
+    - 16
+    - 21
+    - 54
+    - 56
+    - 73
+    - 74
+    - 129
+  ## Disabled Worlds, list here, all the worlds that will not be protected by this plugin.
+  DisabledWorlds:
+    - world_nether
+    - world_the_end
