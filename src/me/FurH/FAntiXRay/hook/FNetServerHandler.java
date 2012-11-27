@@ -73,7 +73,7 @@ public class FNetServerHandler extends FNetServerProxy {
             if (usecache) {
                 obfuscated = cache.read(player.world, c[i], d[i], hash, engine_mode);
             }
-            
+
             if (obfuscated == null) {
                 obfuscated = obfuscate(inflatedBuffers[i], a[i], c[i], d[i], engine_mode);
                 savecache = true;

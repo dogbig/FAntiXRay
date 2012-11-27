@@ -133,9 +133,11 @@ public class FAntiXRay extends JavaPlugin {
         for (World w : getServer().getWorlds()) {
             File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + w.getName());
             if (dir.exists()) {
-                for (File file : dir.listFiles()) {
-                    size += file.length();
-                    files++;
+                for (File filedir : dir.listFiles()) {
+                    for (File file : filedir.listFiles()) {
+                        size += file.length();
+                        files++;
+                    }
                 }
             }
         }

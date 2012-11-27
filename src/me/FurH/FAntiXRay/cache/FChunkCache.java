@@ -58,7 +58,6 @@ public class FChunkCache {
 
             if (config.compress_level > 0) {
                 zis = new ZipInputStream(fis);
-                zis.getNextEntry();
                 ois = new ObjectInputStream(zis);
             } else {
                 ois = new ObjectInputStream(fis);
