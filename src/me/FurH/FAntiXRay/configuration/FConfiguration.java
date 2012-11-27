@@ -70,7 +70,7 @@ public class FConfiguration {
         writes_sec      = getInteger("Cache.WritesPerSec");
         compress_level  = getInteger("Cache.Compress.Level");
         if (compress_level > 9) {
-            com.log("[TAG] The compression level can't be higher than 9!");
+            com.log("[TAG] The compression level can't be higher then 9!");
             compress_level = 9;
         }
 
