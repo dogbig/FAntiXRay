@@ -7,10 +7,14 @@ Options:
 Cache:
   ## Enabled, if true, the cache system will be activated
   Enabled: true
-  ## SizeLimit, set the size limit of the cache folder in MB
+  ## SizeLimit, set the size limit of the cache folder in MB, 0 Will disable it.
   SizeLimit: 5120
   ## WritesPerSec, set the number of files to be written per second
   WritesPerSec: 10
+  ## The level of compression used on the cache, higher this value is, slower the cache will be and more resources will be required to read/write.
+  Compress:
+    ## 0 = No Compression (Ultra fast, higher sizes), 9 = Maximum compression (Slower, more resources needed, smaller sizes)
+    Level: 1
   
 Permissions:
   ## OpHasPerm, if true, op players will have all permissions

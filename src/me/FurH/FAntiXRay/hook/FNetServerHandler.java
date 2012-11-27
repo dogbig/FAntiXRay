@@ -197,6 +197,6 @@ public class FNetServerHandler extends FNetServerProxy {
         Checksum checksum = new CRC32();
         checksum.reset();
         checksum.update(data, 0, size);
-        return (long) checksum.getValue();
+        return checksum.getValue();
     }
 }

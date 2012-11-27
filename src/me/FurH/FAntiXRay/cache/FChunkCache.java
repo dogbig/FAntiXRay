@@ -22,7 +22,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.configuration.FConfiguration;
 import net.minecraft.server.World;
 
 /**
@@ -31,40 +35,57 @@ import net.minecraft.server.World;
  */
 public class FChunkCache {
 
-    public byte[] read(World world, int x1, int z1, long hash1, int engine1) {        
-        File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName());
+    public byte[] read(World world, int x1, int z1, long hash1, int engine1) {
+        File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x1 >> 5) + "." + (z1 >> 5));
+        FConfiguration config = FAntiXRay.getConfiguration();
         if (!dir.exists()) { return null; }
-        
-        File file = new File(dir, "r." + x1 + "." + z1 + ".fx");
+
+        File file = new File(dir, "r." + x1 + "." + z1 + ".udat");
+
+        if (config.compress_level > 0) {
+            file = new File(dir, "r." + x1 + "." + z1 + ".cdat");
+        }
+
         byte[] data = null;
-        
+
         try {
             if (!file.exists()) { return null; }
 
             FileInputStream fis = new FileInputStream(file);
-            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            ZipInputStream zis = null;
+            ObjectInputStream ois = null;
+
+            if (config.compress_level > 0) {
+                zis = new ZipInputStream(fis);
+                zis.getNextEntry();
+                ois = new ObjectInputStream(zis);
+            } else {
+                ois = new ObjectInputStream(fis);
+            }
 
             int engine = ois.readInt();
             if (engine != engine1) {
                 return null;
             }
-            
+
             int x = ois.readInt();
             int z = ois.readInt();
 
             if (x != x1 || z != z1) {
                 return null;
             }
-            
+
             long hash = ois.readLong();
             if (hash != hash1) {
                 return null;
             }
-            
+
             data = (byte[]) ois.readObject();
 
-            fis.close();
             ois.close();
+            if (zis != null) { zis.close(); }
+            fis.close();
         } catch (IOException | ClassNotFoundException ex) {
             FAntiXRay.getCommunicator().error("[TAG] Error while reading the data file: {0}", ex, ex.getMessage());
         }
@@ -72,21 +93,34 @@ public class FChunkCache {
     }
     
     public void write(World world, int x, int z, byte[] obfuscated, long hash, int engine) {        
-        File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName());
+        File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x >> 5) + "." + (z >> 5));
+        FConfiguration config = FAntiXRay.getConfiguration();
         if (!dir.exists()) { dir.mkdirs(); }
 
-        File file = new File(dir, "r." + x + "." + z + ".fx");
+        File file = new File(dir, "r." + x + "." + z + ".udat");
+
+        if (config.compress_level > 0) {
+            file = new File(dir, "r." + x + "." + z + ".cdat");
+        }        
 
         try {
-            if (!file.exists()) { 
-                file.createNewFile(); 
-            } else {
+            if (!file.createNewFile()) { 
                 file.delete();
                 file.createNewFile(); 
             }
 
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            FileOutputStream fos = new FileOutputStream(file);         
+            ObjectOutputStream oos = null;
+            ZipOutputStream zos = null;
+            
+            if (config.compress_level > 0) {
+                zos = new ZipOutputStream(fos);
+                zos.setLevel(config.compress_level);
+                zos.putNextEntry(new ZipEntry("c." + x + "." + z + ".chunk"));
+                oos = new ObjectOutputStream(zos);
+            } else {
+                oos = new ObjectOutputStream(fos);
+            }
 
             oos.writeInt(engine);
             oos.writeInt(x);
@@ -95,6 +129,7 @@ public class FChunkCache {
             oos.writeObject(obfuscated);
 
             oos.close();
+            if (zos != null) { zos.close(); }
             fos.close();
         } catch (IOException ex) {
             FAntiXRay.getCommunicator().error("[TAG] Error while writing the data file: {0}", ex, ex.getMessage());

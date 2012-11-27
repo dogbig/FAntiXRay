@@ -81,7 +81,10 @@ public class FAntiXRay extends JavaPlugin {
         pm.registerEvents(new FPlayerListener(), this);
         pm.registerEvents(new FBlockListener(), this);
 
-        FCacheQueue.queue();
+        if (configuration.enable_cache) {
+            FCacheQueue.queue();
+        }
+
         startMetrics();
         
         if (configuration.updates) {
@@ -89,7 +92,9 @@ public class FAntiXRay extends JavaPlugin {
         }
 
         files = 0; size = 0;
-        getCacheSizeTask();
+        if (configuration.size_limit > 0) { 
+            getCacheSizeTask();
+        }
 
         getCacheSize();
 
@@ -172,7 +177,7 @@ public class FAntiXRay extends JavaPlugin {
     }
     
     public boolean hasPerm(CommandSender sender, String perm) {
-        if ((perm == null) || (perm.equals(""))) {
+        if ((perm == null) || (perm.isEmpty())) {
             return true;
         } else {
             if (!(sender instanceof Player)) {

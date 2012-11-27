@@ -40,6 +40,7 @@ public class FConfiguration {
     public boolean          enable_cache = true;
     public int              size_limit = 1024;
     public int              writes_sec = 10;
+    public int              compress_level = 1;
 
     public boolean          ophasperm = true;
 
@@ -67,7 +68,8 @@ public class FConfiguration {
         enable_cache    = getBoolean("Cache.Enabled");
         size_limit      = getInteger("Cache.SizeLimit");
         writes_sec      = getInteger("Cache.WritesPerSec");
-        
+        compress_level  = getInteger("Cache.Compress.Level");
+
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
         updates         = getBoolean("Updater.Enabled");
