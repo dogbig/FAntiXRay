@@ -69,6 +69,10 @@ public class FConfiguration {
         size_limit      = getInteger("Cache.SizeLimit");
         writes_sec      = getInteger("Cache.WritesPerSec");
         compress_level  = getInteger("Cache.Compress.Level");
+        if (compress_level > 9) {
+            com.log("[TAG] The compression level can't be higher than 9!");
+            compress_level = 9;
+        }
 
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
