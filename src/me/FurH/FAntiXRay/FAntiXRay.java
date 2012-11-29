@@ -27,6 +27,7 @@ import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.listener.FBlockListener;
+import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
@@ -78,8 +79,14 @@ public class FAntiXRay extends JavaPlugin {
         messages.load();
 
         PluginManager pm = getServer().getPluginManager();
+        if (configuration.block_explosion) {
+            pm.registerEvents(new FEntityListener(), this);
+        }
+
+        FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
-        pm.registerEvents(new FBlockListener(), this);
+        pm.registerEvents(blockListener, this);
+        blockListener.loadListeners(this);
 
         if (configuration.enable_cache) {
             FCacheQueue.queue();

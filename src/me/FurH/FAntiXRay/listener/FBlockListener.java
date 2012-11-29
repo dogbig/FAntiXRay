@@ -1,19 +1,20 @@
 package me.FurH.FAntiXRay.listener;
 
-import java.util.ArrayList;
-import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import net.minecraft.server.WorldServer;
-import org.bukkit.Location;
+import me.FurH.FAntiXRay.update.FBlockUpdate;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.plugin.PluginManager;
 
 /**
  *
@@ -21,40 +22,81 @@ import org.bukkit.event.block.BlockBreakEvent;
  */
 public class FBlockListener implements Listener {
     
+    public void loadListeners(FAntiXRay plugin) {
+        FConfiguration config = FAntiXRay.getConfiguration();
+        
+        PluginManager pm = plugin.getServer().getPluginManager();
+        if (config.block_place) {
+            pm.registerEvents(new FBlockPlace(), plugin);
+        }
+        
+        if (config.block_damage) {
+            pm.registerEvents(new FBlockDamage(), plugin);
+        }
+        
+        if (config.block_piston) {
+            pm.registerEvents(new FBlockPiston(), plugin);
+        }
+        
+        if (config.block_physics) {
+            pm.registerEvents(new FBlockPhysics(), plugin);
+        }
+    }
+    
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) { return; }
 
-        Player player = e.getPlayer();
-        Location location = e.getBlock().getLocation();
-        FConfiguration config = FAntiXRay.getConfiguration();
+        FBlockUpdate.update(e.getBlock(), false);
+    }
+    
+    public class FBlockPlace implements Listener {
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+        public void onBlockPlace(BlockPlaceEvent e) {
+            if (e.isCancelled()) { return; }
 
-        if (config.disabled_worlds.contains(player.getWorld().getName())) {
-            return;
+            FBlockUpdate.update(e.getBlock(), false);
         }
-
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
-        int radius = config.update_radius;
-
-        int engine_mode = config.engine_mode;
-
-        for (int a = x-radius; a <= x + radius; a++) {
-            for (int b = y-radius; b <= y + radius; b++) {
-                for (int c = z-radius; c <= z + radius; c++) {
-                    if (a == x && b == y && c == z) { continue; }
-                    Block block = location.getWorld().getBlockAt(a, b, c);
-                    WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
-                    if (engine_mode == 0 || engine_mode == 1) {
-                        if (config.hidden_blocks.contains(block.getTypeId())) {
-                            worldServer.notify(a, b, c);
-                        }
-                    } else {
-                        worldServer.notify(a, b, c);
-                    }
-                }
+    }
+    
+    public class FBlockDamage implements Listener {
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+        public void onBlockDamage(BlockDamageEvent e) {
+            if (e.isCancelled()) { return; }
+            
+            FBlockUpdate.update(e.getBlock(), false);
+        }
+    }
+    
+    public class FBlockPiston implements Listener {
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+        public void onBlockPistonExtend(BlockPistonExtendEvent e) {
+            if (e.isCancelled()) { return; }
+            
+            for (Block b : e.getBlocks()) {
+                FBlockUpdate.update(b, true);
+            }
+        }
+        
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+        public void onBlockPistonRetract(BlockPistonRetractEvent e) {
+            if (e.isCancelled()) { return; }
+            
+            if (e.isSticky()) {
+                FBlockUpdate.update(e.getBlock(), false);
+            }
+        }
+    }
+    
+    public class FBlockPhysics implements Listener {
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+        public void onBlockPhysics(BlockPhysicsEvent e) {
+            if (e.isCancelled()) { return; }
+            
+            if (e.getBlock().getType() == Material.GRAVEL || e.getBlock().getType() == Material.SAND) {
+                FBlockUpdate.update(e.getBlock(), true);
             }
         }
     }
 }
+    

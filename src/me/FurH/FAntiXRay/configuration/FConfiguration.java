@@ -37,6 +37,12 @@ public class FConfiguration {
     public int              engine_mode = 1;
     public int              update_radius = 1;
 
+    public boolean          block_place = false;
+    public boolean          block_explosion = false;
+    public boolean          block_damage = false;
+    public boolean          block_piston = false;
+    public boolean          block_physics = false;
+    
     public boolean          enable_cache = true;
     public int              size_limit = 1024;
     public int              writes_sec = 10;
@@ -64,7 +70,13 @@ public class FConfiguration {
             com.log("[TAG] Update Radius can't be higher than 5!");
             update_radius = 5;
         }
-        
+
+        block_place = getBoolean("UpdateEvents.onBlockPlace");
+        block_explosion = getBoolean("UpdateEvents.onBlockExplosion");
+        block_damage = getBoolean("UpdateEvents.onBlockDamage");
+        block_piston = getBoolean("UpdateEvents.onBlockPiston");
+        block_physics = getBoolean("UpdateEvents.onBlockPhysics");
+
         enable_cache    = getBoolean("Cache.Enabled");
         size_limit      = getInteger("Cache.SizeLimit");
         writes_sec      = getInteger("Cache.WritesPerSec");

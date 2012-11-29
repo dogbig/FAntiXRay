@@ -4,6 +4,21 @@ Options:
   ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1
 
+## Set which events will be used to update the blocks (Deobfuscate)
+## OnBlockBreak is enabled by default and cannot be disabled, those are just extra!
+## More events will use more resources, but will prevent blocks from not being deobfuscated.
+UpdateEvents:
+  ## Update blocks when player put a block
+  onBlockPlace: false
+  ## Update blocks on explosion
+  onBlockExplosion: false
+  ## Update blocks on damage
+  onBlockDamage: false
+  ## Update blocks when piston moves them
+  onBlockPiston: false
+  ## Update blocks on physics
+  onBlockPhysics: false
+
 Cache:
   ## Enabled, if true, the cache system will be activated
   Enabled: true
