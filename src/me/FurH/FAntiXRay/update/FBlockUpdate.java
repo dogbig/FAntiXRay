@@ -31,6 +31,7 @@ import org.bukkit.entity.Player;
  */
 public class FBlockUpdate {
 
+    /* TODO: BETTER BLOCK UPDATE */
     public static void update(Block block, boolean explosion) {
         Location location = block.getLocation();
         FConfiguration config = FAntiXRay.getConfiguration();
@@ -38,12 +39,12 @@ public class FBlockUpdate {
         if (config.disabled_worlds.contains(block.getWorld().getName())) {
             return;
         }
-        
+
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
         int radius = config.update_radius;
-        
+
         if (explosion) {
             radius = 1;
         }
