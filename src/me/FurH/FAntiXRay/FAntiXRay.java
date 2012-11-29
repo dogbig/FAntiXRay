@@ -213,6 +213,21 @@ public class FAntiXRay extends JavaPlugin {
     private int engine0 = 0;
     private int engine1 = 0;
     private int engine2 = 0;
+    
+    private int up0 = 0;
+    private int up1 = 0;
+    private int up2 = 0;
+    private int up3 = 0;
+    
+    private int blockplace = 0;
+    private int explosion = 0;
+    private int damage = 0;
+    private int piston = 0;
+    private int physics = 0;
+    
+    private int cached = 0;
+    private int uncompressed = 0;
+    private int compressed = 0;
     private void startMetrics() {
         try {
             FMetrics metrics = new FMetrics(this);
@@ -258,7 +273,156 @@ public class FAntiXRay extends JavaPlugin {
                     return engine2;
                 }
             });
+            
+            if (configuration.update_radius == 0) {
+                up3++;
+            }
+            
+            if (configuration.update_radius == 1) {
+                up0++;
+            }
+            
+            if (configuration.update_radius == 2) {
+                up1++;
+            }
+            
+            if (configuration.update_radius == 3) {
+                up2++;
+            }
+            
+            Graph upa = metrics.createGraph("Update Radius");
+            upa.addPlotter(new FMetrics.Plotter("Update Radius 1") {
+                @Override
+                public int getValue() {
+                    return up0;
+                }
+            });
+            
+            upa.addPlotter(new FMetrics.Plotter("Update Radius 2") {
+                @Override
+                public int getValue() {
+                    return up1;
+                }
+            });
+            
+            upa.addPlotter(new FMetrics.Plotter("Update Radius 3") {
+                @Override
+                public int getValue() {
+                    return up2;
+                }
+            });
+            
+            upa.addPlotter(new FMetrics.Plotter("Update Radius 0") {
+                @Override
+                public int getValue() {
+                    return up3;
+                }
+            });
+            
+            if (configuration.block_place) {
+                blockplace++;
+            }
+            
+            Graph update = metrics.createGraph("Update On");
+            update.addPlotter(new FMetrics.Plotter("Block Place") {
+                @Override
+                public int getValue() {
+                    return blockplace;
+                }
+            });
+            
+            if (configuration.block_explosion) {
+                explosion++;
+            }
+            
+            update.addPlotter(new FMetrics.Plotter("Explosion") {
+                @Override
+                public int getValue() {
+                    return explosion;
+                }
+            });
+            
+            if (configuration.block_damage) {
+                damage++;
+            }
+            
+            update.addPlotter(new FMetrics.Plotter("Block Damage") {
+                @Override
+                public int getValue() {
+                    return damage;
+                }
+            });
+            
+            if (configuration.block_piston) {
+                piston++;
+            }
+            
+            update.addPlotter(new FMetrics.Plotter("Block Piston") {
+                @Override
+                public int getValue() {
+                    return piston;
+                }
+            });
+            
+            if (configuration.block_physics) {
+                physics++;
+            }
+            
+            update.addPlotter(new FMetrics.Plotter("Block Physics") {
+                @Override
+                public int getValue() {
+                    return physics;
+                }
+            });
+            
+            if (configuration.enable_cache) {
+                cached++;
+            }
+            
+            Graph cachex = metrics.createGraph("Cache System");
+            cachex.addPlotter(new FMetrics.Plotter("Cache Enabled") {
+                @Override
+                public int getValue() {
+                    return cached;
+                }
+            });
 
+            cachex.addPlotter(new FMetrics.Plotter("Cache Disabled") {
+                @Override
+                public int getValue() {
+                    int uncached = 0;
+                    
+                    if (cached == 0) {
+                        uncached++;
+                    }
+
+                    return uncached;
+                }
+            });
+            
+            if (configuration.compress_level > 0) {
+                compressed++;
+            }
+            
+            Graph cachexc = metrics.createGraph("Cache Compression");
+            cachexc.addPlotter(new FMetrics.Plotter("Compressed") {
+                @Override
+                public int getValue() {
+                    return compressed;
+                }
+            });
+            
+            if (configuration.compress_level < 0) {
+                uncompressed++;
+            }
+            
+            cachexc.addPlotter(new FMetrics.Plotter("Uncompressed") {
+                @Override
+                public int getValue() {
+                    return uncompressed;
+                }
+            });
+ 
             metrics.start();
         } catch (IOException e) {
         }

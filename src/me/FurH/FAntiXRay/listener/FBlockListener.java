@@ -4,7 +4,6 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,7 +20,7 @@ import org.bukkit.plugin.PluginManager;
  * @author FurmigaHumana
  */
 public class FBlockListener implements Listener {
-    
+
     public void loadListeners(FAntiXRay plugin) {
         FConfiguration config = FAntiXRay.getConfiguration();
         
@@ -55,7 +54,7 @@ public class FBlockListener implements Listener {
         public void onBlockPlace(BlockPlaceEvent e) {
             if (e.isCancelled()) { return; }
 
-            FBlockUpdate.update(e.getBlock(), false);
+            FBlockUpdate.update(e.getBlock(), true);
         }
     }
     
@@ -64,7 +63,7 @@ public class FBlockListener implements Listener {
         public void onBlockDamage(BlockDamageEvent e) {
             if (e.isCancelled()) { return; }
             
-            FBlockUpdate.update(e.getBlock(), false);
+            FBlockUpdate.update(e.getBlock(), true);
         }
     }
     
@@ -73,9 +72,7 @@ public class FBlockListener implements Listener {
         public void onBlockPistonExtend(BlockPistonExtendEvent e) {
             if (e.isCancelled()) { return; }
             
-            for (Block b : e.getBlocks()) {
-                FBlockUpdate.update(b, true);
-            }
+            FBlockUpdate.update(e.getBlocks());
         }
         
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
@@ -83,7 +80,7 @@ public class FBlockListener implements Listener {
             if (e.isCancelled()) { return; }
             
             if (e.isSticky()) {
-                FBlockUpdate.update(e.getBlock(), false);
+                FBlockUpdate.update(e.getBlock(), true);
             }
         }
     }

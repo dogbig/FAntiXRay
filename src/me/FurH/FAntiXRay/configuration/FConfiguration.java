@@ -34,26 +34,26 @@ import org.bukkit.configuration.file.YamlConfiguration;
  * @author FurmigaHumana
  */
 public class FConfiguration {
-    public int              engine_mode = 1;
-    public int              update_radius = 1;
+    public int              engine_mode     = 1;
+    public int              update_radius   = 1;
 
-    public boolean          block_place = false;
+    public boolean          block_place     = false;
     public boolean          block_explosion = false;
-    public boolean          block_damage = false;
-    public boolean          block_piston = false;
-    public boolean          block_physics = false;
+    public boolean          block_damage    = false;
+    public boolean          block_piston    = false;
+    public boolean          block_physics   = false;
     
-    public boolean          enable_cache = true;
-    public int              size_limit = 1024;
-    public int              writes_sec = 10;
-    public int              compress_level = 1;
+    public boolean          enable_cache    = true;
+    public int              size_limit      = 1024;
+    public int              writes_sec      = 10;
+    public int              compress_level  = 1;
 
-    public boolean          ophasperm = true;
+    public boolean          ophasperm       = true;
 
-    public boolean          updates = true;
+    public boolean          updates         = true;
 
-    public Integer[]        random_blocks = new Integer[] { };
-    public HashSet<Integer> hidden_blocks = new HashSet<>();
+    public Integer[]        random_blocks   = new Integer[] { };
+    public HashSet<Integer> hidden_blocks   = new HashSet<>();
 
     public HashSet<String>  disabled_worlds = new HashSet<>();
 
@@ -66,16 +66,16 @@ public class FConfiguration {
         }
         
         update_radius   = getInteger("Options.UpdateRadius");
-        if (update_radius > 5) {
-            com.log("[TAG] Update Radius can't be higher than 5!");
-            update_radius = 5;
+        if (update_radius > 3) {
+            com.log("[TAG] Update Radius can't be higher than 3!");
+            update_radius = 3;
         }
 
-        block_place = getBoolean("UpdateEvents.onBlockPlace");
+        block_place     = getBoolean("UpdateEvents.onBlockPlace");
         block_explosion = getBoolean("UpdateEvents.onBlockExplosion");
-        block_damage = getBoolean("UpdateEvents.onBlockDamage");
-        block_piston = getBoolean("UpdateEvents.onBlockPiston");
-        block_physics = getBoolean("UpdateEvents.onBlockPhysics");
+        block_damage    = getBoolean("UpdateEvents.onBlockDamage");
+        block_piston    = getBoolean("UpdateEvents.onBlockPiston");
+        block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
 
         enable_cache    = getBoolean("Cache.Enabled");
         size_limit      = getInteger("Cache.SizeLimit");

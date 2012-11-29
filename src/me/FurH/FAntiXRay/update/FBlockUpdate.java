@@ -16,14 +16,14 @@
 
 package me.FurH.FAntiXRay.update;
 
+import java.util.HashSet;
+import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import net.minecraft.server.WorldServer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.Player;
 
 /**
  *
@@ -31,8 +31,29 @@ import org.bukkit.entity.Player;
  */
 public class FBlockUpdate {
 
-    /* TODO: BETTER BLOCK UPDATE */
-    public static void update(Block block, boolean explosion) {
+    public static void update(List<Block> blocks) {
+        HashSet<Integer[]> hash = new HashSet<>();
+
+        if (blocks.isEmpty()) { return; }
+
+        for (Block block : blocks) {
+            if (block.getTypeId() != 0) {
+                HashSet<Integer[]> bls = getBlocks(block.getLocation(), 1);
+                for (Integer[] ints : bls) {
+                    if (!hash.contains(ints)) {
+                        hash.add(ints);
+                    }
+                }
+            }
+        }
+
+        WorldServer worldServer = ((CraftWorld) blocks.get(0).getWorld()).getHandle();
+        for (Integer[] data : hash) {
+            worldServer.notify(data[0], data[1], data[2]);
+        }
+    }
+    
+    public static void update(Block block, boolean fast) {        
         Location location = block.getLocation();
         FConfiguration config = FAntiXRay.getConfiguration();
 
@@ -40,53 +61,95 @@ public class FBlockUpdate {
             return;
         }
 
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
         int radius = config.update_radius;
-
-        if (explosion) {
+        if (fast) {
             radius = 1;
         }
 
-        int engine_mode = FAntiXRay.getConfiguration().engine_mode;
-
         WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
-        
-        for (int a = x-radius; a <= x + radius; a++) {
-            for (int b = y-radius; b <= y + radius; b++) {
-                for (int c = z-radius; c <= z + radius; c++) {
-                    if (a == x && b == y && c == z) { continue; }
-                    
-                    Block block2 = block.getWorld().getBlockAt(a, b, c);
 
-                    if (engine_mode == 0 || engine_mode == 1) {
-                        if (FAntiXRay.getConfiguration().hidden_blocks.contains(block2.getTypeId())) {
-                            if (engine_mode == 0) {
-                                if (radius <= 1 & !explosion) {
-                                    worldServer.notify(a, b, c);
-                                } else {
-                                    for (Player p : Bukkit.getOnlinePlayers()) {
-                                        if (p.getLocation().distance(block2.getLocation()) <= 180) {
-                                            p.sendBlockChange(block2.getLocation(), block2.getType(), block2.getData());
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if (radius <= 1 & !explosion) {
-                            worldServer.notify(a, b, c);
-                        } else {
-                            for (Player p : Bukkit.getOnlinePlayers()) {
-                                if (p.getLocation().distance(block2.getLocation()) <= 180) {
-                                    p.sendBlockChange(block2.getLocation(), block2.getType(), block2.getData());
-                                }
-                            }
-                        }
-                    }
-                }
+        HashSet<Integer[]> blocks = getBlocks(location, radius);
+        if (!blocks.isEmpty()) {
+            for (Integer[] data : blocks) {
+                worldServer.notify(data[0], data[1], data[2]);
             }
         }
+    }
+    
+    private static HashSet<Integer[]> getBlocks(Location loc, int radius) {
+        HashSet<Integer[]> blocks = new HashSet<>();
+
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int z = loc.getBlockZ();
+
+        /*
+         * old school but efficient! Rather than making a loop, with this I only get the blocks I want.
+         */
+        if (radius >= 1) {
+            blocks.add(newInt(x + 1, y - 1, z));
+            blocks.add(newInt(x - 1, y - 1, z));
+            blocks.add(newInt(x, y - 1, z));
+            blocks.add(newInt(x, y - 1, z + 1));
+            blocks.add(newInt(x, y - 1, z - 1));
+        }
+
+        if (radius >= 2) {
+            blocks.add(newInt(x + 1, y - 2, z));
+            blocks.add(newInt(x - 1, y - 2, z));
+            blocks.add(newInt(x, y - 2, z));
+            blocks.add(newInt(x, y - 2, z + 1));
+            blocks.add(newInt(x, y - 2, z - 1));
+            
+            blocks.add(newInt(x, y - 1, z));
+            blocks.add(newInt(x, y - 1, z - 1));
+            blocks.add(newInt(x, y - 1, z + 1));
+            
+            blocks.add(newInt(x + 2, y, z));
+            blocks.add(newInt(x - 2, y, z));
+            blocks.add(newInt(x, y, z + 2));
+            blocks.add(newInt(x, y, z - 2));
+ 
+            blocks.add(newInt(x + 1, y, z + 1));
+            blocks.add(newInt(x - 1, y, z + 1));
+            blocks.add(newInt(x + 1, y , z - 1));
+            blocks.add(newInt(x - 1, y, z - 1));
+            
+            blocks.add(newInt(x + 1, y - 1, z + 1));
+            blocks.add(newInt(x - 1, y - 1, z + 1));
+            blocks.add(newInt(x + 1, y - 1 , z - 1));
+            blocks.add(newInt(x - 1, y - 1, z - 1));
+            
+            blocks.add(newInt(x + 1, y + 1, z + 1));
+            blocks.add(newInt(x - 1, y + 1, z + 1));
+            blocks.add(newInt(x + 1, y + 1, z - 1));
+            blocks.add(newInt(x - 1, y + 1, z - 1));
+            blocks.add(newInt(x + 2, y + 1, z));
+            blocks.add(newInt(x - 2, y + 1, z));
+            blocks.add(newInt(x, y + 1, z + 2));
+            blocks.add(newInt(x, y + 1, z - 2));
+            blocks.add(newInt(x, y + 2, z - 1));
+            blocks.add(newInt(x, y + 2, z + 1));
+            blocks.add(newInt(x + 1, y + 2, z));
+            blocks.add(newInt(x - 1, y + 2, z));
+        }
+
+        if (radius >= 3) {
+            blocks.add(newInt(x + 2, y - 1, z));
+            blocks.add(newInt(x - 2, y - 1, z));
+            blocks.add(newInt(x, y - 1, z + 2));
+            blocks.add(newInt(x, y - 1, z - 2));
+            
+            blocks.add(newInt(x + 1, y - 1, z + 1));
+            blocks.add(newInt(x - 1, y - 1, z + 1));
+            blocks.add(newInt(x + 1, y - 1 , z - 1));
+            blocks.add(newInt(x - 1, y - 1, z - 1));
+        }
+        
+        return blocks;
+    }
+    
+    private static Integer[] newInt(int x, int y, int z) {
+        return new Integer[] { x, y, z };
     }
 }

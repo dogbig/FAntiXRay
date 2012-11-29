@@ -17,7 +17,6 @@
 package me.FurH.FAntiXRay.listener;
 
 import me.FurH.FAntiXRay.update.FBlockUpdate;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,9 +31,7 @@ public class FEntityListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onEntityExplode(EntityExplodeEvent e) {
         if (e.isCancelled()) { return; }
-
-        for (Block b : e.blockList()) {
-            FBlockUpdate.update(b, true);
-        }
+        
+        FBlockUpdate.update(e.blockList());
     }
 }
