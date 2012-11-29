@@ -16,8 +16,6 @@
 
 package me.FurH.FAntiXRay;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -33,12 +31,7 @@ import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.util.FCommunicator;
-import net.minecraft.server.NBTCompressedStreamTools;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.RegionFile;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -109,7 +102,6 @@ public class FAntiXRay extends JavaPlugin {
 
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Enabled");
-        //genCache();
     }
 
     @Override
@@ -121,48 +113,6 @@ public class FAntiXRay extends JavaPlugin {
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");
     }
-    
-    /*protected void genCache() {
-        for (World w : Bukkit.getWorlds()) {
-            File folder = new File(w.getWorldFolder() + File.separator + "region");
-            if (folder.exists() && folder.listFiles().length > 0) {
-                for (File file : folder.listFiles()) {
-                    if (file.getName().contains(".mca")) {
-                        String[] name = file.getName().split("\\.");
-
-                        int x = Integer.parseInt(name[1]);
-                        int z = Integer.parseInt(name[2]);
-
-                        int lock = 0;
-
-                        int cx = 0;
-                        int cz = 0;
-
-                        while (lock != 1023) {
-                            cx++;
-
-                            if (cx == 32) {
-                                cx = 0;
-                                cz++;
-                            }
-                            
-                            lock++;
-                            
-                            int wx = ((x << 4) + cx);
-                            int wz = ((z << 4) + cz);
-                            
-                            Location loc = new Location(w, wx, 60, wz);
-                            Chunk chunk = loc.getChunk();
-                            
-                            if (chunk != null) {
-                                System.out.println("CX: " + cx + ", CZ: " + cz + ", WX: " + wx + ", WZ: " + wz + " ChunkZ: " + chunk.getZ() + ", ChunkX: " + chunk.getX());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 
     public void getCacheSizeTask() {
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
