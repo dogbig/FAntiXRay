@@ -50,12 +50,11 @@ public class FChunkCache {
 
         try {
             if (!file.exists()) { return null; }
-
+            
             FileInputStream fis = new FileInputStream(file);
-
             ZipInputStream zis = null;
             ObjectInputStream ois = null;
-
+        
             if (config.compress_level > 0) {
                 zis = new ZipInputStream(fis);
                 zis.getNextEntry();
@@ -83,9 +82,17 @@ public class FChunkCache {
 
             data = (byte[]) ois.readObject();
 
+            if (zis != null) {
+                zis.closeEntry();
+                zis.close();
+            }
+
             ois.close();
-            if (zis != null) { zis.close(); }
             fis.close();
+            
+            ois = null;
+            zis = null;
+            fis = null;
         } catch (IOException | ClassNotFoundException ex) {
             FAntiXRay.getCommunicator().error("[TAG] Error while reading the data file: {0}", ex, ex.getMessage());
         }
@@ -112,7 +119,7 @@ public class FChunkCache {
             FileOutputStream fos = new FileOutputStream(file);         
             ObjectOutputStream oos = null;
             ZipOutputStream zos = null;
-            
+        
             if (config.compress_level > 0) {
                 zos = new ZipOutputStream(fos);
                 zos.setLevel(config.compress_level);
@@ -128,9 +135,17 @@ public class FChunkCache {
             oos.writeLong(hash);
             oos.writeObject(obfuscated);
 
+            if (zos != null) { 
+                zos.closeEntry();
+                zos.close(); 
+            }
+            
             oos.close();
-            if (zos != null) { zos.close(); }
             fos.close();
+            
+            oos = null;
+            zos = null;
+            fos = null;
         } catch (IOException ex) {
             FAntiXRay.getCommunicator().error("[TAG] Error while writing the data file: {0}", ex, ex.getMessage());
         }
