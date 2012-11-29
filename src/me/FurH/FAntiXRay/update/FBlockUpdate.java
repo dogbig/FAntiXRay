@@ -67,7 +67,7 @@ public class FBlockUpdate {
                                     worldServer.notify(a, b, c);
                                 } else {
                                     for (Player p : Bukkit.getOnlinePlayers()) {
-                                        if (p.getLocation().distance(block2.getLocation()) <= 100) {
+                                        if (p.getLocation().distance(block2.getLocation()) <= 180) {
                                             p.sendBlockChange(block2.getLocation(), block2.getType(), block2.getData());
                                         }
                                     }
@@ -79,7 +79,7 @@ public class FBlockUpdate {
                             worldServer.notify(a, b, c);
                         } else {
                             for (Player p : Bukkit.getOnlinePlayers()) {
-                                if (p.getLocation().distance(block2.getLocation()) <= 100) {
+                                if (p.getLocation().distance(block2.getLocation()) <= 180) {
                                     p.sendBlockChange(block2.getLocation(), block2.getType(), block2.getData());
                                 }
                             }
