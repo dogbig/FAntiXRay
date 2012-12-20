@@ -36,6 +36,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class FConfiguration {
     public int              engine_mode     = 1;
     public int              update_radius   = 1;
+    
+    public boolean          dark_enabled    = false;
+    public boolean          dark_only       = true;
+    public int              dark_radius     = 8;
+    public HashSet<Integer> dark_blocks     = new HashSet<>();
 
     public boolean          block_place     = false;
     public boolean          block_explosion = false;
@@ -70,6 +75,11 @@ public class FConfiguration {
             com.log("[TAG] Update Radius can't be higher than 3!");
             update_radius = 3;
         }
+        
+        dark_enabled    = getBoolean("Darkness.Enabled");
+        dark_only       = getBoolean("Darkness.BrightOnly");
+        dark_radius     = getInteger("Darkness.BrightRadius");
+        dark_blocks     = getIntegerHash("Darkness.UpdateOn");
 
         block_place     = getBoolean("UpdateEvents.onBlockPlace");
         block_explosion = getBoolean("UpdateEvents.onBlockExplosion");
@@ -94,6 +104,9 @@ public class FConfiguration {
         Arrays.sort(random_blocks);
         
         hidden_blocks   = getIntegerHash("Lists.HiddenBlocks");
+        if (hidden_blocks.contains(63)) { hidden_blocks.remove(63); }
+        if (hidden_blocks.contains(68)) { hidden_blocks.remove(68); }
+        
         disabled_worlds = getStringHash("Lists.DisabledWorlds");
     }
     

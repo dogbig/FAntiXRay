@@ -7,47 +7,46 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.util.FUtil;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.NetServerHandler;
-import net.minecraft.server.Packet;
-import net.minecraft.server.Packet51MapChunk;
-import net.minecraft.server.Packet56MapChunkBulk;
-import net.minecraft.server.World;
+import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_6.INetworkManager;
+import net.minecraft.server.v1_4_6.MinecraftServer;
+import net.minecraft.server.v1_4_6.Packet;
+import net.minecraft.server.v1_4_6.Packet51MapChunk;
+import net.minecraft.server.v1_4_6.Packet56MapChunkBulk;
+import net.minecraft.server.v1_4_6.World;
 
 /**
  *
  * @author FurmigaHumana
  */
-public class FNetServerHandler extends FNetServerProxy {
+public class FNetObfuscation extends FPlayerConnection {
     
-    public FNetServerHandler(MinecraftServer minecraftserver, NetServerHandler instance) {
-        super(minecraftserver, instance);
+    public FNetObfuscation(MinecraftServer minecraftserver, INetworkManager inetworkmanager, EntityPlayer entityplayer) {
+        super(minecraftserver, inetworkmanager, entityplayer);
     }
     
     @Override
     public void sendPacket(Packet packet) {
         if (packet instanceof Packet56MapChunkBulk) {
             obfuscate((Packet56MapChunkBulk)packet);
-        } else {
-            if (packet instanceof Packet51MapChunk) {
-                Packet51MapChunk px = (Packet51MapChunk)packet;
-                if (px.c != 0 && px.d != 0) {
-                    FAntiXRay.log.severe("[FAntiXRay]: Packet51MapChunk was used! Alert the developer!");
-                    return;
-                }
-            }
-            super.sendPacket(packet);
         }
+        if (packet instanceof Packet51MapChunk) {
+            Packet51MapChunk p51 = (Packet51MapChunk)packet;
+            if (p51.c != 0 && p51.d != 0) {
+                System.out.println("Packet 51");
+            }
+        }
+        super.sendPacket(packet);
     }
 
-    private void obfuscate(Packet56MapChunkBulk packet) {        
-        NetServerHandler netServerHandler = player.netServerHandler;
-        if (netServerHandler.disconnected) {
+    private void obfuscate(Packet56MapChunkBulk packet) {
+
+        if (getPrivate(packet, "buffer") != null) {
             return;
         }
-        
+
         if (FAntiXRay.getConfiguration().disabled_worlds.contains(player.world.getWorld().getName())) {
-            super.sendPacket(packet);
+            return;
         }
 
         FChunkCache cache = FAntiXRay.getCache();
@@ -66,11 +65,10 @@ public class FNetServerHandler extends FNetServerProxy {
 
         int index = 0;
         for (int i = 0; i < packet.d(); i++) {
-
-            hash = getHash(inflatedBuffers[i], inflatedBuffers[i].length);
             byte[] obfuscated = null;
             
             if (usecache) {
+                hash = getHash(inflatedBuffers[i], inflatedBuffers[i].length);
                 obfuscated = cache.read(player.world, c[i], d[i], hash, engine_mode);
             }
 
@@ -96,56 +94,52 @@ public class FNetServerHandler extends FNetServerProxy {
 
             index += inflatedBuffers[i].length;
         }
-
-        super.sendPacket(packet);
     }
-    
-    private byte[] obfuscate(byte[] buffer, int a, int cx, int cz, int engine_mode) {
-        int c = 0;
-        
-        for (int i = 0; i < 16; i++) {
-            if (  (a & 1 << i) > 0  ) {
-                
-                int index = 0;
-                
-                for (int y = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int x = 0; x < 16; x++) {
-                            
-                            int wx = (cx << 4) + x;
-                            int wy = (i << 4) + y;
-                            int wz = (cz << 4) + z;
-                            
-                            int id = player.world.getTypeId(wx, wy, wz);
 
-                            if (engine_mode == 0) {
-                                if (FAntiXRay.getConfiguration().hidden_blocks.contains(id)) {
-                                    if (id != 63 && id != 68) {
-                                        buffer[(c * 4096) + index] = 1;
-                                    }
-                                }
-                            } else
-                            if (engine_mode == 1) {
-                                if (FAntiXRay.getConfiguration().hidden_blocks.contains(id)) {
-                                    if (id != 63 && id != 68) {
-                                        if (!isBlocksTransparent(player.world, wx, wy, wz)) {
-                                            buffer[(c * 4096) + index] = 1;
-                                        }
-                                    }
-                                }
-                            } else
-                            if (engine_mode == 2) {
-                                if (id != 63 && id != 68) {
-                                    if (!isBlocksTransparent(player.world, wx, wy, wz)) {
-                                        buffer[(c * 4096) + index] = (byte) FUtil.getRandom();
-                                    }
+    private byte[] obfuscate(byte[] buffer, int ca, int cx, int cz, int engine_mode) {
+        for (int i = 0; i < 16; i++) {
+
+            int index = 0;
+
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+
+                        int wx = (cx << 4) + x;
+                        int wy = (i << 4) + y;
+                        int wz = (cz << 4) + z;
+                        int dindex = (i * 4096) + index;
+
+                        int id = player.world.getTypeId(wx, wy, wz);
+                        //int light = player.world.getWorld().getHandle().getLightLevel(wx, wy, wz);
+                        //int light = player.world.getWorld().getBlockAt(wx, wy, wz).getLightLevel();
+
+                        /* 
+                         * TODO: FIND A WAY TO GET THE LIGHT LEVEL, getLightLevel ALWAYS RETURN 0
+                         */
+                        
+                        if (engine_mode == 0) {
+                            if (FAntiXRay.getConfiguration().hidden_blocks.contains(id)) {
+                                buffer[dindex] = 1;
+                            }
+                        } else
+                        if (engine_mode == 1) {
+                            if (FAntiXRay.getConfiguration().hidden_blocks.contains(id)) {
+                                if (!isBlocksTransparent(player.world, wx, wy, wz)) {
+                                    buffer[dindex] = 1;
                                 }
                             }
-                            index++;
+                        } else
+                        if (engine_mode == 2) {
+                            if (id != 63 && id != 68 && id != 0) {
+                                if (!isBlocksTransparent(player.world, wx, wy, wz)) {
+                                    buffer[dindex] = (byte) FUtil.getRandom();
+                                }
+                            }
                         }
+                        index++;
                     }
                 }
-                c++;
             }
         }
         return buffer;
@@ -175,7 +169,7 @@ public class FNetServerHandler extends FNetServerProxy {
     }
 
     private static boolean isBlockTransparent(World world, int x, int y, int z) {
-        if (!net.minecraft.server.Block.i(world.getTypeId(x, y, z))) {
+        if (!net.minecraft.server.v1_4_6.Block.i(world.getTypeId(x, y, z))) {
             return true;
         } else {
             return false;

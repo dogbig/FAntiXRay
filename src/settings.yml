@@ -4,6 +4,16 @@ Options:
   ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1
 
+Darkness:
+  ## Set to true to obfuscate everyblock that is in the darknesss (NOT WORKING)
+  Enabled: false
+  ## BrightOnly, if true, the block will be update only if it have a light level higher then 0
+  BrightOnly: true
+  ## BrightRadius, the radius around the light to be updated, Higher this value is, higher will be the cpu usage.
+  BrightRadius: 8
+  ## UpdateOn, the block id that will cast the update when placed
+  UpdateOn: 50, 51, 89
+
 ## Set which events will be used to update the blocks (Deobfuscate)
 ## OnBlockBreak is enabled by default and cannot be disabled, those are just extra!
 ## More events will use more resources, but will prevent blocks from not being deobfuscated.

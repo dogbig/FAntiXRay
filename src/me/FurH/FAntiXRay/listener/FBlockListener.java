@@ -23,11 +23,7 @@ public class FBlockListener implements Listener {
 
     public void loadListeners(FAntiXRay plugin) {
         FConfiguration config = FAntiXRay.getConfiguration();
-        
         PluginManager pm = plugin.getServer().getPluginManager();
-        if (config.block_place) {
-            pm.registerEvents(new FBlockPlace(), plugin);
-        }
         
         if (config.block_damage) {
             pm.registerEvents(new FBlockDamage(), plugin);
@@ -43,21 +39,26 @@ public class FBlockListener implements Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onBlockPlace(BlockPlaceEvent e) {
+        if (e.isCancelled()) { return; }
+        
+        FConfiguration config = FAntiXRay.getConfiguration();
+        if (config.block_place) {
+            FBlockUpdate.update(e.getBlock(), true);
+        }
+
+        if (config.dark_blocks.contains(e.getBlock().getTypeId())) {
+            FBlockUpdate.update(e.getBlock());
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) { return; }
 
         FBlockUpdate.update(e.getBlock(), false);
     }
-    
-    public class FBlockPlace implements Listener {
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
-        public void onBlockPlace(BlockPlaceEvent e) {
-            if (e.isCancelled()) { return; }
 
-            FBlockUpdate.update(e.getBlock(), true);
-        }
-    }
-    
     public class FBlockDamage implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
         public void onBlockDamage(BlockDamageEvent e) {
@@ -72,16 +73,14 @@ public class FBlockListener implements Listener {
         public void onBlockPistonExtend(BlockPistonExtendEvent e) {
             if (e.isCancelled()) { return; }
             
-            FBlockUpdate.update(e.getBlocks());
+            FBlockUpdate.update(e.getBlock().getWorld(), e.getBlocks());
         }
         
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
         public void onBlockPistonRetract(BlockPistonRetractEvent e) {
             if (e.isCancelled()) { return; }
-            
-            if (e.isSticky()) {
-                FBlockUpdate.update(e.getBlock(), true);
-            }
+
+            FBlockUpdate.update(e.getBlock(), true);
         }
     }
     

@@ -20,10 +20,12 @@ import java.util.HashSet;
 import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import net.minecraft.server.WorldServer;
+import net.minecraft.server.v1_4_6.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
 
 /**
  *
@@ -31,10 +33,51 @@ import org.bukkit.craftbukkit.CraftWorld;
  */
 public class FBlockUpdate {
 
-    public static void update(List<Block> blocks) {
+    public static void update(Block b) {
+        FConfiguration config = FAntiXRay.getConfiguration();
+
+        if (config.disabled_worlds.contains(b.getWorld().getName())) {
+            return;
+        }
+
+        int radius = config.dark_radius;
+        if (radius <= 0) {
+            return;
+        }
+
+        WorldServer worldServer = ((CraftWorld) b.getWorld()).getHandle();
+
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
+
+                    if (center.getType() != Material.AIR && center != null) {
+                        if (center.getLocation().distance(b.getLocation()) <= radius) {
+                            if (center.getLightLevel() > 0) {
+                                worldServer.notify(x, y, z);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void update(World w, List<Block> blocks) {
         HashSet<Integer[]> hash = new HashSet<>();
 
         if (blocks.isEmpty()) { return; }
+
+        FConfiguration config = FAntiXRay.getConfiguration();
+        if (config.disabled_worlds.contains(w.getName())) {
+            return;
+        }
+
+        int radius = config.update_radius;
+        if (radius <= 0) {
+            return;
+        }
 
         for (Block block : blocks) {
             if (block.getTypeId() != 0) {
@@ -52,7 +95,7 @@ public class FBlockUpdate {
             worldServer.notify(data[0], data[1], data[2]);
         }
     }
-    
+
     public static void update(Block block, boolean fast) {        
         Location location = block.getLocation();
         FConfiguration config = FAntiXRay.getConfiguration();
@@ -64,6 +107,10 @@ public class FBlockUpdate {
         int radius = config.update_radius;
         if (fast) {
             radius = 1;
+        }
+        
+        if (radius <= 0) {
+            return;
         }
 
         WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();

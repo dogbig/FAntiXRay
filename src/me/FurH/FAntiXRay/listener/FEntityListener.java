@@ -31,7 +31,7 @@ public class FEntityListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onEntityExplode(EntityExplodeEvent e) {
         if (e.isCancelled()) { return; }
-        
-        FBlockUpdate.update(e.blockList());
+
+        FBlockUpdate.update(e.getLocation().getWorld(), e.blockList());
     }
 }

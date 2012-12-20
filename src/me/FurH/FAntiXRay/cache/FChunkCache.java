@@ -27,15 +27,23 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import net.minecraft.server.World;
+import net.minecraft.server.v1_4_6.World;
 
 /**
  *
  * @author FurmigaHumana
  */
 public class FChunkCache {
+    private int files = 0;
 
     public byte[] read(World world, int x1, int z1, long hash1, int engine1) {
+        files++;
+
+        if (files >= 100) {
+            System.gc();
+            files = 0;
+        }
+
         File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x1 >> 5) + "." + (z1 >> 5));
         FConfiguration config = FAntiXRay.getConfiguration();
         if (!dir.exists()) { return null; }
@@ -99,7 +107,14 @@ public class FChunkCache {
         return data;
     }
     
-    public void write(World world, int x, int z, byte[] obfuscated, long hash, int engine) {        
+    public void write(World world, int x, int z, byte[] obfuscated, long hash, int engine) {
+        files++;
+
+        if (files >= 100) {
+            System.gc();
+            files = 0;
+        }
+        
         File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x >> 5) + "." + (z >> 5));
         FConfiguration config = FAntiXRay.getConfiguration();
         if (!dir.exists()) { dir.mkdirs(); }

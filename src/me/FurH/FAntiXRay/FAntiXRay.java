@@ -122,7 +122,7 @@ public class FAntiXRay extends JavaPlugin {
     }
 
     public void getCacheSizeTask() {
-        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
             @Override
             public void run() {
                 getCacheSize();

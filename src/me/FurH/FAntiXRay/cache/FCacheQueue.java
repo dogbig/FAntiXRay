@@ -22,15 +22,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import me.FurH.FAntiXRay.FAntiXRay;
-import net.minecraft.server.World;
+import net.minecraft.server.v1_4_6.World;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  *
  * @author FurmigaHumana
  */
 public class FCacheQueue {
-    private static final Queue<FCacheWriteData> queue = new LinkedBlockingQueue();
+    private static final Queue<FCacheWriteData> queue = new LinkedBlockingQueue<>();
     private static final HashSet<String> queued = new HashSet<> ();
     private static final Lock lock = new ReentrantLock();
     private static int queueid = 0;
@@ -56,7 +57,7 @@ public class FCacheQueue {
     public static void queue() {
         final FChunkCache cache = FAntiXRay.getCache();
         
-        queueid = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(FAntiXRay.getPlugin(), new Runnable() {
+        BukkitTask task = Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(FAntiXRay.getPlugin(), new Runnable() {
             @Override
             public void run() {
                 if (queue.isEmpty() || !lock.tryLock()) { return; }
@@ -77,6 +78,8 @@ public class FCacheQueue {
                 lock.unlock();
             }
         }, 5 * 20, 5 * 20);
+        
+        queueid = task.getTaskId();
     }
     
     public static class FCacheWriteData {
