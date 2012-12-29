@@ -119,15 +119,15 @@ public class FPlayerConnection extends PlayerConnection {
         this.playerConnection.a(packet16blockitemswitch);
     }
 
-    @Override
+    /*@Override
     public void a(Packet3Chat packet3chat) {
         this.playerConnection.a(packet3chat);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void chat(String s, boolean async) {
         this.playerConnection.chat(s, async);
-    }
+    }*/
 
     @Override
     public void a(Packet18ArmAnimation packet18armanimation) {
@@ -154,10 +154,10 @@ public class FPlayerConnection extends PlayerConnection {
         this.playerConnection.a(packet7useentity);
     }
 
-    @Override
+    /*@Override
     public void a(Packet205ClientCommand packet205clientcommand) {
         this.playerConnection.a(packet205clientcommand);
-    }
+    }*/
 
     @Override
     public boolean b() {
