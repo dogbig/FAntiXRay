@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011-2012 FurmigaHumana.  All rights reserved.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation,  version 3.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.FurH.FAntiXRay.hook;
 
 import net.minecraft.server.v1_4_6.EntityPlayer;
@@ -11,7 +27,6 @@ import net.minecraft.server.v1_4_6.Packet106Transaction;
 import net.minecraft.server.v1_4_6.Packet107SetCreativeSlot;
 import net.minecraft.server.v1_4_6.Packet108ButtonClick;
 import net.minecraft.server.v1_4_6.Packet10Flying;
-import net.minecraft.server.v1_4_6.Packet130UpdateSign;
 import net.minecraft.server.v1_4_6.Packet14BlockDig;
 import net.minecraft.server.v1_4_6.Packet15Place;
 import net.minecraft.server.v1_4_6.Packet16BlockItemSwitch;
@@ -41,7 +56,7 @@ public class FPlayerConnection extends PlayerConnection {
     public FPlayerConnection(MinecraftServer minecraftserver, INetworkManager inetworkmanager, EntityPlayer entityplayer) {
         super(minecraftserver, inetworkmanager, entityplayer);
         this.player = entityplayer;
-        this.playerConnection = new PlayerConnection(minecraftserver, inetworkmanager, entityplayer); //NOPE
+        this.playerConnection = new PlayerConnection(minecraftserver, inetworkmanager, entityplayer);
     }
 
     @Override
@@ -179,10 +194,10 @@ public class FPlayerConnection extends PlayerConnection {
         this.playerConnection.a(packet106transaction);
     }
 
-    @Override
+    /*@Override
     public void a(Packet130UpdateSign packet130updatesign) {
         this.playerConnection.a(packet130updatesign);
-    }
+    }*/
 
     @Override
     public void a(Packet0KeepAlive packet0keepalive) {

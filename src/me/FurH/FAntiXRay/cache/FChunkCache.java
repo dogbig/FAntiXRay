@@ -38,14 +38,14 @@ public class FChunkCache {
 
     public byte[] read(World world, int x1, int z1, long hash1, int engine1) {
         files++;
-
-        if (files >= 100) {
+        
+        FConfiguration config = FAntiXRay.getConfiguration();
+        if (files >= config.call_gc) {
             System.gc();
             files = 0;
         }
 
         File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x1 >> 5) + "." + (z1 >> 5));
-        FConfiguration config = FAntiXRay.getConfiguration();
         if (!dir.exists()) { return null; }
 
         File file = new File(dir, "r." + x1 + "." + z1 + ".udat");
@@ -110,13 +110,13 @@ public class FChunkCache {
     public void write(World world, int x, int z, byte[] obfuscated, long hash, int engine) {
         files++;
 
-        if (files >= 100) {
+        FConfiguration config = FAntiXRay.getConfiguration();
+        if (files >= config.call_gc) {
             System.gc();
             files = 0;
         }
         
         File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x >> 5) + "." + (z >> 5));
-        FConfiguration config = FAntiXRay.getConfiguration();
         if (!dir.exists()) { dir.mkdirs(); }
 
         File file = new File(dir, "r." + x + "." + z + ".udat");

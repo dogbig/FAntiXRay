@@ -37,10 +37,10 @@ public class FConfiguration {
     public int              engine_mode     = 1;
     public int              update_radius   = 1;
     
-    public boolean          dark_enabled    = false;
+    /*public boolean          dark_enabled    = false;
     public boolean          dark_only       = true;
     public int              dark_radius     = 8;
-    public HashSet<Integer> dark_blocks     = new HashSet<>();
+    public HashSet<Integer> dark_blocks     = new HashSet<>();*/
 
     public boolean          block_place     = false;
     public boolean          block_explosion = false;
@@ -48,6 +48,7 @@ public class FConfiguration {
     public boolean          block_piston    = false;
     public boolean          block_physics   = false;
     
+    public int              call_gc         = 100;
     public boolean          enable_cache    = true;
     public int              size_limit      = 1024;
     public int              writes_sec      = 10;
@@ -65,9 +66,9 @@ public class FConfiguration {
     public void load() {
         FCommunicator com    = FAntiXRay.getCommunicator();
         engine_mode     = getInteger("Options.EngineMode");
-        if (engine_mode > 2) {
-            com.log("[TAG] Engine Mode can't be higher than 2!");
-            engine_mode = 2;
+        if (engine_mode > 4) {
+            com.log("[TAG] Engine Mode can't be higher than 4!");
+            engine_mode = 4;
         }
         
         update_radius   = getInteger("Options.UpdateRadius");
@@ -76,10 +77,10 @@ public class FConfiguration {
             update_radius = 3;
         }
         
-        dark_enabled    = getBoolean("Darkness.Enabled");
+        /*dark_enabled    = getBoolean("Darkness.Enabled");
         dark_only       = getBoolean("Darkness.BrightOnly");
         dark_radius     = getInteger("Darkness.BrightRadius");
-        dark_blocks     = getIntegerHash("Darkness.UpdateOn");
+        dark_blocks     = getIntegerHash("Darkness.UpdateOn");*/
 
         block_place     = getBoolean("UpdateEvents.onBlockPlace");
         block_explosion = getBoolean("UpdateEvents.onBlockExplosion");
@@ -87,6 +88,7 @@ public class FConfiguration {
         block_piston    = getBoolean("UpdateEvents.onBlockPiston");
         block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
 
+        call_gc         = getInteger("Cache.callGCat");
         enable_cache    = getBoolean("Cache.Enabled");
         size_limit      = getInteger("Cache.SizeLimit");
         writes_sec      = getInteger("Cache.WritesPerSec");

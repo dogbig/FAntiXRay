@@ -1,5 +1,5 @@
 Options:
-  ## Engine Mode, set to 0, 1 or 2. Check the plugin's description for more information.
+  ## Engine Mode, set to 0, 1, 2, 3 or 4. Check the plugin's description for more information.
   EngineMode: 1
   ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1
@@ -30,8 +30,10 @@ UpdateEvents:
   onBlockPhysics: false
 
 Cache:
+  ## callGCat, a number of cache files to read/write before forcing a gc
+  callGCat: 100
   ## Enabled, if true, the cache system will be activated
-  Enabled: true
+  Enabled: false
   ## SizeLimit, set the size limit of the cache folder in MB, 0 Will disable it.
   SizeLimit: 5120
   ## WritesPerSec, set the number of files to be written per second
@@ -43,7 +45,7 @@ Cache:
   
 Permissions:
   ## OpHasPerm, if true, op players will have all permissions
-  OpHasPerm: true
+  OpHasPerm: false
 
 Updater:
   ## Updater, if true, this plugin will check for updates automatically
@@ -66,5 +68,6 @@ Lists:
     - 129
   ## Disabled Worlds, list here, all the worlds that will not be protected by this plugin.
   DisabledWorlds:
+    - world_flat
     - world_nether
     - world_the_end

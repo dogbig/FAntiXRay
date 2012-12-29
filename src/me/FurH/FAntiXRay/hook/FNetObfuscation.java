@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011-2012 FurmigaHumana.  All rights reserved.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation,  version 3.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.FurH.FAntiXRay.hook;
 
 import java.lang.reflect.Field;
@@ -6,6 +22,9 @@ import java.util.zip.Checksum;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
+import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.hook.FChunkRWork.FChunkData;
+import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.util.FUtil;
 import net.minecraft.server.v1_4_6.EntityPlayer;
 import net.minecraft.server.v1_4_6.INetworkManager;
@@ -20,28 +39,29 @@ import net.minecraft.server.v1_4_6.World;
  * @author FurmigaHumana
  */
 public class FNetObfuscation extends FPlayerConnection {
-    
+
     public FNetObfuscation(MinecraftServer minecraftserver, INetworkManager inetworkmanager, EntityPlayer entityplayer) {
         super(minecraftserver, inetworkmanager, entityplayer);
     }
-    
+
     @Override
     public void sendPacket(Packet packet) {
         if (packet instanceof Packet56MapChunkBulk) {
             obfuscate((Packet56MapChunkBulk)packet);
-        }
+        } else
         if (packet instanceof Packet51MapChunk) {
             Packet51MapChunk p51 = (Packet51MapChunk)packet;
             if (p51.c != 0 && p51.d != 0) {
-                System.out.println("Packet 51");
+                System.out.println("Packet 51"); //TODO: Mitigate
             }
+        } else {
+            super.sendPacket(packet);
         }
-        super.sendPacket(packet);
     }
 
     private void obfuscate(Packet56MapChunkBulk packet) {
 
-        if (getPrivate(packet, "buffer") != null) {
+        if (getPrivate(packet, "buffer") != null) { //Chunk is already being compressed
             return;
         }
 
@@ -63,9 +83,19 @@ public class FNetObfuscation extends FPlayerConnection {
         byte[][] inflatedBuffers = (byte[][]) getPrivate(packet, "inflatedBuffers");
         byte[] buildBuffer = (byte[]) getPrivate(packet, "buildBuffer");
 
+        boolean sendpacket = true;
+
         int index = 0;
         for (int i = 0; i < packet.d(); i++) {
             byte[] obfuscated = null;
+
+            if (FWorldListener.chunks.remove(c[i] + ":" + d[i])) {
+                FChunkRWork.queue.add(new FChunkData(packet, this.player));
+                sendpacket = false;
+                continue;
+            }
+
+            System.arraycopy(inflatedBuffers[i], 0, buildBuffer, index, inflatedBuffers[i].length);
             
             if (usecache) {
                 hash = getHash(inflatedBuffers[i], inflatedBuffers[i].length);
@@ -73,7 +103,7 @@ public class FNetObfuscation extends FPlayerConnection {
             }
 
             if (obfuscated == null) {
-                obfuscated = obfuscate(inflatedBuffers[i], a[i], c[i], d[i], engine_mode);
+                obfuscated = obfuscate(inflatedBuffers[i], c[i], d[i], engine_mode);
                 savecache = true;
             }
 
@@ -94,9 +124,13 @@ public class FNetObfuscation extends FPlayerConnection {
 
             index += inflatedBuffers[i].length;
         }
+
+        if (sendpacket) {
+            super.sendPacket(packet);
+        }
     }
 
-    private byte[] obfuscate(byte[] buffer, int ca, int cx, int cz, int engine_mode) {
+    private byte[] obfuscate(byte[] buffer, int cx, int cz, int engine_mode) {
         for (int i = 0; i < 16; i++) {
 
             int index = 0;
@@ -111,20 +145,19 @@ public class FNetObfuscation extends FPlayerConnection {
                         int dindex = (i * 4096) + index;
 
                         int id = player.world.getTypeId(wx, wy, wz);
-                        //int light = player.world.getWorld().getHandle().getLightLevel(wx, wy, wz);
-                        //int light = player.world.getWorld().getBlockAt(wx, wy, wz).getLightLevel();
 
+                        FConfiguration config = FAntiXRay.getConfiguration();
                         /* 
                          * TODO: FIND A WAY TO GET THE LIGHT LEVEL, getLightLevel ALWAYS RETURN 0
                          */
                         
                         if (engine_mode == 0) {
-                            if (FAntiXRay.getConfiguration().hidden_blocks.contains(id)) {
+                            if (config.hidden_blocks.contains(id)) {
                                 buffer[dindex] = 1;
                             }
                         } else
                         if (engine_mode == 1) {
-                            if (FAntiXRay.getConfiguration().hidden_blocks.contains(id)) {
+                            if (config.hidden_blocks.contains(id)) {
                                 if (!isBlocksTransparent(player.world, wx, wy, wz)) {
                                     buffer[dindex] = 1;
                                 }
@@ -134,6 +167,22 @@ public class FNetObfuscation extends FPlayerConnection {
                             if (id != 63 && id != 68 && id != 0) {
                                 if (!isBlocksTransparent(player.world, wx, wy, wz)) {
                                     buffer[dindex] = (byte) FUtil.getRandom();
+                                }
+                            }
+                        } else
+                        if (engine_mode == 3) {
+                            if (id == 1) {
+                                if (!isBlocksTransparent(player.world, wx, wy, wz)) {
+                                    buffer[dindex] = (byte) FUtil.getRandom();
+                                }
+                            }
+                        } else
+                        if (engine_mode == 4) {
+                            if (!isBlocksTransparent(player.world, wx, wy, wz)) {
+                                buffer[dindex] = (byte) FUtil.getRandom();
+                            } else {
+                                if (config.hidden_blocks.contains(id)) {
+                                    buffer[dindex] = 1;
                                 }
                             }
                         }

@@ -26,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -33,6 +34,7 @@ import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
  */
 public class FBlockUpdate {
 
+    /*
     public static void update(Block b) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
@@ -44,7 +46,7 @@ public class FBlockUpdate {
         if (radius <= 0) {
             return;
         }
-
+        
         WorldServer worldServer = ((CraftWorld) b.getWorld()).getHandle();
 
         for (int x = -radius; x <= radius; x++) {
@@ -62,7 +64,7 @@ public class FBlockUpdate {
                 }
             }
         }
-    }
+    }*/
 
     public static void update(World w, List<Block> blocks) {
         HashSet<Integer[]> hash = new HashSet<>();
@@ -96,6 +98,12 @@ public class FBlockUpdate {
         }
     }
 
+    public static void update(Player p, Block b, boolean fast) {
+        if (!FAntiXRay.isExempt(p.getName())) {
+            update(b, fast);
+        }
+    }
+    
     public static void update(Block block, boolean fast) {        
         Location location = block.getLocation();
         FConfiguration config = FAntiXRay.getConfiguration();

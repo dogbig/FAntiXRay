@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011-2012 FurmigaHumana.  All rights reserved.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation,  version 3.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.FurH.FAntiXRay.listener;
 
 import me.FurH.FAntiXRay.FAntiXRay;
@@ -17,7 +33,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
  * @author FurmigaHumana
  */
 public class FPlayerListener implements Listener  {
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
@@ -26,7 +42,16 @@ public class FPlayerListener implements Listener  {
         FMessages messages = FAntiXRay.getMessages();
         FAntiXRay plugin = FAntiXRay.getPlugin();
         
-        if (!plugin.hasPerm(p, "Deobfuscate")) {
+        if (plugin.hasPerm(p, "Deobfuscate")) {
+            com.msg(p, messages.deobfuscated);
+            FAntiXRay.exempt(p.getName());
+        }
+
+        if (plugin.hasPerm(p, "Quiet.Deobfuscate")) {
+            FAntiXRay.exempt(p.getName());
+        }
+        
+        if (!FAntiXRay.isExempt(p.getName())) {
             CraftPlayer cp = (CraftPlayer)p;
             CraftServer s = (CraftServer)p.getServer();
             if (!(cp.getHandle().playerConnection instanceof FNetObfuscation)) {
@@ -34,8 +59,6 @@ public class FPlayerListener implements Listener  {
                 cp.getHandle().playerConnection.networkManager.a(handler);
                 cp.getHandle().playerConnection = handler;
             }
-        } else {
-            com.msg(p, messages.deobfuscated);
         }
 
         if (plugin.hasUpdate) {

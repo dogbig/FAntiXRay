@@ -19,6 +19,7 @@ package me.FurH.FAntiXRay;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,9 +27,11 @@ import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
+import me.FurH.FAntiXRay.hook.FChunkRWork;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
+import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.util.FCommunicator;
@@ -65,6 +68,8 @@ public class FAntiXRay extends JavaPlugin {
     private static FMessages messages;
     private static FChunkCache cache;
     private static FConfiguration configuration;
+    
+    public static HashSet<String> exempt = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -85,6 +90,7 @@ public class FAntiXRay extends JavaPlugin {
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
+        pm.registerEvents(new FWorldListener(), this);
         pm.registerEvents(blockListener, this);
         blockListener.loadListeners(this);
 
@@ -104,7 +110,8 @@ public class FAntiXRay extends JavaPlugin {
         }
 
         getCacheSize();
-
+        FChunkRWork.toReloadW();
+        
         communicator.log("[TAG] Cache Size: {0} MB in {1} files", size, files);
 
         PluginDescriptionFile desc = getDescription();
@@ -153,7 +160,7 @@ public class FAntiXRay extends JavaPlugin {
         
         return size;
     }
-    
+
     protected void clearCache() {
         for (World w : getServer().getWorlds()) {
             File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + w.getName());
@@ -183,6 +190,18 @@ public class FAntiXRay extends JavaPlugin {
 
     public static FAntiXRay getPlugin() {
         return plugin;
+    }
+
+    public static void exempt(String player) {
+        exempt.add(player);
+    }
+
+    public static void unexempt(String player) {
+        exempt.remove(player);
+    }
+
+    public static boolean isExempt(String player) {
+        return exempt.contains(player);
     }
     
     public boolean hasPerm(CommandSender sender, String perm) {

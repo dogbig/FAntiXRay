@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011-2012 FurmigaHumana.  All rights reserved.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation,  version 3.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package me.FurH.FAntiXRay.listener;
 
 import me.FurH.FAntiXRay.FAntiXRay;
@@ -43,20 +59,24 @@ public class FBlockListener implements Listener {
         if (e.isCancelled()) { return; }
         
         FConfiguration config = FAntiXRay.getConfiguration();
+        /*if (config.dark_only) {
+            FBlockUpdate.update(e.getBlock());
+        } else*/
         if (config.block_place) {
-            FBlockUpdate.update(e.getBlock(), true);
+            FBlockUpdate.update(e.getPlayer(), e.getBlock(), true);
+            //TODO: Finish Darkness Update
         }
 
-        if (config.dark_blocks.contains(e.getBlock().getTypeId())) {
+        /*if (config.dark_enabled && config.dark_blocks.contains(e.getBlock().getTypeId())) {
             FBlockUpdate.update(e.getBlock());
-        }
+        }*/
     }
-    
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) { return; }
 
-        FBlockUpdate.update(e.getBlock(), false);
+        FBlockUpdate.update(e.getPlayer(), e.getBlock(), false);
     }
 
     public class FBlockDamage implements Listener {
@@ -64,7 +84,7 @@ public class FBlockListener implements Listener {
         public void onBlockDamage(BlockDamageEvent e) {
             if (e.isCancelled()) { return; }
             
-            FBlockUpdate.update(e.getBlock(), true);
+            FBlockUpdate.update(e.getPlayer(), e.getBlock(), true);
         }
     }
     
