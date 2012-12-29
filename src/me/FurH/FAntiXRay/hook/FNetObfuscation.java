@@ -54,7 +54,6 @@ public class FNetObfuscation extends FPlayerConnection {
             if (p51.c != 0 && p51.d != 0) {
                 System.out.println("Packet 51"); //TODO: Mitigate
             }
-            super.sendPacket(p51);
         } else {
             super.sendPacket(packet);
         }
