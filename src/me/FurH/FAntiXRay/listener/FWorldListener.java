@@ -27,12 +27,13 @@ import org.bukkit.event.world.ChunkLoadEvent;
  * @author FurmigaHumana
  */
 public class FWorldListener implements Listener {
-    public static HashSet<String> chunks = new HashSet<>();
+    /*public static HashSet<String> chunks = new HashSet<>();
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent e) {
         if (e.isNewChunk()) {
             chunks.add(e.getChunk().getX() + ":" + e.getChunk().getZ());
+            System.out.println("X: " + e.getChunk().getX() + ", Z: " + e.getChunk().getZ());
         }
-    }
+    }*/
 }

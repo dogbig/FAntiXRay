@@ -28,6 +28,7 @@ import org.bukkit.Bukkit;
  * @author FurmigaHumana
  */
 public class FChunkRWork {
+    /*
     public static Queue<FChunkData> queue = new LinkedBlockingQueue<>();
 
     public static class FChunkData {
@@ -50,5 +51,5 @@ public class FChunkRWork {
                 }
             }
         }, 1L, 1L);
-    }
+    }*/
 }

@@ -90,7 +90,7 @@ public class FAntiXRay extends JavaPlugin {
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
-        pm.registerEvents(new FWorldListener(), this);
+        //pm.registerEvents(new FWorldListener(), this);
         pm.registerEvents(blockListener, this);
         blockListener.loadListeners(this);
 
@@ -110,7 +110,7 @@ public class FAntiXRay extends JavaPlugin {
         }
 
         getCacheSize();
-        FChunkRWork.toReloadW();
+        //FChunkRWork.toReloadW();
         
         communicator.log("[TAG] Cache Size: {0} MB in {1} files", size, files);
 

@@ -23,7 +23,6 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import me.FurH.FAntiXRay.hook.FChunkRWork.FChunkData;
 import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.util.FUtil;
 import net.minecraft.server.v1_4_6.EntityPlayer;
@@ -48,11 +47,13 @@ public class FNetObfuscation extends FPlayerConnection {
     public void sendPacket(Packet packet) {
         if (packet instanceof Packet56MapChunkBulk) {
             obfuscate((Packet56MapChunkBulk)packet);
+            super.sendPacket(packet);
         } else
         if (packet instanceof Packet51MapChunk) {
             Packet51MapChunk p51 = (Packet51MapChunk)packet;
-            if (p51.c != 0 && p51.d != 0) {
-                System.out.println("Packet 51"); //TODO: Mitigate
+            byte[] inflatedBuffer = (byte[]) getPrivate(p51, "inflatedBuffer");
+            if (inflatedBuffer.length == 256) {
+                super.sendPacket(p51);
             }
         } else {
             super.sendPacket(packet);
@@ -61,7 +62,7 @@ public class FNetObfuscation extends FPlayerConnection {
 
     private void obfuscate(Packet56MapChunkBulk packet) {
 
-        if (getPrivate(packet, "buffer") != null) { //Chunk is already being compressed
+        if (getPrivate(packet, "buffer") != null) { //Assuming the chunk is already being compressed
             return;
         }
 
@@ -76,24 +77,22 @@ public class FNetObfuscation extends FPlayerConnection {
         boolean usecache = FAntiXRay.getConfiguration().enable_cache;
         boolean savecache = false;
 
-        int[] a = packet.a;
         int[] c = (int[]) getPrivate(packet, "c"); //X
         int[] d = (int[]) getPrivate(packet, "d"); //Z
 
         byte[][] inflatedBuffers = (byte[][]) getPrivate(packet, "inflatedBuffers");
         byte[] buildBuffer = (byte[]) getPrivate(packet, "buildBuffer");
 
-        boolean sendpacket = true;
-
         int index = 0;
         for (int i = 0; i < packet.d(); i++) {
             byte[] obfuscated = null;
 
-            if (FWorldListener.chunks.remove(c[i] + ":" + d[i])) {
-                FChunkRWork.queue.add(new FChunkData(packet, this.player));
-                sendpacket = false;
-                continue;
-            }
+            /*if (FWorldListener.chunks.remove(c[i] + ":" + d[i])) {
+                //FChunkRWork.queue.add(new FChunkData(packet, this.player));
+                //sendpacket = false;
+                //continue;
+                System.out.println("IS HERE: " + c[i] + ":" + d[i]);
+            }*/
 
             System.arraycopy(inflatedBuffers[i], 0, buildBuffer, index, inflatedBuffers[i].length);
             
@@ -123,10 +122,6 @@ public class FNetObfuscation extends FPlayerConnection {
             }
 
             index += inflatedBuffers[i].length;
-        }
-
-        if (sendpacket) {
-            super.sendPacket(packet);
         }
     }
 
