@@ -3,3 +3,8 @@ main: me.FurH.FAntiXRay.FAntiXRay
 version: 1.5
 author: FurmigaHumana
 description: Modify chunk sending to prevent xray mod.
+commands:
+  fantixray:
+    aliases: [antixray, ax, axr]
+    description: FAntiXRay Commands
+    usage: /FAntiXRay help

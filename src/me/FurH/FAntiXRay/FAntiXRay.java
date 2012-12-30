@@ -19,10 +19,13 @@ package me.FurH.FAntiXRay;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import me.FurH.FAntiXRay.cache.FCacheManager;
 import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
@@ -34,8 +37,10 @@ import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.util.FCommunicator;
+import me.FurH.FAntiXRay.util.FUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -58,8 +63,6 @@ public class FAntiXRay extends JavaPlugin {
     public boolean hasUpdate = false;
     public int currentVersion = 0;
     public int newVersion = 0;
-    private int files = 0;
-    private int size = 0;
     
     /* classes */
     private static FAntiXRay plugin;
@@ -103,14 +106,16 @@ public class FAntiXRay extends JavaPlugin {
             updateThread();
         }
 
-        files = 0; size = 0;
-        if (configuration.size_limit > 0) { 
-            getCacheSizeTask();
-        }
-
-        getCacheSize();
+        if (configuration.enable_cache) {
+            if (configuration.size_limit > 0) {
+                FCacheManager.getCacheSizeTask();
+            }
         
-        communicator.log("[TAG] Cache Size: {0} MB in {1} files", size, files);
+            double size = FCacheManager.getCacheSize();
+            double limit = configuration.size_limit;
+
+            communicator.log("[TAG] Cache Size: {0} of {1} allowed in {2} files", FUtil.format(size), FUtil.format(limit * 1024 * 1024), FCacheManager.files.size());
+        }
 
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Enabled");
@@ -128,48 +133,52 @@ public class FAntiXRay extends JavaPlugin {
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");
     }
 
-    public void getCacheSizeTask() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
-            @Override
-            public void run() {
-                getCacheSize();
-                if (size > configuration.size_limit) {
-                    communicator.log("[TAG] The cache is too big, {0} MB of {1} MB allowed, cleaning up!", size, configuration.size_limit);
-                    clearCache();
-                }
-            }
-        }, 3600 * 20, 3600 * 20);
-    }
-
-    public int getCacheSize() {
-        files = 0; size = 0;
-        
-        for (World w : getServer().getWorlds()) {
-            File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + w.getName());
-            if (dir.exists()) {
-                for (File filedir : dir.listFiles()) {
-                    for (File file : filedir.listFiles()) {
-                        size += file.length();
-                        files++;
+    /*
+     * //axr cache[0] - Size
+     * //axr cache[0] clear[1] - Clear
+     */
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("fantixray")) {
+            if (sender.hasPermission("FAntiXRay.ClearCache")) {
+                if (args.length <= 0) {
+                    communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                    communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                    return true;
+                } else if (args.length > 0) {
+                    if (args.length > 1) {
+                        if (args.length > 2) {
+                            communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                            communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                            return true;
+                        } else {
+                            communicator.msg(sender, "&7Cleaning cache...");
+                            int left = FCacheManager.clearCache();
+                            if (left > 0) {
+                                communicator.msg(sender, "&a{0}&7 files could not be deleted!", left);
+                                return true;
+                            } else {
+                                communicator.msg(sender, "&aCache cleared successfully!");
+                                return true;
+                            }
+                        }
+                    } else {
+                        double size = FCacheManager.getCacheSize();
+                        double limit = configuration.size_limit;
+                        
+                        communicator.msg(sender, "&7Current cache size: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", FUtil.format(size), FUtil.format(limit * 1024 * 1024), FCacheManager.files.size());
+                        return true;
                     }
+                } else {
+                    communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                    communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
                 }
+            } else {
+                communicator.msg(sender, "&4You don't have permission to use this command");
+                return true;
             }
         }
-
-        size = (int) Math.floor(size / 1024 / 1024);
-        
-        return size;
-    }
-
-    protected void clearCache() {
-        for (World w : getServer().getWorlds()) {
-            File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + w.getName());
-            if (dir.exists()) {
-                for (File file : dir.listFiles()) {
-                    file.delete();
-                }
-            }
-        }
+        return true;
     }
 
     public static FChunkCache getCache() {

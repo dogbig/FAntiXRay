@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +41,23 @@ import org.bukkit.plugin.Plugin;
  * @author FurmigaHumana
  */
 public class FUtil {
+    private static final DecimalFormat decimal = new DecimalFormat("#.##");
+    
+    public static String format(double bytes) {
+        if (bytes >= 1099511627776.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1099511627776.0D)).append(" TB").toString();
+        }
+        if (bytes >= 1073741824.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1073741824.0D)).append(" GB").toString();
+        }
+        if (bytes >= 1048576.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1048576.0D)).append(" MB").toString();
+        }
+        if (bytes >= 1024.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1024.0D)).append(" KB").toString();
+        }
+        return new StringBuilder().append("").append((int)bytes).append(" bytes").toString();
+    }
     
     public static long getHash(byte[] data) {
         Checksum checksum = new CRC32();
