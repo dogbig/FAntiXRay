@@ -76,11 +76,6 @@ public class FNetObfuscation extends FPlayerConnection {
     }
 
     private void obfuscate(Packet56MapChunkBulk packet) {
-
-        if (player.playerConnection.disconnected) {
-            return;
-        }
-
         if (FUtil.getPrivateField(packet, "buffer") != null) { //Assuming the chunk is already being compressed
             return;
         }
@@ -120,13 +115,8 @@ public class FNetObfuscation extends FPlayerConnection {
                 obfuscated = new byte[ inflatedBuffers[i].length ];
             }
 
-            try {
-                System.arraycopy(obfuscated, 0, buildBuffer, index, inflatedBuffers[i].length);
-            } catch (Exception ex) {
-                FAntiXRay.log.severe("[FAntiXRay]: Error on chunk processing! Please, send this error to the developer!");
-                FAntiXRay.log.severe("[FAntiXRay]: inflatedBuffer: " + inflatedBuffers[i].length + ", buildBuffer: " + buildBuffer.length + ", obfuscated: " + obfuscated.length);
-            }
-            
+            System.arraycopy(obfuscated, 0, buildBuffer, index, inflatedBuffers[i].length);
+
             if (savecache && usecache) {
                 FCacheQueue.onQueue(player.world, c[i], d[i], obfuscated, hash, engine_mode);
             }
