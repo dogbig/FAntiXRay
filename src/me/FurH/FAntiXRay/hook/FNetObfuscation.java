@@ -16,12 +16,11 @@
 
 package me.FurH.FAntiXRay.hook;
 
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.util.FUtil;
 import net.minecraft.server.v1_4_6.EntityPlayer;
 import net.minecraft.server.v1_4_6.INetworkManager;
@@ -46,16 +45,34 @@ public class FNetObfuscation extends FPlayerConnection {
         if (packet instanceof Packet56MapChunkBulk) {
             obfuscate((Packet56MapChunkBulk)packet);
         }
-
+        
         if (packet instanceof Packet51MapChunk) {
-            Packet51MapChunk p51 = (Packet51MapChunk)packet;
-            byte[] inflatedBuffer = (byte[]) FUtil.getPrivateField(p51, "inflatedBuffer");
-            if (inflatedBuffer.length > 256) {
+            if (obfuscate((Packet51MapChunk)packet)) {
                 return;
             }
         }
 
         super.sendPacket(packet);
+    }
+    
+    public boolean obfuscate(Packet51MapChunk packet) {
+
+        if (FAntiXRay.getConfiguration().disabled_worlds.contains(player.world.getWorld().getName())) {
+            return false;
+        }
+
+        if (packet.c == 0 && packet.d == 0) {
+            return false;
+        }
+
+        /*
+         * If this chunk already was sent, there is no need to obfuscate and send it again.
+         */
+        if (FWorldListener.chunks.remove(packet.a + ":" +packet.b)) { 
+            return true;
+        }
+
+        return false;
     }
 
     private void obfuscate(Packet56MapChunkBulk packet) {
@@ -63,7 +80,7 @@ public class FNetObfuscation extends FPlayerConnection {
         if (player.playerConnection.disconnected) {
             return;
         }
-        
+
         if (FUtil.getPrivateField(packet, "buffer") != null) { //Assuming the chunk is already being compressed
             return;
         }
@@ -90,7 +107,7 @@ public class FNetObfuscation extends FPlayerConnection {
             byte[] obfuscated = null;
 
             if (usecache) {
-                hash = getHash(inflatedBuffers[i], inflatedBuffers[i].length);
+                hash = FUtil.getHash(inflatedBuffers[i]);
                 obfuscated = cache.read(player.world, c[i], d[i], hash, engine_mode);
             }
 
@@ -118,10 +135,12 @@ public class FNetObfuscation extends FPlayerConnection {
         }
     }
 
-    private byte[] obfuscate(byte[] buffer, int cx, int cz, int engine_mode) {
+    public byte[] obfuscate(byte[] buffer, int cx, int cz, int engine_mode) {
+        FConfiguration config = FAntiXRay.getConfiguration();
+        
         for (int i = 0; i < 16; i++) {
 
-            int index = 0;
+            int increment = 0;
 
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {
@@ -130,58 +149,92 @@ public class FNetObfuscation extends FPlayerConnection {
                         int wx = (cx << 4) + x;
                         int wy = (i << 4) + y;
                         int wz = (cz << 4) + z;
-                        int dindex = (i * 4096) + index;
+                        int index = (i * 4096) + increment;
 
                         int id = player.world.getTypeId(wx, wy, wz);
-
-                        FConfiguration config = FAntiXRay.getConfiguration();
-                        /* 
-                         * TODO: FIND A WAY TO GET THE LIGHT LEVEL, getLightLevel ALWAYS RETURN 0
-                         */
+                        boolean light = false;
+                        
+                        if (config.dark_enabled) {
+                            light = isBlocksInLight(wx, wy, wz);
+                        }
                         
                         if (engine_mode == 0) {
                             if (config.hidden_blocks.contains(id)) {
-                                buffer[dindex] = 1;
+                                if (!light) {
+                                    buffer[index] = 1;
+                                }
+                            } else if (!light) {
+                                if (config.dark_extra.contains(id)) {
+                                    buffer[index] = 1;
+                                }
                             }
                         } else
                         if (engine_mode == 1) {
                             if (config.hidden_blocks.contains(id)) {
                                 if (!isBlocksTransparent(player.world, wx, wy, wz)) {
-                                    buffer[dindex] = 1;
+                                    buffer[index] = 1;
+                                } else if (!light) {
+                                    buffer[index] = 1;
+                                }
+                            } else if (!light) {
+                                if (config.dark_extra.contains(id)) {
+                                    buffer[index] = 1;
                                 }
                             }
                         } else
                         if (engine_mode == 2) {
                             if (id != 63 && id != 68 && id != 0) {
                                 if (!isBlocksTransparent(player.world, wx, wy, wz)) {
-                                    buffer[dindex] = (byte) FUtil.getRandom();
+                                    buffer[index] = (byte) FUtil.getRandom();
                                 }
                             }
                         } else
                         if (engine_mode == 3) {
                             if (id == 1) {
                                 if (!isBlocksTransparent(player.world, wx, wy, wz)) {
-                                    buffer[dindex] = (byte) FUtil.getRandom();
+                                    buffer[index] = (byte) FUtil.getRandom();
                                 }
                             }
                         } else
                         if (engine_mode == 4) {
                             if (!isBlocksTransparent(player.world, wx, wy, wz)) {
-                                buffer[dindex] = (byte) FUtil.getRandom();
+                                buffer[index] = (byte) FUtil.getRandom();
                             } else {
                                 if (config.hidden_blocks.contains(id)) {
-                                    buffer[dindex] = 1;
+                                    buffer[index] = 1;
                                 }
                             }
                         }
-                        index++;
+                        increment++;
                     }
                 }
             }
         }
         return buffer;
     }
-
+    
+    private boolean isBlocksInLight(int x, int y, int z) {
+        if (player.world.getWorld().getBlockAt(x, y + 1, z).getLightLevel() > 0) {
+            return true;
+        } else
+        if (player.world.getWorld().getBlockAt(x, y - 1, z).getLightLevel() > 0) {
+            return true;
+        } else
+        if (player.world.getWorld().getBlockAt(x + 1, y, z).getLightLevel() > 0) {
+            return true;
+        } else
+        if (player.world.getWorld().getBlockAt(x - 1, y, z).getLightLevel() > 0) {
+            return true;
+        } else
+        if (player.world.getWorld().getBlockAt(x, y, z + 1).getLightLevel() > 0) {
+            return true;
+        } else
+        if (player.world.getWorld().getBlockAt(x, y, z - 1).getLightLevel() > 0) {
+            return true;
+        }
+        return false;
+    }
+    
     private boolean isBlocksTransparent(World world, int x, int y, int z) {
         if (isBlockTransparent(world, x + 1, y, z)) {
             return true;
@@ -204,21 +257,12 @@ public class FNetObfuscation extends FPlayerConnection {
             return false;
         }
     }
-
+    
     private static boolean isBlockTransparent(World world, int x, int y, int z) {
         if (!net.minecraft.server.v1_4_6.Block.i(world.getTypeId(x, y, z))) {
             return true;
         } else {
             return false;
         }
-    }
-
-
-    
-    private long getHash(byte[] data, int size) {
-        Checksum checksum = new CRC32();
-        checksum.reset();
-        checksum.update(data, 0, size);
-        return checksum.getValue();
     }
 }

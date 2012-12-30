@@ -37,11 +37,12 @@ public class FConfiguration {
     public int              engine_mode     = 1;
     public int              update_radius   = 1;
     
-    /*public boolean          dark_enabled    = false;
+    public boolean          dark_enabled    = false;
     public boolean          dark_only       = true;
     public int              dark_radius     = 8;
-    public HashSet<Integer> dark_blocks     = new HashSet<>();*/
-
+    public HashSet<Integer> dark_blocks     = new HashSet<>();
+    public HashSet<Integer> dark_extra      = new HashSet<>();
+    
     public boolean          block_place     = false;
     public boolean          block_explosion = false;
     public boolean          block_damage    = false;
@@ -76,11 +77,12 @@ public class FConfiguration {
             com.log("[TAG] Update Radius can't be higher than 3!");
             update_radius = 3;
         }
-        
-        /*dark_enabled    = getBoolean("Darkness.Enabled");
+
+        dark_enabled    = getBoolean("Darkness.Enabled");
         dark_only       = getBoolean("Darkness.BrightOnly");
         dark_radius     = getInteger("Darkness.BrightRadius");
-        dark_blocks     = getIntegerHash("Darkness.UpdateOn");*/
+        dark_blocks     = getIntegerHash("Darkness.UpdateOn");
+        dark_extra      = getIntegerHash("Darkness.ExtraBlocks");
 
         block_place     = getBoolean("UpdateEvents.onBlockPlace");
         block_explosion = getBoolean("UpdateEvents.onBlockExplosion");

@@ -30,10 +30,10 @@ import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
+import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.util.FCommunicator;
-import me.FurH.FAntiXRay.util.FUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -81,7 +81,7 @@ public class FAntiXRay extends JavaPlugin {
         
         configuration.load();
         messages.load();
-
+        
         PluginManager pm = getServer().getPluginManager();
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
@@ -89,6 +89,7 @@ public class FAntiXRay extends JavaPlugin {
         
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
+        pm.registerEvents(new FWorldListener(), this);
         pm.registerEvents(blockListener, this);
         blockListener.loadListeners(this);
 
@@ -117,7 +118,9 @@ public class FAntiXRay extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        FCacheQueue.saveQueue();
+        if (configuration.enable_cache) {
+            FCacheQueue.saveQueue();
+        }
 
         Bukkit.getScheduler().cancelTasks(this);
         
@@ -445,7 +448,7 @@ public class FAntiXRay extends JavaPlugin {
     }
     
     public void updateThread() {
-        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
             @Override
             public void run() {
                 currentVersion = Integer.parseInt(getDescription().getVersion().replaceAll("[^0-9]", ""));

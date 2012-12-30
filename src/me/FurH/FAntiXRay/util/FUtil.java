@@ -23,14 +23,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 import me.FurH.FAntiXRay.FAntiXRay;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -40,6 +40,13 @@ import org.bukkit.plugin.Plugin;
  * @author FurmigaHumana
  */
 public class FUtil {
+    
+    public static long getHash(byte[] data) {
+        Checksum checksum = new CRC32();
+        checksum.reset();
+        checksum.update(data, 0, data.length);
+        return checksum.getValue();
+    }
     
     public static void setPrivateField(Object obj, String x, Object value) {
         try {

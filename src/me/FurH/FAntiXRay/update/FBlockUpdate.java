@@ -22,8 +22,10 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import net.minecraft.server.v1_4_6.WorldServer;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
 import org.bukkit.entity.Player;
 
@@ -33,8 +35,7 @@ import org.bukkit.entity.Player;
  */
 public class FBlockUpdate {
 
-    /*
-    public static void update(Block b) {
+    public static void update(Player p, Block b) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
         if (config.disabled_worlds.contains(b.getWorld().getName())) {
@@ -45,7 +46,7 @@ public class FBlockUpdate {
         if (radius <= 0) {
             return;
         }
-        
+
         WorldServer worldServer = ((CraftWorld) b.getWorld()).getHandle();
 
         for (int x = -radius; x <= radius; x++) {
@@ -54,16 +55,40 @@ public class FBlockUpdate {
                     Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
 
                     if (center.getType() != Material.AIR && center != null) {
-                        if (center.getLocation().distance(b.getLocation()) <= radius) {
-                            if (center.getLightLevel() > 0) {
-                                worldServer.notify(x, y, z);
+                        if (config.hidden_blocks.contains(center.getTypeId()) || config.dark_extra.contains(center.getTypeId())) {
+                            if (center.getLocation().distance(b.getLocation()) <= radius) {
+                                if (isBlocksInLight(center)) {
+                                    worldServer.notify(b.getX() + x, b.getY() + y, b.getZ() + z);
+                                }
                             }
                         }
                     }
                 }
             }
         }
-    }*/
+    }
+    
+    private static boolean isBlocksInLight(Block center) {
+        if (center.getRelative(BlockFace.UP).getLightLevel() > 0) {
+            return true;
+        } else
+        if (center.getRelative(BlockFace.DOWN).getLightLevel() > 0) {
+            return true;
+        } else
+        if (center.getRelative(BlockFace.NORTH).getLightLevel() > 0) {
+            return true;
+        } else
+        if (center.getRelative(BlockFace.SOUTH).getLightLevel() > 0) {
+            return true;
+        } else
+        if (center.getRelative(BlockFace.EAST).getLightLevel() > 0) {
+            return true;
+        } else
+        if (center.getRelative(BlockFace.WEST).getLightLevel() > 0) {
+            return true;
+        }
+        return false;
+    }
 
     public static void update(World w, List<Block> blocks) {
         HashSet<Integer[]> hash = new HashSet<>();
@@ -109,6 +134,12 @@ public class FBlockUpdate {
 
         if (config.disabled_worlds.contains(block.getWorld().getName())) {
             return;
+        }
+        
+        if (config.dark_only) {
+            if (!isBlocksInLight(block)) {
+                return;
+            }
         }
 
         int radius = config.update_radius;

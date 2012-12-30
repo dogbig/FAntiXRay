@@ -57,19 +57,15 @@ public class FBlockListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockPlace(BlockPlaceEvent e) {
         if (e.isCancelled()) { return; }
-        
+
         FConfiguration config = FAntiXRay.getConfiguration();
-        /*if (config.dark_only) {
-            FBlockUpdate.update(e.getBlock());
-        } else*/
         if (config.block_place) {
             FBlockUpdate.update(e.getPlayer(), e.getBlock(), true);
-            //TODO: Finish Darkness Update
         }
 
-        /*if (config.dark_enabled && config.dark_blocks.contains(e.getBlock().getTypeId())) {
-            FBlockUpdate.update(e.getBlock());
-        }*/
+        if (config.dark_only && config.dark_blocks.contains(e.getBlock().getTypeId())) {
+            FBlockUpdate.update(e.getPlayer(), e.getBlock());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)

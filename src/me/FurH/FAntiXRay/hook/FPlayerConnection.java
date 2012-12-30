@@ -16,8 +16,6 @@
 
 package me.FurH.FAntiXRay.hook;
 
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-import me.FurH.FAntiXRay.util.FUtil;
 import net.minecraft.server.v1_4_6.EntityPlayer;
 import net.minecraft.server.v1_4_6.INetworkManager;
 import net.minecraft.server.v1_4_6.MinecraftServer;
@@ -124,7 +122,7 @@ public class FPlayerConnection extends PlayerConnection {
 
     @Override
     public void a(Packet3Chat packet3chat) {
-        FUtil.setPrivateField(this.playerConnection, "m", 0);
+        //FUtil.setPrivateField(this.playerConnection, "m", 0);
         this.playerConnection.a(packet3chat);
     }
 

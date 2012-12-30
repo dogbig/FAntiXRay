@@ -5,7 +5,7 @@ Options:
   UpdateRadius: 1
 
 Darkness:
-  ## Set to true to obfuscate everyblock that is in the darknesss (NOT WORKING)
+  ## Enabled, if true, all blocks that is in the dark will be obfuscated
   Enabled: false
   ## BrightOnly, if true, the block will be update only if it have a light level higher then 0
   BrightOnly: true
@@ -13,6 +13,20 @@ Darkness:
   BrightRadius: 8
   ## UpdateOn, the block id that will cast the update when placed
   UpdateOn: 50, 51, 89
+  ## ExtraBlocks, the extra blocks to be obfuscated if it is in the dark
+  ExtraBlocks:
+    - 5
+    - 4
+    - 30
+    - 46
+    - 47
+    - 48
+    - 49
+    - 52
+    - 54
+    - 66
+    - 85
+    - 101
 
 ## Set which events will be used to update the blocks (Deobfuscate)
 ## OnBlockBreak is enabled by default and cannot be disabled, those are just extra!
@@ -42,7 +56,7 @@ Cache:
   Compress:
     ## 0 = No Compression (Ultra fast, higher sizes), 9 = Maximum compression (Slower, more resources needed, smaller sizes)
     Level: 1
-  
+
 Permissions:
   ## OpHasPerm, if true, op players will have all permissions
   OpHasPerm: false
