@@ -102,7 +102,7 @@ public class FChunkCache {
             zis = null;
             fis = null;
         } catch (IOException | ClassNotFoundException ex) {
-            FAntiXRay.getCommunicator().error("[TAG] Error while reading the data file: {0}", ex, ex.getMessage());
+            FAntiXRay.getCommunicator().error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, "[TAG] Error while reading the data file: {0}", ex.getMessage());
         }
         return data;
     }
@@ -162,7 +162,7 @@ public class FChunkCache {
             zos = null;
             fos = null;
         } catch (IOException ex) {
-            FAntiXRay.getCommunicator().error("[TAG] Error while writing the data file: {0}", ex, ex.getMessage());
+            FAntiXRay.getCommunicator().error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, "[TAG] Error while writing the data file: {0}", ex.getMessage());            
         }
     }
 }

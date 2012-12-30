@@ -16,14 +16,12 @@
 
 package me.FurH.FAntiXRay.hook;
 
-import java.lang.reflect.Field;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.util.FUtil;
 import net.minecraft.server.v1_4_6.EntityPlayer;
 import net.minecraft.server.v1_4_6.INetworkManager;
@@ -47,22 +45,26 @@ public class FNetObfuscation extends FPlayerConnection {
     public void sendPacket(Packet packet) {
         if (packet instanceof Packet56MapChunkBulk) {
             obfuscate((Packet56MapChunkBulk)packet);
-            super.sendPacket(packet);
-        } else
+        }
+
         if (packet instanceof Packet51MapChunk) {
             Packet51MapChunk p51 = (Packet51MapChunk)packet;
-            byte[] inflatedBuffer = (byte[]) getPrivate(p51, "inflatedBuffer");
-            if (inflatedBuffer.length == 256) {
-                super.sendPacket(p51);
+            byte[] inflatedBuffer = (byte[]) FUtil.getPrivateField(p51, "inflatedBuffer");
+            if (inflatedBuffer.length > 256) {
+                return;
             }
-        } else {
-            super.sendPacket(packet);
         }
+
+        super.sendPacket(packet);
     }
 
     private void obfuscate(Packet56MapChunkBulk packet) {
 
-        if (getPrivate(packet, "buffer") != null) { //Assuming the chunk is already being compressed
+        if (player.playerConnection.disconnected) {
+            return;
+        }
+        
+        if (FUtil.getPrivateField(packet, "buffer") != null) { //Assuming the chunk is already being compressed
             return;
         }
 
@@ -77,25 +79,16 @@ public class FNetObfuscation extends FPlayerConnection {
         boolean usecache = FAntiXRay.getConfiguration().enable_cache;
         boolean savecache = false;
 
-        int[] c = (int[]) getPrivate(packet, "c"); //X
-        int[] d = (int[]) getPrivate(packet, "d"); //Z
+        int[] c = (int[]) FUtil.getPrivateField(packet, "c"); //X
+        int[] d = (int[]) FUtil.getPrivateField(packet, "d"); //Z
 
-        byte[][] inflatedBuffers = (byte[][]) getPrivate(packet, "inflatedBuffers");
-        byte[] buildBuffer = (byte[]) getPrivate(packet, "buildBuffer");
+        byte[][] inflatedBuffers = (byte[][]) FUtil.getPrivateField(packet, "inflatedBuffers");
+        byte[] buildBuffer = (byte[]) FUtil.getPrivateField(packet, "buildBuffer");
 
         int index = 0;
         for (int i = 0; i < packet.d(); i++) {
             byte[] obfuscated = null;
 
-            /*if (FWorldListener.chunks.remove(c[i] + ":" + d[i])) {
-                //FChunkRWork.queue.add(new FChunkData(packet, this.player));
-                //sendpacket = false;
-                //continue;
-                System.out.println("IS HERE: " + c[i] + ":" + d[i]);
-            }*/
-
-            System.arraycopy(inflatedBuffers[i], 0, buildBuffer, index, inflatedBuffers[i].length);
-            
             if (usecache) {
                 hash = getHash(inflatedBuffers[i], inflatedBuffers[i].length);
                 obfuscated = cache.read(player.world, c[i], d[i], hash, engine_mode);
@@ -220,16 +213,7 @@ public class FNetObfuscation extends FPlayerConnection {
         }
     }
 
-    private Object getPrivate(Object object, String x) {
-        try {
-            Field field = object.getClass().getDeclaredField(x);
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            FAntiXRay.log.severe("[FAntiXRay]: Failed to get private field: " + x + ", " + ex.getMessage());
-        }
-        return null;
-    }
+
     
     private long getHash(byte[] data, int size) {
         Checksum checksum = new CRC32();

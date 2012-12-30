@@ -16,6 +16,8 @@
 
 package me.FurH.FAntiXRay.hook;
 
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import me.FurH.FAntiXRay.util.FUtil;
 import net.minecraft.server.v1_4_6.EntityPlayer;
 import net.minecraft.server.v1_4_6.INetworkManager;
 import net.minecraft.server.v1_4_6.MinecraftServer;
@@ -27,6 +29,7 @@ import net.minecraft.server.v1_4_6.Packet106Transaction;
 import net.minecraft.server.v1_4_6.Packet107SetCreativeSlot;
 import net.minecraft.server.v1_4_6.Packet108ButtonClick;
 import net.minecraft.server.v1_4_6.Packet10Flying;
+import net.minecraft.server.v1_4_6.Packet130UpdateSign;
 import net.minecraft.server.v1_4_6.Packet14BlockDig;
 import net.minecraft.server.v1_4_6.Packet15Place;
 import net.minecraft.server.v1_4_6.Packet16BlockItemSwitch;
@@ -119,14 +122,20 @@ public class FPlayerConnection extends PlayerConnection {
         this.playerConnection.a(packet16blockitemswitch);
     }
 
-    /*@Override
+    @Override
     public void a(Packet3Chat packet3chat) {
+        FUtil.setPrivateField(this.playerConnection, "m", 0);
         this.playerConnection.a(packet3chat);
-    }*/
+    }
 
-    /*@Override
+    @Override
     public void chat(String s, boolean async) {
         this.playerConnection.chat(s, async);
+    }
+
+    /*@Override
+    private void handleCommand(String s) {
+        this.playerConnection.handleCommand(s);
     }*/
 
     @Override
@@ -154,10 +163,10 @@ public class FPlayerConnection extends PlayerConnection {
         this.playerConnection.a(packet7useentity);
     }
 
-    /*@Override
+    @Override
     public void a(Packet205ClientCommand packet205clientcommand) {
         this.playerConnection.a(packet205clientcommand);
-    }*/
+    }
 
     @Override
     public boolean b() {
@@ -194,10 +203,10 @@ public class FPlayerConnection extends PlayerConnection {
         this.playerConnection.a(packet106transaction);
     }
 
-    /*@Override
+    @Override
     public void a(Packet130UpdateSign packet130updatesign) {
         this.playerConnection.a(packet130updatesign);
-    }*/
+    }
 
     @Override
     public void a(Packet0KeepAlive packet0keepalive) {

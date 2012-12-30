@@ -70,13 +70,16 @@ public class FMessages {
                 try {
                     config.save(dir);
                 } catch (IOException ex) {
-                    com.error(FAntiXRay.tag + "Can't update the messages file: {0}", ex, ex.getMessage());
+                    com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                        FAntiXRay.tag + "[TAG] Can't update the messages file: {0}", ex.getMessage());  
                 }
             }
-        } catch (IOException e) {
-            com.error(FAntiXRay.tag + "Can't load the messages file: {0}", e, e.getMessage());
+        } catch (IOException ex) {
+            com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                FAntiXRay.tag + "[TAG] Can't load the messages file: {0}", ex.getMessage()); 
         } catch (InvalidConfigurationException ex) {
-            com.error(FAntiXRay.tag + "Can't load the messages file: {0}", ex, ex.getMessage());
+            com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                FAntiXRay.tag + "[TAG] Can't load the messages file: {0}", ex.getMessage()); 
             com.log(FAntiXRay.tag + " You have a broken message node at: {0}", node);
         }
         

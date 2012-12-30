@@ -170,13 +170,16 @@ public class FConfiguration {
                 try {
                     config.save(dir);
                 } catch (IOException ex) {
-                    com.error("[TAG] Can't update the settings file: {0}", ex, ex.getMessage());
+                    com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                            "[TAG] Can't update the settings file: {0}", ex.getMessage());            
                 }
             }
-        } catch (IOException e) {
-            com.error("[TAG] Can't load the settings file: {0}", e, e.getMessage());
+        } catch (IOException ex) {
+            com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Can't load the settings file: {0}", ex.getMessage());  
         } catch (InvalidConfigurationException ex) {
-            com.error("[TAG] Can't load the settings file: {0}", ex, ex.getMessage());
+            com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Can't load the settings file: {0}", ex.getMessage());  
             com.log("[TAG] You have a broken node in your settings file at: {0}", node);
         }
         

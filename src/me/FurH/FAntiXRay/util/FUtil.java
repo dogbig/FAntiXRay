@@ -23,13 +23,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
-import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -37,6 +40,31 @@ import org.bukkit.plugin.Plugin;
  * @author FurmigaHumana
  */
 public class FUtil {
+    
+    public static void setPrivateField(Object obj, String x, Object value) {
+        try {
+            Field f = obj.getClass().getDeclaredField(x);
+            f.setAccessible(true);
+            f.set(obj, value);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            FAntiXRay.getCommunicator().error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Failed to set private field: {0} to {1}, {2}", x, value, ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+    
+    public static Object getPrivateField(Object obj, String x) {
+        try {
+            Field f = obj.getClass().getDeclaredField(x);
+            f.setAccessible(true);
+            return f.get(obj);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            FAntiXRay.getCommunicator().error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Failed to get private field: {0} , {1}", x, ex.getMessage());
+            ex.printStackTrace();
+        }
+        return null;
+    }
     
     /*
      * return a HashSet of the List contends
@@ -60,6 +88,7 @@ public class FUtil {
      * convert and string to a list
      */
     public static List<Integer> toIntegerList(String string, String split) {
+        FCommunicator com    = FAntiXRay.getCommunicator();
         try {
             string = string.replaceAll("\\[", "").replaceAll("\\]", "");
             if (string.contains(split) && !"[]".equals(string)) {
@@ -71,8 +100,8 @@ public class FUtil {
                         int i = Integer.parseInt(str);
                         ints.add(i);
                     } catch (Exception ex) {
-                        FCommunicator com    = FAntiXRay.getCommunicator();
-                        com.error("[TAG] {0} is not a valid number!, {1}", ex, str, ex.getMessage());
+                        com.error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                                "[TAG] {0} is not a valid number!, {1}", str, ex.getMessage());
                     }
                 }
                 
@@ -85,8 +114,8 @@ public class FUtil {
                 }
             }
         } catch (Exception ex) {
-            FCommunicator com    = FAntiXRay.getCommunicator();
-            com.error("[TAG] Failed to parse string to list: {0}, split: {1}, {2}", ex, string, split, ex.getMessage());
+            com.error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Failed to parse string to list: {0}, split: {1}, {2}", string, split, ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -99,47 +128,75 @@ public class FUtil {
     /*
      * Dump the stack to a file
      */
-    public static String stack(Throwable ex) {
+    public static String stack(String className, int line, String method, Throwable ex, String message) {
         FAntiXRay      plugin = FAntiXRay.getPlugin();
         String format1 = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss").format(System.currentTimeMillis());
         File data = new File(plugin.getDataFolder() + File.separator + "error", "");
         if (!data.exists()) { data.mkdirs(); }
         
+        FCommunicator com    = FAntiXRay.getCommunicator();
         data = new File(data.getAbsolutePath(), "error-"+format1+".txt");
         if (!data.exists()) {
             try {
                 data.createNewFile();
             } catch (IOException e) {
-                FCommunicator com    = FAntiXRay.getCommunicator();
-                com.error("Failed to create new log file, {0} .", e, e.getMessage());
+                
+                com.log("Failed to create new log file, {0} .", e.getMessage());
             }
         }
         
-        StackTraceElement[] st = ex.getStackTrace();
-        FileWriter Writer;
         try {
+            StackTraceElement[] st = ex.getStackTrace();
+            String l = System.getProperty("line.separator");
+
             String format2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(System.currentTimeMillis());
-            Writer = new FileWriter(data, true);
-            BufferedWriter Out = new BufferedWriter(Writer);
-            Out.write(format2 + " - " + "Error Message: " + ex.getMessage() + System.getProperty("line.separator"));
+            FileWriter fw = new FileWriter(data, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            Runtime runtime = Runtime.getRuntime();
             
-            List<String> pls = new ArrayList<>();
-            Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
-            for (Plugin pl1 : plugins) {
-                pls.add(pl1.getDescription().getFullName());
-            }
+            File root = new File("/");
 
-            Out.write(format2 + " - " + "Plugins ("+pls.size()+"): " + pls.toString() + System.getProperty("line.separator"));
-            Out.write(format2 + " - " + "=============================[ ERROR  STACKTRACE ]=============================" + System.getProperty("line.separator"));
-            for (int i = 0; i < st.length; i++) {
-                Out.write(format2 + " - " + st[i].toString() + System.getProperty("line.separator"));
+            bw.write(format2 +l);
+            bw.write("	=============================[ ERROR INFORMATION ]============================="+l);
+            bw.write("	- Plugin: " + plugin.getDescription().getFullName() + " (Latest: " + plugin.getVersion("1.0") + ")" +l);
+            bw.write("	- Error Message: " + ex.getMessage() +l);
+            bw.write("	- Location: " + className + ", Line: " + line + ", Method: " + method +l);
+            bw.write("	- Comment: " + message +l);
+            bw.write("	=============================[ HARDWARE SETTINGS ]============================="+l);
+            bw.write("		Java: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("java.vendor.url") +l);
+            bw.write("		System: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch") +l);
+            bw.write("		Processors: " + runtime.availableProcessors() +l);
+            bw.write("		Memory: "+l);
+            bw.write("			Free: " + runtime.freeMemory() +l);
+            bw.write("			Total: " + runtime.totalMemory() +l);
+            bw.write("			Max: " + runtime.maxMemory() +l);
+            bw.write("		Storage: "+l);
+            bw.write("			Total: " + root.getTotalSpace() +l);
+            bw.write("			Free: " + root.getTotalSpace() +l);
+            bw.write("	=============================[ INSTALLED PLUGINS ]============================="+l);
+            bw.write("	Plugins:"+l);
+            for (Plugin x : plugin.getServer().getPluginManager().getPlugins()) {
+                bw.write("		- " + x.getDescription().getFullName() +l);
             }
-
-            Out.write(format2 + " - " + "=============================[ END OF STACKTRACE ]=============================" + System.getProperty("line.separator"));
-            Out.close();
+            bw.write("	=============================[  LOADED  WORLDS  ]============================="+l);
+            bw.write("	Worlds:"+l);
+            for (World w : plugin.getServer().getWorlds()) {
+                bw.write("		" + w.getName() + ":" +l);
+                bw.write("			Envioronment: " + w.getEnvironment().toString() +l);
+                bw.write("			Player Count: " + w.getPlayers().size() +l);
+                bw.write("			Entity Count: " + w.getEntities().size() +l);
+                bw.write("			Loaded Chunks: " + w.getLoadedChunks().length +l);
+            }
+            bw.write("	=============================[ ERROR  STACKTRACE ]============================="+l);
+            for (StackTraceElement element : st) {
+                bw.write("		- " + element.toString()+l);
+            }
+            bw.write("	=============================[ END OF STACKTRACE ]============================="+l);
+            bw.write(format2);
+            bw.close();
+            fw.close();
         } catch (IOException e) {
-            FCommunicator com    = FAntiXRay.getCommunicator();
-            com.error("Failed to write in the log file, {0}", e, e.getMessage());
+            com.log("Failed to write in the log file, {0}", e.getMessage());
         }
         
         return format1;
@@ -162,7 +219,8 @@ public class FUtil {
             out.close();
         } catch (IOException ex) {
             FCommunicator com    = FAntiXRay.getCommunicator();
-            com.error("Failed to copy the file {0}, {1}", ex, file.getName(), ex.getMessage());
+            com.error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Failed to copy the file {0}, {1}", file.getName(), ex.getMessage());
         }
     }
 }

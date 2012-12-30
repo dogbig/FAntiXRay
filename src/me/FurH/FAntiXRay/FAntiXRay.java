@@ -27,14 +27,13 @@ import me.FurH.FAntiXRay.cache.FCacheQueue;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
-import me.FurH.FAntiXRay.hook.FChunkRWork;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
-import me.FurH.FAntiXRay.listener.FWorldListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.util.FCommunicator;
+import me.FurH.FAntiXRay.util.FUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -69,7 +68,7 @@ public class FAntiXRay extends JavaPlugin {
     private static FChunkCache cache;
     private static FConfiguration configuration;
     
-    public static HashSet<String> exempt = new HashSet<>();
+    private static HashSet<String> exempt = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -87,10 +86,9 @@ public class FAntiXRay extends JavaPlugin {
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
         }
-
+        
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
-        //pm.registerEvents(new FWorldListener(), this);
         pm.registerEvents(blockListener, this);
         blockListener.loadListeners(this);
 
@@ -110,7 +108,6 @@ public class FAntiXRay extends JavaPlugin {
         }
 
         getCacheSize();
-        //FChunkRWork.toReloadW();
         
         communicator.log("[TAG] Cache Size: {0} MB in {1} files", size, files);
 

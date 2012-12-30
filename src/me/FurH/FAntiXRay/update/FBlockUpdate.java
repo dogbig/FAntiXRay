@@ -22,7 +22,6 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import net.minecraft.server.v1_4_6.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_4_6.CraftWorld;
