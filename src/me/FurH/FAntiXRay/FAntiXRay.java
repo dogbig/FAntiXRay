@@ -185,6 +185,7 @@ public class FAntiXRay extends JavaPlugin {
             if (args.length <= 0) {
                 communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
                 communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                communicator.msg(sender, "&a/axr cache flush &8-&7 Write the cache queue");
                 communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                 return true;
             } else if (args.length > 0) {
@@ -248,6 +249,7 @@ public class FAntiXRay extends JavaPlugin {
                     } else {
                         communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
                         communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                        communicator.msg(sender, "&a/axr cache flush &8-&7 Write the cache queue");
                         communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                         return true;
                     }
@@ -255,6 +257,7 @@ public class FAntiXRay extends JavaPlugin {
             } else {
                 communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
                 communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                communicator.msg(sender, "&a/axr cache flush &8-&7 Write the cache queue");
                 communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                 return true;
             }
