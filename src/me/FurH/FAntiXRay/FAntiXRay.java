@@ -190,22 +190,35 @@ public class FAntiXRay extends JavaPlugin {
             } else if (args.length > 0) {
                 if (args.length > 1) {
                     if (args.length > 2) {
-                        communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                        communicator.msg(sender, "&a/axr cache flush &8-&7 Write the cache queue");
                         communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
-                        communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                         return true;
                     } else {
-                        if (!sender.hasPermission("FAntiXRay.ClearCache")) {
-                            communicator.msg(sender, "&4You don't have permission to use this command");
-                            return true;
-                        } else {
-                            communicator.msg(sender, "&7Cleaning cache...");
-                            int left = FCacheManager.clearCache();
-                            if (left > 0) {
-                                communicator.msg(sender, "&a{0}&7 files could not be deleted!", left);
+                        if (args[1].equalsIgnoreCase("clear")) {
+                            if (!sender.hasPermission("FAntiXRay.ClearCache")) {
+                                communicator.msg(sender, "&4You don't have permission to use this command");
                                 return true;
                             } else {
-                                communicator.msg(sender, "&aCache cleared successfully!");
+                                communicator.msg(sender, "&7Cleaning cache...");
+                                int left = FCacheManager.clearCache();
+                                if (left > 0) {
+                                    communicator.msg(sender, "&a{0}&7 files could not be deleted!", left);
+                                    return true;
+                                } else {
+                                    communicator.msg(sender, "&aCache cleared successfully!");
+                                    return true;
+                                }
+                            }
+                        } else
+                        if (args[1].equalsIgnoreCase("flush")) {
+                            if (!sender.hasPermission("FAntiXRay.FlushCache")) {
+                                communicator.msg(sender, "&4You don't have permission to use this command");
+                                return true;
+                            } else {
+                                communicator.msg(sender, "&7Writing cache...");
+                                FCacheQueue.saveQueue();
+                                FCacheQueue.queue();
+                                communicator.msg(sender, "&aDone!");
                                 return true;
                             }
                         }
