@@ -18,10 +18,7 @@ package me.FurH.FAntiXRay.listener;
 
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FMessages;
-import me.FurH.FAntiXRay.hook.FNetObfuscation;
 import me.FurH.FAntiXRay.util.FCommunicator;
-import org.bukkit.craftbukkit.v1_4_6.CraftServer;
-import org.bukkit.craftbukkit.v1_4_6.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,25 +39,6 @@ public class FPlayerListener implements Listener  {
         FMessages messages = FAntiXRay.getMessages();
         FAntiXRay plugin = FAntiXRay.getPlugin();
         
-        if (plugin.hasPerm(p, "Deobfuscate")) {
-            com.msg(p, messages.deobfuscated);
-            FAntiXRay.exempt(p.getName());
-        }
-
-        if (plugin.hasPerm(p, "Quiet.Deobfuscate")) {
-            FAntiXRay.exempt(p.getName());
-        }
-        
-        if (!FAntiXRay.isExempt(p.getName())) {
-            CraftPlayer cp = (CraftPlayer)p;
-            CraftServer s = (CraftServer)p.getServer();
-            if (!(cp.getHandle().playerConnection instanceof FNetObfuscation)) {
-                FNetObfuscation handler = new FNetObfuscation(s.getServer(), cp.getHandle().playerConnection.networkManager, cp.getHandle().playerConnection.player);
-                cp.getHandle().playerConnection.networkManager.a(handler);
-                cp.getHandle().playerConnection = handler;
-            }
-        }
-
         if (plugin.hasUpdate) {
             if (plugin.hasPerm(p, "Updates")) {
                 com.msg(p, messages.update1, plugin.newVersion, plugin.currentVersion);

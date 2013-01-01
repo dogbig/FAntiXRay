@@ -48,12 +48,6 @@ public class FConfiguration {
     public boolean          block_damage    = false;
     public boolean          block_piston    = false;
     public boolean          block_physics   = false;
-    
-    public int              call_gc         = 100;
-    public boolean          enable_cache    = true;
-    public int              size_limit      = 1024;
-    public int              writes_sec      = 10;
-    public int              compress_level  = 1;
 
     public boolean          ophasperm       = true;
 
@@ -90,16 +84,6 @@ public class FConfiguration {
         block_piston    = getBoolean("UpdateEvents.onBlockPiston");
         block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
 
-        call_gc         = getInteger("Cache.callGCat");
-        enable_cache    = getBoolean("Cache.Enabled");
-        size_limit      = getInteger("Cache.SizeLimit");
-        writes_sec      = getInteger("Cache.WritesPerSec");
-        compress_level  = getInteger("Cache.Compress.Level");
-        if (compress_level > 9) {
-            com.log("[TAG] The compression level can't be higher then 9!");
-            compress_level = 9;
-        }
-
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
         updates         = getBoolean("Updater.Enabled");
@@ -112,6 +96,8 @@ public class FConfiguration {
         if (hidden_blocks.contains(68)) { hidden_blocks.remove(68); }
         
         disabled_worlds = getStringHash("Lists.DisabledWorlds");
+        
+        org.bukkit.craftbukkit.v1_4_6.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled);
     }
     
     /*

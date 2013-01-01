@@ -1,6 +1,6 @@
 Options:
   ## Engine Mode, set to 0, 1, 2, 3 or 4. Check the plugin's description for more information.
-  EngineMode: 1
+  EngineMode: 0
   ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1
 
@@ -8,7 +8,7 @@ Darkness:
   ## Enabled, if true, all blocks that is in the dark will be obfuscated
   Enabled: false
   ## BrightOnly, if true, the block will be update only if it have a light level higher then 0
-  BrightOnly: true
+  BrightOnly: false
   ## BrightRadius, the radius around the light to be updated, Higher this value is, higher will be the cpu usage.
   BrightRadius: 8
   ## UpdateOn, the block id that will cast the update when placed
@@ -42,20 +42,6 @@ UpdateEvents:
   onBlockPiston: false
   ## Update blocks on physics
   onBlockPhysics: false
-
-Cache:
-  ## callGCat, a number of cache files to read/write before forcing a gc
-  callGCat: 100
-  ## Enabled, if true, the cache system will be activated
-  Enabled: false
-  ## SizeLimit, set the size limit of the cache folder in MB, 0 Will disable it.
-  SizeLimit: 5120
-  ## WritesPerSec, set the number of files to be written per second
-  WritesPerSec: 10
-  ## The level of compression used on the cache, higher this value is, slower the cache will be and more resources will be required to read/write.
-  Compress:
-    ## 0 = No Compression (Ultra fast, higher sizes), 9 = Maximum compression (Slower, more resources needed, smaller sizes)
-    Level: 1
 
 Permissions:
   ## OpHasPerm, if true, op players will have all permissions

@@ -23,15 +23,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 import me.FurH.FAntiXRay.FAntiXRay;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -58,39 +55,7 @@ public class FUtil {
         }
         return new StringBuilder().append("").append((int)bytes).append(" bytes").toString();
     }
-    
-    public static long getHash(byte[] data) {
-        Checksum checksum = new CRC32();
-        checksum.reset();
-        checksum.update(data, 0, data.length);
-        return checksum.getValue();
-    }
-    
-    public static void setPrivateField(Object obj, String x, Object value) {
-        try {
-            Field f = obj.getClass().getDeclaredField(x);
-            f.setAccessible(true);
-            f.set(obj, value);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            FAntiXRay.getCommunicator().error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
-                    "[TAG] Failed to set private field: {0} to {1}, {2}", x, value, ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
-    
-    public static Object getPrivateField(Object obj, String x) {
-        try {
-            Field f = obj.getClass().getDeclaredField(x);
-            f.setAccessible(true);
-            return f.get(obj);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            FAntiXRay.getCommunicator().error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
-                    "[TAG] Failed to get private field: {0} , {1}", x, ex.getMessage());
-            ex.printStackTrace();
-        }
-        return null;
-    }
-    
+
     /*
      * return a HashSet of the List contends
      */
@@ -144,12 +109,7 @@ public class FUtil {
             return new ArrayList<>();
         }
     }
-    
-    public static int getRandom() {
-        int random = ((int)(Math.random() * FAntiXRay.getConfiguration().random_blocks.length));
-        return FAntiXRay.getConfiguration().random_blocks[ random ];
-    }
-    
+
     /*
      * Dump the stack to a file
      */
