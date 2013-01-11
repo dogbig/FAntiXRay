@@ -29,7 +29,7 @@ public class Packet51MapChunk extends Packet {
         this.a = chunk.x;
         this.b = chunk.z;
         this.e = flag;
-        ChunkMap chunkmap = a(chunk, flag, i);
+        ChunkMap chunkmap = a(chunk, flag, i, true); // FurH - add true
         Deflater deflater = new Deflater(-1);
 
         this.d = chunkmap.c;
@@ -102,8 +102,14 @@ public class Packet51MapChunk extends Packet {
     public int a() {
         return 17 + this.size;
     }
-
+    
+    // FurH - start
     public static ChunkMap a(Chunk chunk, boolean flag, int i) {
+        return a(chunk, flag, i, false);
+    }
+    // FurH - end
+
+    public static ChunkMap a(Chunk chunk, boolean flag, int i, boolean p51) { // FurH - add boolean p51
         int j = 0;
         ChunkSection[] achunksection = chunk.i();
         int k = 0;
@@ -140,16 +146,22 @@ public class Packet51MapChunk extends Packet {
         for (l = 0; l < achunksection.length; ++l) {
             if (achunksection[l] != null && (!flag || !achunksection[l].a()) && (i & 1 << l) != 0) {
                 nibblearray = achunksection[l].j();
-                System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                j += nibblearray.a.length;
+                // Spigot start
+                // System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                // j += nibblearray.a.length;
+                j = nibblearray.copyToByteArray(abyte, j);
+                // Spigot end
             }
         }
 
         for (l = 0; l < achunksection.length; ++l) {
             if (achunksection[l] != null && (!flag || !achunksection[l].a()) && (i & 1 << l) != 0) {
                 nibblearray = achunksection[l].k();
-                System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                j += nibblearray.a.length;
+                // Spigot start
+                // System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                // j += nibblearray.a.length;
+                j = nibblearray.copyToByteArray(abyte, j);
+                // Spigot end
             }
         }
 
@@ -157,8 +169,11 @@ public class Packet51MapChunk extends Packet {
             for (l = 0; l < achunksection.length; ++l) {
                 if (achunksection[l] != null && (!flag || !achunksection[l].a()) && (i & 1 << l) != 0) {
                     nibblearray = achunksection[l].l();
-                    System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                    j += nibblearray.a.length;
+                    // Spigot start
+                    // System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                    // j += nibblearray.a.length;
+                    j = nibblearray.copyToByteArray(abyte, j);
+                    // Spigot end
                 }
             }
         }
@@ -167,8 +182,11 @@ public class Packet51MapChunk extends Packet {
             for (l = 0; l < achunksection.length; ++l) {
                 if (achunksection[l] != null && (!flag || !achunksection[l].a()) && achunksection[l].i() != null && (i & 1 << l) != 0) {
                     nibblearray = achunksection[l].i();
-                    System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                    j += nibblearray.a.length;
+                    // Spigot start
+                    //System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                    //j += nibblearray.a.length;
+                    j = nibblearray.copyToByteArray(abyte, j);
+                    // Spigot end
                 }
             }
         }
@@ -180,8 +198,12 @@ public class Packet51MapChunk extends Packet {
             j += abyte2.length;
         }
 
-        abyte = FAntiXRay.obfuscate(chunkmap, chunk, abyte); //FurH
-
+        // FurH - start
+        if (p51) {
+            abyte = FAntiXRay.obfuscate(chunkmap, chunk, buildBuffer, flag, i);
+        }
+        // FurH - end
+        
         chunkmap.a = new byte[j];
         System.arraycopy(abyte, 0, chunkmap.a, 0, j);
         return chunkmap;

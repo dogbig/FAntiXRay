@@ -97,7 +97,13 @@ public class FConfiguration {
         
         disabled_worlds = getStringHash("Lists.DisabledWorlds");
         
-        org.bukkit.craftbukkit.v1_4_6.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled);
+        try {
+            org.bukkit.craftbukkit.v1_4_6.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled);
+        } catch (NoClassDefFoundError ex) {
+            com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
+                    "[TAG] Can't hook into craftbukkit's jar: {0}", ex.getMessage());
+            FAntiXRay.getPlugin().onUnload();
+        }
     }
     
     /*

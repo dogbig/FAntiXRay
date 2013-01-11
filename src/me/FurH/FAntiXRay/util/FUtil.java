@@ -38,23 +38,6 @@ import org.bukkit.plugin.Plugin;
  * @author FurmigaHumana
  */
 public class FUtil {
-    private static final DecimalFormat decimal = new DecimalFormat("#.##");
-    
-    public static String format(double bytes) {
-        if (bytes >= 1099511627776.0D) {
-            return new StringBuilder().append(decimal.format(bytes / 1099511627776.0D)).append(" TB").toString();
-        }
-        if (bytes >= 1073741824.0D) {
-            return new StringBuilder().append(decimal.format(bytes / 1073741824.0D)).append(" GB").toString();
-        }
-        if (bytes >= 1048576.0D) {
-            return new StringBuilder().append(decimal.format(bytes / 1048576.0D)).append(" MB").toString();
-        }
-        if (bytes >= 1024.0D) {
-            return new StringBuilder().append(decimal.format(bytes / 1024.0D)).append(" KB").toString();
-        }
-        return new StringBuilder().append("").append((int)bytes).append(" bytes").toString();
-    }
 
     /*
      * return a HashSet of the List contends
@@ -152,18 +135,18 @@ public class FUtil {
             bw.write("		System: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch") +l);
             bw.write("		Processors: " + runtime.availableProcessors() +l);
             bw.write("		Memory: "+l);
-            bw.write("			Free: " + runtime.freeMemory() +l);
-            bw.write("			Total: " + runtime.totalMemory() +l);
-            bw.write("			Max: " + runtime.maxMemory() +l);
+            bw.write("			Free: " + format(runtime.freeMemory()) +l);
+            bw.write("			Total: " + format(runtime.totalMemory()) +l);
+            bw.write("			Max: " + format(runtime.maxMemory()) +l);
             bw.write("		Storage: "+l);
-            bw.write("			Total: " + root.getTotalSpace() +l);
-            bw.write("			Free: " + root.getTotalSpace() +l);
+            bw.write("			Total: " + format(root.getTotalSpace()) +l);
+            bw.write("			Free: " + format(root.getTotalSpace()) +l);
             bw.write("	=============================[ INSTALLED PLUGINS ]============================="+l);
             bw.write("	Plugins:"+l);
             for (Plugin x : plugin.getServer().getPluginManager().getPlugins()) {
                 bw.write("		- " + x.getDescription().getFullName() +l);
             }
-            bw.write("	=============================[  LOADED  WORLDS  ]============================="+l);
+            bw.write("	=============================[  LOADED   WORLDS  ]============================="+l);
             bw.write("	Worlds:"+l);
             for (World w : plugin.getServer().getWorlds()) {
                 bw.write("		" + w.getName() + ":" +l);
@@ -185,6 +168,23 @@ public class FUtil {
         }
         
         return format1;
+    }
+
+    public static String format(double bytes) {
+        DecimalFormat decimal = new DecimalFormat("#.##");
+        if (bytes >= 1099511627776.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1099511627776.0D)).append(" TB").toString();
+        }
+        if (bytes >= 1073741824.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1073741824.0D)).append(" GB").toString();
+        }
+        if (bytes >= 1048576.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1048576.0D)).append(" MB").toString();
+        }
+        if (bytes >= 1024.0D) {
+            return new StringBuilder().append(decimal.format(bytes / 1024.0D)).append(" KB").toString();
+        }
+        return new StringBuilder().append("").append((int)bytes).append(" bytes").toString();
     }
 
     /*

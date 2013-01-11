@@ -38,6 +38,10 @@ public class FBlockUpdate {
     public static void update(Player p, Block b) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
+        if (FAntiXRay.isExempt(p.getName())) {
+            return;
+        }
+        
         if (config.disabled_worlds.contains(b.getWorld().getName())) {
             return;
         }

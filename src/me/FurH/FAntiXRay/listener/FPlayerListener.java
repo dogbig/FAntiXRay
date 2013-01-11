@@ -38,6 +38,15 @@ public class FPlayerListener implements Listener  {
         FCommunicator com = FAntiXRay.getCommunicator();
         FMessages messages = FAntiXRay.getMessages();
         FAntiXRay plugin = FAntiXRay.getPlugin();
+
+        if (plugin.hasPerm(p, "Deobfuscate")) {
+            com.msg(p, messages.deobfuscated);
+            FAntiXRay.exempt(p.getName());
+        }
+
+        if (plugin.hasPerm(p, "Quiet.Deobfuscate")) {
+            FAntiXRay.exempt(p.getName());
+        }
         
         if (plugin.hasUpdate) {
             if (plugin.hasPerm(p, "Updates")) {

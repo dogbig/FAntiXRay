@@ -69,9 +69,9 @@ public class FAntiXRay extends JavaPlugin {
         messages = new FMessages();
         configuration = new FConfiguration();
         
-        configuration.load();
         messages.load();
-        
+        configuration.load();
+
         PluginManager pm = getServer().getPluginManager();
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
@@ -83,7 +83,7 @@ public class FAntiXRay extends JavaPlugin {
         blockListener.loadListeners(this);
 
         startMetrics();
-        
+
         if (configuration.updates) {
             updateThread();
         }
@@ -124,11 +124,11 @@ public class FAntiXRay extends JavaPlugin {
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");
     }
+    
+    public void onUnload() {
+        this.setEnabled(false);
+    }
 
-    /*
-     * //axr cache[0] - Size
-     * //axr cache[0] clear[1] - Clear
-     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (cmd.getName().equalsIgnoreCase("fantixray")) {
@@ -179,15 +179,15 @@ public class FAntiXRay extends JavaPlugin {
     }
 
     public static void exempt(String player) {
-
+        org.bukkit.craftbukkit.v1_4_6.FAntiXRay.exempt(player);
     }
 
     public static void unexempt(String player) {
-
+        org.bukkit.craftbukkit.v1_4_6.FAntiXRay.unexempt(player);
     }
 
     public static boolean isExempt(String player) {
-        return false;
+        return org.bukkit.craftbukkit.v1_4_6.FAntiXRay.isExempt(player);
     }
     
     public boolean hasPerm(CommandSender sender, String perm) {
