@@ -40,6 +40,138 @@ import org.bukkit.plugin.Plugin;
 public class FUtil {
 
     /*
+    public static void patch() {
+        FCommunicator com    = FAntiXRay.getCommunicator();
+
+        File dir = FAntiXRay.getPlugin().getDataFolder();
+        File cb = new File(dir, "craftbukkit.jar");
+        
+        if (!cb.exists()) {
+            com.log("[TAG] Can't find craftbukkit.jar, put it inside /plugins/FAntiXRay/ folder.");
+            return;
+        }
+        
+        com.log("[TAG] CraftBukkit.jar found!");
+
+        com.log("[TAG] Patching files...");
+        
+        HashSet<String> files = new HashSet<>();
+        files.add("net/minecraft/server/v1_4_6/NetworkManager.class");
+        files.add("net/minecraft/server/v1_4_6/Packet51MapChunk.class");
+        files.add("net/minecraft/server/v1_4_6/Packet56MapChunkBulk$1.class");
+        files.add("net/minecraft/server/v1_4_6/Packet56MapChunkBulk.class");
+        files.add("net/minecraft/server/v1_4_6/PlayerConnection$1.class");
+        files.add("net/minecraft/server/v1_4_6/PlayerConnection$2.class");
+        files.add("net/minecraft/server/v1_4_6/PlayerConnection$3.class");
+        files.add("net/minecraft/server/v1_4_6/PlayerConnection$4.class");
+        files.add("net/minecraft/server/v1_4_6/PlayerConnection$5.class");
+        files.add("net/minecraft/server/v1_4_6/PlayerConnection.class");
+        files.add("org/bukkit/craftbukkit/v1_4_6/FAntiXRay.class");
+        files.add("org/bukkit/craftbukkit/v1_4_6/FUtils.class");
+        
+
+        com.log("[TAG] Repacking...");
+
+        //repack(cb, files, dirs);
+
+        com.log("[TAG] Done! Move the patched file!");
+    }
+
+    public static boolean isSpigot() {
+        String mod = FAntiXRay.getPlugin().getServer().getVersion().substring(4, 10);
+        return mod.equalsIgnoreCase("Spigot");
+    }*/
+    
+    /*public static void repack(File source, File[] files, String[] dirs) {
+        try {
+            
+            File tmpZip = File.createTempFile(source.getName(), null);
+            tmpZip.delete();
+            
+            if (!source.renameTo(tmpZip)) {
+                throw new Exception("Could not make temp file (" + source.getName() + ")");
+            }
+
+            HashSet<String> skip = new HashSet<>();
+
+            byte[] buffer = new byte[1024];
+            ZipInputStream zin = new ZipInputStream(new FileInputStream(tmpZip));
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(source));
+            zos.setMethod(ZipOutputStream.DEFLATED); 
+
+            for (int i = 0; i < files.length; i++) {
+                InputStream in = new FileInputStream(files[i]);
+
+                byte [] data = new byte[ 2048 ];
+                FileInputStream fis = null;
+                int len;
+
+                /*String[] drs = dirs[i].split("\\/");
+                for (int j = 0; j < drs.length; j++) {
+                    zos.putNextEntry(new ZipEntry(drs[j]));
+                }*/
+                //File file = files[i];
+                /*ZipEntry entry = new ZipEntry(dirs[i] + File.separator + file.getName());
+                entry.setSize(file.length());
+                entry.setTime(file.lastModified());
+
+                zos.putNextEntry(entry);
+
+                fis = new FileInputStream(file);
+                CRC32 crc32 = new CRC32();
+
+                while ((len = fis.read(data)) > -1) {
+                    zos.write(data, 0, len);
+                    crc32.update(data, 0, len);
+                }
+
+                entry.setCrc(crc32.getValue());
+                fis.close();
+
+                skip.add(files[i].getName());
+
+                for (int read = in.read(buffer); read > -1; read = in.read(buffer)) {
+                    zos.write(buffer, 0, read);
+                }
+
+                zos.closeEntry();
+                in.close();*/
+            //}
+            
+            /*ZipEntry ze = zin.getNextEntry();
+            while (ze != null) {
+                
+                String[] split = ze.getName().split("\\/");
+                String name = split[split.length - 1];
+
+                if (skip.contains(name)) {
+                    ze = zin.getNextEntry();
+                    continue;
+                }
+
+                try {
+                    zos.putNextEntry(ze);
+                } catch (ZipException ex) {
+                    ze = zin.getNextEntry();
+                    continue;
+                }
+
+                for (int read = zin.read(buffer); read > -1; read = zin.read(buffer)) {
+                    zos.write(buffer, 0, read);
+                }
+
+                zos.closeEntry();
+                ze = zin.getNextEntry();
+            }
+
+            zos.close();
+            tmpZip.delete();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }*/
+
+    /*
      * return a HashSet of the List contends
      */
     public static HashSet<String> toStringHashSet(List<String> list) {

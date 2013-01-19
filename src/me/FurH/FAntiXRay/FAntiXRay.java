@@ -69,8 +69,14 @@ public class FAntiXRay extends JavaPlugin {
         messages = new FMessages();
         configuration = new FConfiguration();
         
+        //FPatcher.load();
+
         messages.load();
         configuration.load();
+        /*if (true) {
+            this.setEnabled(false);
+            return;
+        }*/
 
         PluginManager pm = getServer().getPluginManager();
         if (configuration.block_explosion) {
@@ -126,7 +132,7 @@ public class FAntiXRay extends JavaPlugin {
     }
     
     public void onUnload() {
-        this.setEnabled(false);
+        this.getPluginLoader().disablePlugin(this);
     }
 
     @Override
@@ -179,15 +185,15 @@ public class FAntiXRay extends JavaPlugin {
     }
 
     public static void exempt(String player) {
-        org.bukkit.craftbukkit.v1_4_6.FAntiXRay.exempt(player);
+        org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.exempt(player);
     }
 
     public static void unexempt(String player) {
-        org.bukkit.craftbukkit.v1_4_6.FAntiXRay.unexempt(player);
+        org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.unexempt(player);
     }
 
     public static boolean isExempt(String player) {
-        return org.bukkit.craftbukkit.v1_4_6.FAntiXRay.isExempt(player);
+        return org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.isExempt(player);
     }
     
     public boolean hasPerm(CommandSender sender, String perm) {
@@ -232,9 +238,6 @@ public class FAntiXRay extends JavaPlugin {
     private int piston = 0;
     private int physics = 0;
     
-    private int cached = 0;
-    private int uncompressed = 0;
-    private int compressed = 0;
     private void startMetrics() {
         try {
             FMetrics metrics = new FMetrics(this);
