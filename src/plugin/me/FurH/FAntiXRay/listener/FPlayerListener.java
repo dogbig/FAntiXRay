@@ -51,7 +51,7 @@ public class FPlayerListener implements Listener  {
             FAntiXRay.exempt(p.getName());
         }
         
-        if (FAntiXRay.getProtocol() == null) {
+        if (!FAntiXRay.isProtocolEnabled()) {
             if (!FAntiXRay.isExempt(p.getName())) {
                 CraftPlayer cp = (CraftPlayer)p;
                 CraftServer s = (CraftServer)p.getServer();
