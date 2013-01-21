@@ -16,8 +16,6 @@
 
 package me.FurH.FAntiXRay;
 
-import com.bergerkiller.bukkit.nolagg.NoLagg;
-import com.bergerkiller.bukkit.nolagg.NoLaggComponent;
 import com.bergerkiller.bukkit.nolagg.NoLaggComponents;
 import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -99,6 +97,9 @@ public class FAntiXRay extends JavaPlugin {
         Plugin nolagg = pm.getPlugin("NoLagg");
         if (nolagg != null) {
             NoLaggComponents component = NoLaggComponents.CHUNKS;
+            if (component.isEnabled()) {
+                configuration.warning("[TAG] NoLagg Chunks detected! Disable it you must!");
+            }
         }
         
         if (configuration.block_explosion) {
