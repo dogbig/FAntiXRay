@@ -16,6 +16,15 @@
 
 package me.FurH.FAntiXRay;
 
+import com.bergerkiller.bukkit.nolagg.NoLagg;
+import com.bergerkiller.bukkit.nolagg.NoLaggComponent;
+import com.bergerkiller.bukkit.nolagg.NoLaggComponents;
+import com.comphenix.protocol.Packets;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ConnectionSide;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
@@ -30,11 +39,14 @@ import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.util.FCommunicator;
+import net.minecraft.server.v1_4_R1.Packet51MapChunk;
+import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -57,6 +69,8 @@ public class FAntiXRay extends JavaPlugin {
     public int currentVersion = 0;
     public int newVersion = 0;
     
+    private static ProtocolManager manager;
+    
     /* classes */
     private static FAntiXRay plugin;
     private static FCommunicator communicator;
@@ -75,6 +89,18 @@ public class FAntiXRay extends JavaPlugin {
         configuration.load();
 
         PluginManager pm = getServer().getPluginManager();
+        Plugin protocol = pm.getPlugin("ProtocolLib");
+        if (protocol != null) {
+            manager = ProtocolLibrary.getProtocolManager();
+            setupProtocolLib();
+            communicator.log("[TAG] ProtocolLib support enabled!");
+        }
+        
+        Plugin nolagg = pm.getPlugin("NoLagg");
+        if (nolagg != null) {
+            NoLaggComponents component = NoLaggComponents.CHUNKS;
+        }
+        
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
         }
@@ -126,6 +152,27 @@ public class FAntiXRay extends JavaPlugin {
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");
     }
+    
+    public void setupProtocolLib() {
+        manager.addPacketListener(new PacketAdapter(this, ConnectionSide.SERVER_SIDE, new Integer[] { Packets.Server.MAP_CHUNK, Packets.Server.MAP_CHUNK_BULK }) {
+            @Override
+            public void onPacketSending(PacketEvent e) {
+                Player p = e.getPlayer();
+                if (e.getPacketID() == Packets.Server.MAP_CHUNK) {
+                    Packet51MapChunk packet = (Packet51MapChunk) e.getPacket().getHandle();
+                    if (!isExempt(p.getName())) {
+                        packet.obfuscate = true;
+                    }
+                } else
+                if (e.getPacketID() == Packets.Server.MAP_CHUNK_BULK) {
+                    Packet56MapChunkBulk packet = (Packet56MapChunkBulk) e.getPacket().getHandle();
+                    if (!isExempt(p.getName())) {
+                        packet.obfuscate = true;
+                    }
+                }
+            }
+        });
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -158,6 +205,10 @@ public class FAntiXRay extends JavaPlugin {
             }
         }
         return true;
+    }
+    
+    public static ProtocolManager getProtocol() {
+        return manager;
     }
     
     public static FConfiguration getConfiguration() {

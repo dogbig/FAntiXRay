@@ -51,13 +51,15 @@ public class FPlayerListener implements Listener  {
             FAntiXRay.exempt(p.getName());
         }
         
-        if (!FAntiXRay.isExempt(p.getName())) {
-            CraftPlayer cp = (CraftPlayer)p;
-            CraftServer s = (CraftServer)p.getServer();
-            if (!(cp.getHandle().playerConnection instanceof FPlayerConnection)) {
-                FPlayerConnection handler = new FPlayerConnection(s.getServer(), cp.getHandle().playerConnection.networkManager, cp.getHandle().playerConnection.player);
-                cp.getHandle().playerConnection.networkManager.a(handler);
-                cp.getHandle().playerConnection = handler;
+        if (FAntiXRay.getProtocol() == null) {
+            if (!FAntiXRay.isExempt(p.getName())) {
+                CraftPlayer cp = (CraftPlayer)p;
+                CraftServer s = (CraftServer)p.getServer();
+                if (!(cp.getHandle().playerConnection instanceof FPlayerConnection)) {
+                    FPlayerConnection handler = new FPlayerConnection(s.getServer(), cp.getHandle().playerConnection.networkManager, cp.getHandle().playerConnection.player);
+                    cp.getHandle().playerConnection.networkManager.a(handler);
+                    cp.getHandle().playerConnection = handler;
+                }
             }
         }
         
