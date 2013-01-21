@@ -112,7 +112,7 @@ public class FConfiguration {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(FAntiXRay.getPlugin(), new Runnable() {
             @Override
             public void run() {
-                com.log("[TAG] Can't hook into craftbukkit's jar, this plugin will not work and players will not be able to join the server!");
+                com.log("[TAG] Can't hook into craftbukkit's jar, this plugin will not work and you will not be protected against xray!");
             }
         }, 20 * 30, 0);
     }
