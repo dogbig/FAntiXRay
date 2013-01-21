@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-import org.bukkit.craftbukkit.FAntiXRay; //FurH
+import me.FurH.server.FAntiXRay.FAntiXRay;
 
 public class Packet51MapChunk extends Packet {
 
+    public static boolean obfuscate = false; // FurH
     public int a;
     public int b;
     public int c;
@@ -29,7 +30,7 @@ public class Packet51MapChunk extends Packet {
         this.a = chunk.x;
         this.b = chunk.z;
         this.e = flag;
-        ChunkMap chunkmap = a(chunk, flag, i, true); // FurH - add true
+        ChunkMap chunkmap = a(chunk, flag, i);
         Deflater deflater = new Deflater(-1);
 
         this.d = chunkmap.c;
@@ -102,7 +103,7 @@ public class Packet51MapChunk extends Packet {
     public int a() {
         return 17 + this.size;
     }
-
+    
     // FurH - start
     public static ChunkMap a(Chunk chunk, boolean flag, int i) {
         return a(chunk, flag, i, false);
@@ -185,14 +186,15 @@ public class Packet51MapChunk extends Packet {
             System.arraycopy(abyte2, 0, abyte, j, abyte2.length);
             j += abyte2.length;
         }
+
+        chunkmap.a = new byte[j];
         
         // FurH - start
-        if (p51) {
-            abyte = FAntiXRay.obfuscate(chunkmap, chunk, buildBuffer, flag, i);
+        if (p51 && obfuscate) {
+            FAntiXRay.obfuscate(chunkmap, chunk, buildBuffer, flag, i);
         }
         // FurH - end
         
-        chunkmap.a = new byte[j];
         System.arraycopy(abyte, 0, chunkmap.a, 0, j);
         return chunkmap;
     }

@@ -18,6 +18,7 @@ package me.FurH.FAntiXRay;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -50,6 +51,7 @@ import org.xml.sax.SAXException;
  */
 public class FAntiXRay extends JavaPlugin {
     public static final Logger log = Logger.getLogger("minecraft");
+    private static HashSet<String> exempt = new HashSet<>();
     public static String tag = "[FAntiXRay]: ";
     public boolean hasUpdate = false;
     public int currentVersion = 0;
@@ -69,14 +71,8 @@ public class FAntiXRay extends JavaPlugin {
         messages = new FMessages();
         configuration = new FConfiguration();
         
-        //FPatcher.load();
-
         messages.load();
         configuration.load();
-        /*if (true) {
-            this.setEnabled(false);
-            return;
-        }*/
 
         PluginManager pm = getServer().getPluginManager();
         if (configuration.block_explosion) {
@@ -102,22 +98,22 @@ public class FAntiXRay extends JavaPlugin {
         HandlerList.unregisterAll(this);
 
         Bukkit.getScheduler().cancelTasks(this);
-        
+
         configuration.load();
         messages.load();
-        
+
         PluginManager pm = getServer().getPluginManager();
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
         }
-        
+
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
         pm.registerEvents(blockListener, this);
         blockListener.loadListeners(this);
 
         startMetrics();
-        
+
         if (configuration.updates) {
             updateThread();
         }
@@ -129,10 +125,6 @@ public class FAntiXRay extends JavaPlugin {
         
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");
-    }
-    
-    public void onUnload() {
-        this.getPluginLoader().disablePlugin(this);
     }
 
     @Override
@@ -185,15 +177,15 @@ public class FAntiXRay extends JavaPlugin {
     }
 
     public static void exempt(String player) {
-        org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.exempt(player);
+        exempt.add(player);
     }
 
     public static void unexempt(String player) {
-        org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.unexempt(player);
+        exempt.remove(player);
     }
 
     public static boolean isExempt(String player) {
-        return org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.isExempt(player);
+        return exempt.contains(player);
     }
     
     public boolean hasPerm(CommandSender sender, String perm) {

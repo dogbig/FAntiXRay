@@ -26,6 +26,7 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import me.FurH.FAntiXRay.util.FCommunicator.Type;
 import me.FurH.FAntiXRay.util.FUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -98,12 +99,22 @@ public class FConfiguration {
         disabled_worlds = getStringHash("Lists.DisabledWorlds");
         
         try {
-            org.bukkit.craftbukkit.v1_4_R1.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled);
+            me.FurH.server.FAntiXRay.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled);
         } catch (NoClassDefFoundError ex) {
             com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
                     "[TAG] Can't hook into craftbukkit's jar: {0}", ex.getMessage());
-            FAntiXRay.getPlugin().onUnload();
+            warning();
         }
+    }
+    
+    public void warning() {
+        final FCommunicator com = FAntiXRay.getCommunicator();
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(FAntiXRay.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+                com.log("[TAG] Can't hook into craftbukkit's jar, this plugin will not work and players will not be able to join the server!");
+            }
+        }, 20 * 30, 0);
     }
     
     /*

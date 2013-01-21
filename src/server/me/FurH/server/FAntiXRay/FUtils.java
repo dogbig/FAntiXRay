@@ -1,4 +1,4 @@
-package org.bukkit.craftbukkit;
+package me.FurH.server.FAntiXRay;
 
 import java.lang.reflect.Field;
 
@@ -7,7 +7,8 @@ import java.lang.reflect.Field;
  * @author FurmigaHumana
  */
 public class FUtils {
-    
+
+    /* get a private field */
     public static Object getPrivateField(Object obj, String x) {
         try {
             Field f = obj.getClass().getDeclaredField(x);
@@ -22,7 +23,8 @@ public class FUtils {
         }
         return null;
     }
-    
+
+    /* return true if the id is a transparent block */
     public static boolean isTransparent(int id) {
         if (id == 0) {
             return true;

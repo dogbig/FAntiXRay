@@ -10,7 +10,8 @@ import java.util.zip.Inflater;
 
 public class Packet56MapChunkBulk extends Packet {
 
-    public EntityPlayer player; // FurH - TODO: Find a better way to do this
+    public volatile List chunks; // FurH
+    public boolean obfuscate = false; // FurH
     private int[] c;
     private int[] d;
     public int[] a;
@@ -42,6 +43,8 @@ public class Packet56MapChunkBulk extends Packet {
         this.inflatedBuffers = new byte[i][];
         this.h = !list.isEmpty() && !((Chunk) list.get(0)).world.worldProvider.f;
         int j = 0;
+
+        this.chunks = list; // FurH
 
         for (int k = 0; k < i; ++k) {
             Chunk chunk = (Chunk) list.get(k);

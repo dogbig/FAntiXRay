@@ -19,6 +19,9 @@ package me.FurH.FAntiXRay.listener;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.util.FCommunicator;
+import me.FurH.server.FAntiXRay.hooks.FPlayerConnection;
+import org.bukkit.craftbukkit.v1_4_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_4_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,6 +49,16 @@ public class FPlayerListener implements Listener  {
 
         if (plugin.hasPerm(p, "Quiet.Deobfuscate")) {
             FAntiXRay.exempt(p.getName());
+        }
+        
+        if (!FAntiXRay.isExempt(p.getName())) {
+            CraftPlayer cp = (CraftPlayer)p;
+            CraftServer s = (CraftServer)p.getServer();
+            if (!(cp.getHandle().playerConnection instanceof FPlayerConnection)) {
+                FPlayerConnection handler = new FPlayerConnection(s.getServer(), cp.getHandle().playerConnection.networkManager, cp.getHandle().playerConnection.player);
+                cp.getHandle().playerConnection.networkManager.a(handler);
+                cp.getHandle().playerConnection = handler;
+            }
         }
         
         if (plugin.hasUpdate) {

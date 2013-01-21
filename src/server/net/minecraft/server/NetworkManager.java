@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.crypto.SecretKey;
 
 import java.io.IOException; // CraftBukkit
-import org.bukkit.craftbukkit.FAntiXRay; // FurH
 
 public class NetworkManager implements INetworkManager {
 
@@ -135,7 +134,7 @@ public class NetworkManager implements INetworkManager {
         }
     }
 
-    private Packet a(boolean flag) {
+    public Packet a(boolean flag) { // FurH private -> public
         Packet packet = null;
         List list = flag ? this.lowPriorityQueue : this.highPriorityQueue;
         Object object = this.h;
@@ -148,14 +147,6 @@ public class NetworkManager implements INetworkManager {
                     packet = null;
                 }
             }
-            
-            // FurH - start
-            if (packet != null) {
-                if (packet instanceof Packet56MapChunkBulk) {
-                    packet = FAntiXRay.obfuscate((Packet56MapChunkBulk)packet);
-                }
-            }
-            // FurH - end
 
             return packet;
         }
