@@ -11,6 +11,7 @@ import me.FurH.server.FAntiXRay.FAntiXRay;
 public class Packet51MapChunk extends Packet {
 
     public static boolean obfuscate = false; // FurH
+    public Chunk chunk; // FurH
     public int a;
     public int b;
     public int c;
@@ -30,7 +31,7 @@ public class Packet51MapChunk extends Packet {
         this.a = chunk.x;
         this.b = chunk.z;
         this.e = flag;
-        ChunkMap chunkmap = a(chunk, flag, i);
+        ChunkMap chunkmap = a(chunk, flag, i, true); // FurH -> add true
         Deflater deflater = new Deflater(-1);
 
         this.d = chunkmap.c;
@@ -110,7 +111,7 @@ public class Packet51MapChunk extends Packet {
     }
     // FurH - end
 
-    public static ChunkMap a(Chunk chunk, boolean flag, int i, boolean p51) { // FurH - add boolean p51
+    public static ChunkMap a(Chunk chunk, boolean flag, int i, boolean p51) { // FurH -> add boolean p51
         int j = 0;
         ChunkSection[] achunksection = chunk.i();
         int k = 0;
@@ -186,15 +187,14 @@ public class Packet51MapChunk extends Packet {
             System.arraycopy(abyte2, 0, abyte, j, abyte2.length);
             j += abyte2.length;
         }
-
-        chunkmap.a = new byte[j];
         
         // FurH - start
         if (p51 && obfuscate) {
-            FAntiXRay.obfuscate(chunkmap, chunk, buildBuffer, flag, i);
+            abyte = FAntiXRay.obfuscate(chunkmap, chunk, abyte, flag, i);
         }
         // FurH - end
-        
+
+        chunkmap.a = new byte[j];
         System.arraycopy(abyte, 0, chunkmap.a, 0, j);
         return chunkmap;
     }

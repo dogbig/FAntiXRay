@@ -1,5 +1,6 @@
 package me.FurH.server.FAntiXRay;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkMap;
@@ -11,13 +12,13 @@ import net.minecraft.server.Packet56MapChunkBulk;
  * @author FurmigaHumana
  */
 public class FAntiXRay {
-    public static Integer[] random_blocks;
-    public static HashSet<Integer> hidden_blocks;
-    public static HashSet<String> disabled_worlds;
-    public static HashSet<Integer> dark_blocks;
+    public static Integer[] random_blocks = new Integer[] { 5, 15, 48, 56 };
+    public static HashSet<Integer> hidden_blocks = new HashSet<Integer>(Arrays.asList(new Integer[] { 14, 15, 16, 21, 56, 73, 74, 129 }));
+    public static HashSet<String> disabled_worlds = new HashSet<String>();
+    public static HashSet<Integer> dark_blocks = new HashSet<Integer>();
 
-    public static int engine_mode;
-    public static boolean dark_enabled;
+    public static int engine_mode = 0;
+    public static boolean dark_enabled = false;
 
     /* load the configurations */
     public static void load(Integer[] random_blocks, HashSet<Integer> hidden_blocks, HashSet<String> disabled_worlds, HashSet<Integer> dark_extra, int engine_mode, boolean dark_enabled) {        
@@ -38,8 +39,8 @@ public class FAntiXRay {
         if (!packet.obfuscate) {
             return packet;
         }
-        
-        /* who sent this chunk?, return */
+
+        /* who sent this packet?, return */
         if (packet.chunks == null) {
             return packet;
         }
@@ -57,7 +58,7 @@ public class FAntiXRay {
         byte[][] inflatedBuffers = (byte[][]) FUtils.getPrivateField(packet, "inflatedBuffers");
         byte[] buildBuffer = (byte[]) FUtils.getPrivateField(packet, "buildBuffer");
         byte[] obfuscated; // obfuscated data
-        
+
         int index = 0;
         for (int i = 0; i < packet.chunks.size(); i++) {
             Chunk chunk = (Chunk)packet.chunks.get(i);
@@ -222,35 +223,25 @@ public class FAntiXRay {
 
     /* return true if the block have a transparent block in one of its faces */
     private static int isBlocksTransparent(Chunk chunk, int x, int y, int z) {
-        if (isBlockTransparent(chunk, x + 1, y, z)) {
+        if (FUtils.isTransparent(chunk.world.getTypeId(x + 1, y, z))) {
             return 0;
         } else
-        if (isBlockTransparent(chunk, x - 1, y, z)) {
+        if (FUtils.isTransparent(chunk.world.getTypeId(x - 1, y, z))) {
             return 1;
         } else
-        if (isBlockTransparent(chunk, x, y + 1, z)) {
+        if (FUtils.isTransparent(chunk.world.getTypeId(x, y + 1, z))) {
             return 2;
         } else
-        if (isBlockTransparent(chunk, x, y - 1, z)) {
+        if (FUtils.isTransparent(chunk.world.getTypeId(x, y - 1, z))) {
             return 3;
         } else
-        if (isBlockTransparent(chunk, x, y, z + 1)) {
+        if (FUtils.isTransparent(chunk.world.getTypeId(x, y, z + 1))) {
             return 4;
         } else
-        if (isBlockTransparent(chunk, x, y, z - 1)) {
+        if (FUtils.isTransparent(chunk.world.getTypeId(x, y, z - 1))) {
             return 5;
         }
-
         return -1;
-    }
-
-    /* return true if the block is transparent */
-    private static boolean isBlockTransparent(Chunk chunk, int x, int y, int z) {
-        if (FUtils.isTransparent(chunk.world.getTypeId(x, y, z))) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /* return true if it is a obfuscable id */

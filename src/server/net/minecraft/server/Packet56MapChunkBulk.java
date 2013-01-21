@@ -10,7 +10,7 @@ import java.util.zip.Inflater;
 
 public class Packet56MapChunkBulk extends Packet {
 
-    public volatile List chunks; // FurH
+    public List chunks; // FurH
     public boolean obfuscate = false; // FurH
     private int[] c;
     private int[] d;
@@ -45,7 +45,7 @@ public class Packet56MapChunkBulk extends Packet {
         int j = 0;
 
         this.chunks = list; // FurH
-
+        
         for (int k = 0; k < i; ++k) {
             Chunk chunk = (Chunk) list.get(k);
             ChunkMap chunkmap = Packet51MapChunk.a(chunk, true, '\uffff');
