@@ -11,7 +11,7 @@ Options:
 
 Darkness:
   ## Enabled, if true, all blocks that is in the dark will be obfuscated (This is a special engine and will replace the engine mode defined above)
-  ## This mode will replace all blocks in the HiddenBlocks list by a stone if the light level is 0.
+  ## This mode will replace all blocks in the HiddenBlocks or in the ExtraBlocks lists by a stone if the light level is 0.
   Enabled: false
   ## BrightOnly, if true, the block will be update only if it have a light level higher then 0
   BrightOnly: false
@@ -60,7 +60,9 @@ Updater:
 Lists:
   ## Random Blocks, list here, all the blocks used on engine mode 2
   RandomBlocks:
+    - 5
     - 15
+    - 48
     - 56
   ## Hidden Blocks, list here, all the blocks that will be obfuscated by engine mode 0 and 1
   HiddenBlocks:

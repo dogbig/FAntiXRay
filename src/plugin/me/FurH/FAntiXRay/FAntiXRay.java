@@ -191,26 +191,21 @@ public class FAntiXRay extends JavaPlugin {
     public boolean hasPerm(CommandSender sender, String perm) {
         if ((perm == null) || (perm.isEmpty())) {
             return true;
-        } else {
-            if (!(sender instanceof Player)) {
-                return true;
-            } else {
-                Player p = (Player) sender;
-                if (p.isOp()) {
-                    if (configuration.ophasperm) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    if (p.hasPermission("FAntiXRay."+perm)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
+        }
+        
+        if (!(sender instanceof Player)) {
+            return true;
+        }
+        
+        Player p = (Player) sender;
+        
+        if (p.isOp()) {
+            if (!configuration.ophasperm) {
+                return false;
             }
         }
+
+        return (p.hasPermission("FAntiXRay."+perm));
     }
     
     private int engine0 = 0;
