@@ -6,12 +6,13 @@ import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-import me.FurH.server.FAntiXRay.FAntiXRay;
 
 public class Packet51MapChunk extends Packet {
 
-    public static boolean obfuscate = false; // FurH
-    public Chunk chunk; // FurH
+    public static boolean obfuscate = false; // FurH ->
+    public Chunk chunk; // FurH ->
+    public int i; // FurH ->
+
     public int a;
     public int b;
     public int c;
@@ -31,22 +32,37 @@ public class Packet51MapChunk extends Packet {
         this.a = chunk.x;
         this.b = chunk.z;
         this.e = flag;
-        ChunkMap chunkmap = a(chunk, flag, i, true); // FurH -> add true
-        Deflater deflater = new Deflater(-1);
+        ChunkMap chunkmap = a(chunk, flag, i);
 
         this.d = chunkmap.c;
         this.c = chunkmap.b;
+        
+        this.chunk = chunk; // FurH ->
+        this.i = i; // FurH ->
+        
+        this.inflatedBuffer = chunkmap.a; // FurH ->
+        
+        // FurH -> start
+        if (d == 0 && c == 0) {
+            compress();
+        }
+        // FurH -> end
+    }
+    
+    // FurH -> start
+    public void compress() {
+        Deflater deflater = new Deflater(-1);
 
         try {
-            this.inflatedBuffer = chunkmap.a;
-            deflater.setInput(chunkmap.a, 0, chunkmap.a.length);
+            deflater.setInput(inflatedBuffer, 0, inflatedBuffer.length);
             deflater.finish();
-            this.buffer = new byte[chunkmap.a.length];
+            this.buffer = new byte[ inflatedBuffer.length ];
             this.size = deflater.deflate(this.buffer);
         } finally {
             deflater.end();
         }
     }
+    // FurH -> end
 
     public void a(DataInputStream datainputstream) throws IOException { // CraftBukkit - throws IOException
         this.a = datainputstream.readInt();
@@ -104,14 +120,8 @@ public class Packet51MapChunk extends Packet {
     public int a() {
         return 17 + this.size;
     }
-    
-    // FurH - start
-    public static ChunkMap a(Chunk chunk, boolean flag, int i) {
-        return a(chunk, flag, i, false);
-    }
-    // FurH - end
 
-    public static ChunkMap a(Chunk chunk, boolean flag, int i, boolean p51) { // FurH -> add boolean p51
+    public static ChunkMap a(Chunk chunk, boolean flag, int i) {
         int j = 0;
         ChunkSection[] achunksection = chunk.i();
         int k = 0;
@@ -187,12 +197,6 @@ public class Packet51MapChunk extends Packet {
             System.arraycopy(abyte2, 0, abyte, j, abyte2.length);
             j += abyte2.length;
         }
-        
-        // FurH - start
-        if (p51 && obfuscate) {
-            abyte = FAntiXRay.obfuscate(chunkmap, chunk, abyte, flag, i);
-        }
-        // FurH - end
 
         chunkmap.a = new byte[j];
         System.arraycopy(abyte, 0, chunkmap.a, 0, j);

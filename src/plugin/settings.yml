@@ -1,23 +1,22 @@
 Options:
-  ## Engine Mode, set to 0, 1, 2, 3 or 4.
+  ## Engine Mode, set to 0, 1, or 2.
   ## Engine Mode 0 > Hide all block in the HiddenBlocks list even if there is nothing blocking your view from it.
   ## Engine Mode 1 > Hide all blocks in the HiddenBlocks list that doesn't have air in one of its sides.
-  ## Engine Mode 2 > Replace every block that doesn't have air in one of its sides by a random block.
-  ## Engine Mode 3 > Replace all stones that doesn't have air in one of its sides by a random block.
-  ## Engine Mode 4 > Replace all stones that doesn't have air in one of its sides by a random block, but if it has air in one of its sides and the block is listed in the HiddenBlocks list it will be replaced by a stone.
+  ## Engine Mode 2 > Replace all stones that doesn't have air in one of its sides by a random block.
   EngineMode: 0
   ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1
   ## FakeCaves, set Enabled to true to generate fake caves in way to prevent xray texture pack and cavefinders.
   FakeCaves:
-    ## It **might** cause fps drops on the client side and also a little bit more of cpu on the server side.
+    ## It **might** cause fps drops on the client side and also a little bit more of cpu on the server si
+    ## ATTENTTION: If you are using engine mode 2, don't remove the item id 1 from the random blocks list
     Enabled: false
     ## Intensity, the intensity of caves to generate, higher this value is, more fake caves you will have
     Intensity: 50
 
 Darkness:
-  ## Enabled, if true, all blocks that is in the dark will be obfuscated (This is a special engine and will replace the engine mode defined above)
-  ## This mode will replace all blocks in the HiddenBlocks or in the ExtraBlocks lists by a stone if the light level is 0.
+  ## Enabled, if true, all blocks that is in the dark will be obfuscated (By default, the plugin will check for transparent blocks (air), if this is true, it will check the light level)
+  ## This mode will replace all blocks from the HiddenBlocks and ExtraBlocks lists by a stone if the light level is 0.
   Enabled: false
   ## BrightOnly, if true, the block will be update only if it have a light level higher then 0
   BrightOnly: false
@@ -66,9 +65,8 @@ Updater:
 Lists:
   ## Random Blocks, list here, all the blocks used on engine mode 2
   RandomBlocks:
-    - 5
+    - 1
     - 15
-    - 48
     - 56
   ## Hidden Blocks, list here, all the blocks that will be obfuscated by engine mode 0 and 1
   HiddenBlocks:

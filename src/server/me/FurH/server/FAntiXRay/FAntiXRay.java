@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import net.minecraft.server.Chunk;
-import net.minecraft.server.ChunkMap;
 import net.minecraft.server.ChunkSection;
+import net.minecraft.server.Packet51MapChunk;
 import net.minecraft.server.Packet56MapChunkBulk;
 
 /**
@@ -16,7 +16,6 @@ public class FAntiXRay {
     public static Integer[] random_blocks = new Integer[] { 5, 15, 48, 56 };
     public static HashSet<Integer> hidden_blocks = new HashSet<Integer>(Arrays.asList(new Integer[] { 14, 15, 16, 21, 56, 73, 74, 129 }));
     public static HashSet<String> disabled_worlds = new HashSet<String>();
-    public static HashSet<Integer> dark_blocks = new HashSet<Integer>();
 
     public static int engine_mode = 0;
     public static boolean dark_enabled = false;
@@ -29,8 +28,7 @@ public class FAntiXRay {
         FAntiXRay.random_blocks = random_blocks;
         FAntiXRay.hidden_blocks = hidden_blocks;
         FAntiXRay.disabled_worlds = disabled_worlds;
-        FAntiXRay.dark_blocks = new HashSet<Integer>(dark_extra);
-        dark_blocks.addAll(hidden_blocks);
+        hidden_blocks.addAll(dark_extra);
 
         FAntiXRay.engine_mode = engine_mode;        
         FAntiXRay.dark_enabled = dark_enabled;
@@ -69,7 +67,7 @@ public class FAntiXRay {
         for (int i = 0; i < packet.chunks.size(); i++) {
             Chunk chunk = (Chunk)packet.chunks.get(i);
 
-            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, '\uffff', false);
+            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, '\uffff');
 
             System.arraycopy(obfuscated, 0, buildBuffer, index, inflatedBuffers[i].length);
             index += inflatedBuffers[i].length;
@@ -77,34 +75,40 @@ public class FAntiXRay {
 
         /* might be better for gc */
         inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
-        index = 0; packet.chunks.clear(); packet.chunks = null;
+        index = 0; //packet.chunks.clear(); packet.chunks = null;
 
         /* return the obfuscated packet */
         return packet;
     }
     
-    /* initialize the Packet51MapChunk */
-    public static byte[] obfuscate(ChunkMap chunkmap, Chunk chunk, byte[] buildBuffer, boolean flag, int i) {
+    public static Packet51MapChunk obfuscate(Packet51MapChunk packet) {
 
-        /* empty chunk, return */
-        if (chunkmap.b == 0 && chunkmap.c == 0) {
-            return buildBuffer;
+        /* empty chunk?, return */
+        if (packet.d == 0 && packet.c == 0) {
+            return packet;
+        }
+        
+        /* who sent this packet?, return */
+        if (packet.chunk == null) {
+            return packet;
         }
 
         /* world is disabled, return */
-        if (disabled_worlds.contains(chunk.world.getWorld().getName())) {
-            return buildBuffer;
+        if (disabled_worlds.contains(packet.chunk.world.getWorld().getName())) {
+            return packet;
         }
 
-        /* might be better for gc */
-        chunkmap = null;
+        byte[] inflatedBuffer = (byte[]) FUtils.getPrivateField(packet, "inflatedBuffer");
+        byte[] obfuscated = obfuscate(packet.chunk, inflatedBuffer, packet.e, packet.i);
 
-        /* return the obfuscated packet */
-        return obfuscate(chunk, buildBuffer, flag, i, true);
+        System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
+        packet.compress();
+
+        return packet;
     }
     
     /* initialize the chunk */
-    public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i, boolean p51) {
+    public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i) {
         
         int index = 0;
         byte[] obfuscated;
@@ -124,12 +128,12 @@ public class FAntiXRay {
 
         return buildBuffer;
     }
-
+    
     /* obfuscated the chunk */
     public static byte[] obfuscate(ChunkSection section, Chunk chunk, int i) {
         byte[] buffer = section.g().clone();
 
-        int incrementor = 5;
+        int incrm = 5;
         int index = 0;
 
         for (int y = 0; y < 16; y++) {
@@ -137,123 +141,51 @@ public class FAntiXRay {
                 for (int x = 0; x < 16; x++) {
 
                     int wx = (chunk.x << 4) + x;
-                    int wy = (i << 4) + y;
+                    int wy = (section.d()) + y;
                     int wz = (chunk.z << 4) + z;
 
                     int id = section.a(x, y, z);
-                    
                     boolean air = false;
-                    int face = -2;
-                    
-                    if (caves_enabled) {
-                        boolean setair = false;
 
-                        if (incrementor > 0) {
-                            setair = true;
+                    if (caves_enabled && id == 1) {
+                        if (rnd.nextInt(1001) <= caves_intensity) {
+                            incrm = rnd.nextInt(5);
                         }
 
-                        if (rnd.nextInt(101) <= caves_intensity) {
-                            if (incrementor < 0) {
-                                incrementor = rnd.nextInt(5);
-                            }
-                            setair = true;
-                        }
-
-                        if (setair) {
-                            if (id == 1) {
-                                face = (isBlocksTransparent(chunk, wx, wy, wz));
-                                if (face == -1) {
-                                    air = true;
-                                    buffer[index] = 0;
-                                    incrementor--;
-                                }
-                            }
+                        if (incrm > 0) {
+                            air = true;
+                            incrm--;
                         }
                     }
-                    
-                    if (dark_enabled) {
-                        if (dark_blocks.contains(id)) {
-                            if (face == -2) {
-                                face = isBlocksTransparent(chunk, wx, wy, wz);
-                            }
 
-                            if (face == -1) {
-                                if (!air) {
-                                    buffer[index] = 1;
-                                }
-                            } else
-                            if (!isBlocksInLight(chunk, wx, wy, wz, face)) {
-                                if (!air) {
-                                    buffer[index] = 1;
-                                }
-                            }
+                    if (air) {
+                        if (isToObfuscate(chunk, wx, wy, wz)) {
+                            buffer[index] = 0;
                         }
                     } else
                     if (engine_mode == 0) {
                         if (hidden_blocks.contains(id)) {
-                            if (!air) {
-                                buffer[index] = 1;
-                            }
+                            buffer[index] = 1;
                         }
                     } else
                     if (engine_mode == 1) {
                         if (hidden_blocks.contains(id)) {
-                            
-                            if (face == -2) {
-                                face = isBlocksTransparent(chunk, wx, wy, wz);
-                            }
-
-                            if (face == -1) {
-                                if (!air) {
-                                    buffer[index] = 1;
-                                }
+                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                                buffer[index] = 1;
                             }
                         }
                     } else
                     if (engine_mode == 2) {
                         if (isObfuscable(id)) {
-                            if (face == -2) {
-                                face = isBlocksTransparent(chunk, wx, wy, wz);
-                            }
-
-                            if (face == -1) {
-                                if (!air) {
+                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                                if (id == 1) {
                                     buffer[index] = (byte) getRandom();
-                                }
-                            }
-                        }
-                    } else
-                    if (engine_mode == 3) {
-                        if (id == 1) {
-                            if (face == -2) {
-                                face = isBlocksTransparent(chunk, wx, wy, wz);
-                            }
-
-                            if (face == -1) {
-                                if (!air) {
-                                    buffer[index] = (byte) getRandom();
-                                }
-                            }
-                        }
-                    } else
-                    if (engine_mode == 4) {
-                        if (face == -2) {
-                            face = isBlocksTransparent(chunk, wx, wy, wz);
-                        }
-
-                        if (face == -1) {
-                            if (!air) {
-                                buffer[index] = (byte) getRandom();
-                            }
-                        } else {
-                            if (hidden_blocks.contains(id)) {
-                                if (!air) {
+                                } else {
                                     buffer[index] = 1;
                                 }
                             }
                         }
                     }
-                        
                     index++;
                 }
             }
@@ -266,65 +198,67 @@ public class FAntiXRay {
         int random = ((int)(Math.random() * random_blocks.length));
         return random_blocks[ random ];
     }
+    
+    private static boolean isToObfuscate(Chunk chunk, int x, int y, int z) {
+        if (dark_enabled) {
+            return !isBlocksInLight(chunk, x, y, z);
+        } else {
+            return !isBlocksTransparent(chunk, x, y, z);
+        }
+    }
 
     /* return true if the block have light in one of its faces */
-    private static boolean isBlocksInLight(Chunk chunk, int x, int y, int z, int face) {
-        if (y > 60) { return true; }
-
-        if (face == 0) {
-            return (chunk.world.getLightLevel(x + 1, y, z) > 0);
+    private static boolean isBlocksInLight(Chunk chunk, int x, int y, int z) {
+        if (chunk.world.getLightLevel(x + 1, y, z) > 0) {
+            return true;
         } else
-        if (face == 1) {
-            return (chunk.world.getLightLevel(x - 1, y, z) > 0);
+        if (chunk.world.getLightLevel(x - 1, y, z) > 0) {
+            return true;
         } else
-        if (face == 2) {
-            return (chunk.world.getLightLevel(x, y + 1, z) > 0);
+        if (chunk.world.getLightLevel(x, y + 1, z) > 0) {
+            return true;
         } else
-        if (face == 3) {
-            return (chunk.world.getLightLevel(x, y - 1, z) > 0);
+        if (chunk.world.getLightLevel(x, y - 1, z) > 0) {
+            return true;
         } else
-        if (face == 4) {
-            return (chunk.world.getLightLevel(x, y, z + 1) > 0);
+        if (chunk.world.getLightLevel(x, y, z + 1) > 0) {
+            return true;
         } else
-        if (face == 5) {
-            return (chunk.world.getLightLevel(x, y, z - 1) > 0);
+        if (chunk.world.getLightLevel(x, y, z - 1) > 0) {
+            return true;
         }
-
         return false;
     }
 
     /* return true if the block have a transparent block in one of its faces */
-    private static int isBlocksTransparent(Chunk chunk, int x, int y, int z) {
+    private static boolean isBlocksTransparent(Chunk chunk, int x, int y, int z) {
         if (FUtils.isTransparent(chunk.world.getTypeId(x + 1, y, z))) {
-            return 0;
+            return true;
         } else
         if (FUtils.isTransparent(chunk.world.getTypeId(x - 1, y, z))) {
-            return 1;
+            return true;
         } else
         if (FUtils.isTransparent(chunk.world.getTypeId(x, y + 1, z))) {
-            return 2;
+            return true;
         } else
         if (FUtils.isTransparent(chunk.world.getTypeId(x, y - 1, z))) {
-            return 3;
+            return true;
         } else
         if (FUtils.isTransparent(chunk.world.getTypeId(x, y, z + 1))) {
-            return 4;
+            return true;
         } else
         if (FUtils.isTransparent(chunk.world.getTypeId(x, y, z - 1))) {
-            return 5;
+            return true;
         }
-        return -1;
+        return false;
     }
 
     /* return true if it is a obfuscable id */
     public static boolean isObfuscable(int id) {
-        switch (id) {
-            case 1:
-            case 3:
-            case 13:
-                return true;
-            default:
-                return false;
+        if (id == 1) {
+            return true;
         }
+
+        return hidden_blocks.contains(id);
     }
 }

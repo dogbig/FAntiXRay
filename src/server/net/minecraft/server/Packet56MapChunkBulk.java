@@ -10,8 +10,9 @@ import java.util.zip.Inflater;
 
 public class Packet56MapChunkBulk extends Packet {
 
-    public List chunks; // FurH
-    public boolean obfuscate = false; // FurH
+    public List chunks; // FurH ->
+    public boolean obfuscate = false; // FurH ->
+    
     private int[] c;
     private int[] d;
     public int[] a;
@@ -44,7 +45,7 @@ public class Packet56MapChunkBulk extends Packet {
         this.h = !list.isEmpty() && !((Chunk) list.get(0)).world.worldProvider.f;
         int j = 0;
 
-        this.chunks = list; // FurH
+        this.chunks = list; // FurH ->
         
         for (int k = 0; k < i; ++k) {
             Chunk chunk = (Chunk) list.get(k);

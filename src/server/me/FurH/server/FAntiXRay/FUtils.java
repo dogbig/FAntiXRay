@@ -35,6 +35,6 @@ public class FUtils {
             return false;
         }
         
-        return Block.i(id);
+        return !Block.i(id);
     }
 }

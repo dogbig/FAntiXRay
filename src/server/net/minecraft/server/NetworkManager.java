@@ -149,13 +149,16 @@ public class NetworkManager implements INetworkManager {
             }
         }
 
-        // FurH - start
+        // FurH -> start
         if (packet != null) {
             if (packet instanceof Packet56MapChunkBulk) {
                 packet = FAntiXRay.obfuscate((Packet56MapChunkBulk)packet);
+            } else
+            if (packet instanceof Packet51MapChunk) {
+                packet = FAntiXRay.obfuscate((Packet51MapChunk)packet);
             }
         }
-        // FurH - end
+        // FurH -> end
 
         return packet;
     }
