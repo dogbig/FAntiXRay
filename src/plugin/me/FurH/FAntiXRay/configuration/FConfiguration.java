@@ -37,6 +37,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class FConfiguration {
     public int              engine_mode     = 1;
     public int              update_radius   = 1;
+    public boolean          caves_enabled   = false;
+    public int              caves_intensity = 50;
     
     public boolean          dark_enabled    = false;
     public boolean          dark_only       = true;
@@ -72,6 +74,8 @@ public class FConfiguration {
             com.log("[TAG] Update Radius can't be higher than 3!");
             update_radius = 3;
         }
+        caves_enabled   = getBoolean("Options.FakeCaves.Enabled");
+        caves_intensity = getInteger("Options.FakeCaves.Intensity");
 
         dark_enabled    = getBoolean("Darkness.Enabled");
         dark_only       = getBoolean("Darkness.BrightOnly");
@@ -99,7 +103,7 @@ public class FConfiguration {
         disabled_worlds = getStringHash("Lists.DisabledWorlds");
         
         try {
-            me.FurH.server.FAntiXRay.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled);
+            me.FurH.server.FAntiXRay.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled, caves_enabled, caves_intensity);
         } catch (NoClassDefFoundError ex) {
             com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
                     "[TAG] Can't hook into craftbukkit's jar: {0}", ex.getMessage());

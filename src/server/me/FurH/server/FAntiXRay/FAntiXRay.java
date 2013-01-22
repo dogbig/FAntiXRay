@@ -2,6 +2,7 @@ package me.FurH.server.FAntiXRay;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 import net.minecraft.server.Chunk;
 import net.minecraft.server.ChunkMap;
 import net.minecraft.server.ChunkSection;
@@ -19,9 +20,12 @@ public class FAntiXRay {
 
     public static int engine_mode = 0;
     public static boolean dark_enabled = false;
+    public static boolean caves_enabled = false;
+    public static int caves_intensity = 50;
+    private static Random rnd = new Random(101);
 
     /* load the configurations */
-    public static void load(Integer[] random_blocks, HashSet<Integer> hidden_blocks, HashSet<String> disabled_worlds, HashSet<Integer> dark_extra, int engine_mode, boolean dark_enabled) {        
+    public static void load(Integer[] random_blocks, HashSet<Integer> hidden_blocks, HashSet<String> disabled_worlds, HashSet<Integer> dark_extra, int engine_mode, boolean dark_enabled, boolean caves_enabled, int caves_intensity) {        
         FAntiXRay.random_blocks = random_blocks;
         FAntiXRay.hidden_blocks = hidden_blocks;
         FAntiXRay.disabled_worlds = disabled_worlds;
@@ -30,6 +34,8 @@ public class FAntiXRay {
 
         FAntiXRay.engine_mode = engine_mode;        
         FAntiXRay.dark_enabled = dark_enabled;
+        FAntiXRay.caves_enabled = caves_enabled;
+        FAntiXRay.caves_intensity = caves_intensity;
     }
 
     /* initialize the Packet56MapChunkBulk */
@@ -123,6 +129,7 @@ public class FAntiXRay {
     public static byte[] obfuscate(ChunkSection section, Chunk chunk, int i) {
         byte[] buffer = section.g().clone();
 
+        int incrementor = 5;
         int index = 0;
 
         for (int y = 0; y < 16; y++) {
@@ -134,50 +141,115 @@ public class FAntiXRay {
                     int wz = (chunk.z << 4) + z;
 
                     int id = section.a(x, y, z);
+                    
+                    boolean air = false;
+                    int face = -2;
+                    
+                    if (caves_enabled) {
+                        boolean setair = false;
 
+                        if (incrementor > 0) {
+                            setair = true;
+                        }
+
+                        if (rnd.nextInt(101) <= caves_intensity) {
+                            if (incrementor < 0) {
+                                incrementor = rnd.nextInt(5);
+                            }
+                            setair = true;
+                        }
+
+                        if (setair) {
+                            if (id == 1) {
+                                face = (isBlocksTransparent(chunk, wx, wy, wz));
+                                if (face == -1) {
+                                    air = true;
+                                    buffer[index] = 0;
+                                    incrementor--;
+                                }
+                            }
+                        }
+                    }
+                    
                     if (dark_enabled) {
                         if (dark_blocks.contains(id)) {
-                            int face = isBlocksTransparent(chunk, wx, wy, wz);
+                            if (face == -2) {
+                                face = isBlocksTransparent(chunk, wx, wy, wz);
+                            }
+
                             if (face == -1) {
-                                buffer[index] = 1;
+                                if (!air) {
+                                    buffer[index] = 1;
+                                }
                             } else
                             if (!isBlocksInLight(chunk, wx, wy, wz, face)) {
-                                buffer[index] = 1;
+                                if (!air) {
+                                    buffer[index] = 1;
+                                }
                             }
                         }
                     } else
                     if (engine_mode == 0) {
                         if (hidden_blocks.contains(id)) {
-                            buffer[index] = 1;
+                            if (!air) {
+                                buffer[index] = 1;
+                            }
                         }
                     } else
                     if (engine_mode == 1) {
                         if (hidden_blocks.contains(id)) {
-                            if (isBlocksTransparent(chunk, wx, wy, wz) == -1) {
-                                buffer[index] = 1;
+                            
+                            if (face == -2) {
+                                face = isBlocksTransparent(chunk, wx, wy, wz);
+                            }
+
+                            if (face == -1) {
+                                if (!air) {
+                                    buffer[index] = 1;
+                                }
                             }
                         }
                     } else
                     if (engine_mode == 2) {
                         if (isObfuscable(id)) {
-                            if (isBlocksTransparent(chunk, wx, wy, wz) == -1) {
-                                buffer[index] = (byte) getRandom();
+                            if (face == -2) {
+                                face = isBlocksTransparent(chunk, wx, wy, wz);
+                            }
+
+                            if (face == -1) {
+                                if (!air) {
+                                    buffer[index] = (byte) getRandom();
+                                }
                             }
                         }
                     } else
                     if (engine_mode == 3) {
                         if (id == 1) {
-                            if (isBlocksTransparent(chunk, wx, wy, wz) == -1) {
-                                buffer[index] = (byte) getRandom();
+                            if (face == -2) {
+                                face = isBlocksTransparent(chunk, wx, wy, wz);
+                            }
+
+                            if (face == -1) {
+                                if (!air) {
+                                    buffer[index] = (byte) getRandom();
+                                }
                             }
                         }
                     } else
                     if (engine_mode == 4) {
-                        if (isBlocksTransparent(chunk, wx, wy, wz) == -1) {
-                            buffer[index] = (byte) getRandom();
+                        if (face == -2) {
+                            face = isBlocksTransparent(chunk, wx, wy, wz);
+                        }
+
+                        if (face == -1) {
+                            if (!air) {
+                                buffer[index] = (byte) getRandom();
+                            }
                         } else {
                             if (hidden_blocks.contains(id)) {
-                                buffer[index] = 1;
+                                if (!air) {
+                                    buffer[index] = 1;
+                                }
                             }
                         }
                     }

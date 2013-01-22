@@ -59,15 +59,27 @@ public class FBlockUpdate {
                     Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
 
                     if (center.getType() != Material.AIR && center != null) {
-                        if (config.hidden_blocks.contains(center.getTypeId()) || config.dark_extra.contains(center.getTypeId())) {
+                        if (!config.caves_enabled && config.hidden_blocks.contains(center.getTypeId()) || config.dark_extra.contains(center.getTypeId())) {
+                            update(center, b, radius, worldServer, x, y, z);
                             if (center.getLocation().distance(b.getLocation()) <= radius) {
                                 if (isBlocksInLight(center)) {
                                     worldServer.notify(b.getX() + x, b.getY() + y, b.getZ() + z);
                                 }
                             }
+                        } else
+                        if (config.caves_enabled) {
+                            update(center, b, radius, worldServer, x, y, z);
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    private static void update(Block center, Block b, int radius, WorldServer worldServer, int x, int y, int z) {
+        if (center.getLocation().distance(b.getLocation()) <= radius) {
+            if (isBlocksInLight(center)) {
+                worldServer.notify(b.getX() + x, b.getY() + y, b.getZ() + z);
             }
         }
     }
