@@ -81,7 +81,12 @@ public class FConfiguration {
         dark_only       = getBoolean("Darkness.BrightOnly");
         dark_radius     = getInteger("Darkness.BrightRadius");
         dark_blocks     = getIntegerHash("Darkness.UpdateOn");
-        dark_extra      = getIntegerHash("Darkness.ExtraBlocks");
+        
+        if (dark_enabled) {
+            dark_extra      = getIntegerHash("Darkness.ExtraBlocks");
+        } else {
+            dark_extra = new HashSet<>();
+        }
 
         block_place     = getBoolean("UpdateEvents.onBlockPlace");
         block_explosion = getBoolean("UpdateEvents.onBlockExplosion");
