@@ -32,13 +32,13 @@ public class Packet51MapChunk extends Packet {
         this.b = chunk.z;
         this.e = flag;
         ChunkMap chunkmap = a(chunk, flag, i);
-
+        inflatedBuffer = chunkmap.a; // FurH ->
+        
         this.d = chunkmap.c;
         this.c = chunkmap.b;
         
         // FurH -> start
         if (c == 0 && d == 0) {
-            inflatedBuffer = chunkmap.a;
             compress();
         }
         // FurH -> end
