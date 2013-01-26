@@ -22,7 +22,7 @@ import java.io.InputStream;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import me.FurH.FAntiXRay.util.FCommunicator.Type;
-import me.FurH.FAntiXRay.util.FUtil;
+import me.FurH.FAntiXRay.util.FUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -49,7 +49,7 @@ public class FMessages {
         FAntiXRay      plugin = FAntiXRay.getPlugin();
         
         File dir = new File(plugin.getDataFolder(), "messages.yml");
-        if (!dir.exists()) { FUtil.ccFile(plugin.getResource("messages.yml"), dir); }
+        if (!dir.exists()) { FUtils.ccFile(plugin.getResource("messages.yml"), dir); }
 
         YamlConfiguration config = new YamlConfiguration();
         try {

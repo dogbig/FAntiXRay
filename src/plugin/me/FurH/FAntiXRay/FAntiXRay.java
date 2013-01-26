@@ -16,7 +16,6 @@
 
 package me.FurH.FAntiXRay;
 
-import com.bergerkiller.bukkit.nolagg.NoLaggComponents;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
@@ -31,6 +30,7 @@ import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -59,9 +59,9 @@ public class FAntiXRay extends JavaPlugin {
     public boolean hasUpdate = false;
     public int currentVersion = 0;
     public int newVersion = 0;
-    
+
     private static boolean protocol = false;
-    
+
     /* classes */
     private static FAntiXRay plugin;
     private static FCommunicator communicator;
@@ -75,33 +75,33 @@ public class FAntiXRay extends JavaPlugin {
         communicator = new FCommunicator();
         messages = new FMessages();
         configuration = new FConfiguration();
-        
+
         messages.load();
         configuration.load();
 
         PluginManager pm = getServer().getPluginManager();
-        Plugin protocolpl = pm.getPlugin("ProtocolLib");
-        if (protocolpl != null) {
-            if (protocolpl.isEnabled()) {
-                FProtocolLib.setupProtocolLib(this);
-                communicator.log("[TAG] ProtocolLib support enabled!");
-            }
-        }
         
-        Plugin nolagg = pm.getPlugin("NoLagg");
-        if (nolagg != null) {
-            if (nolagg.isEnabled()) {
-                NoLaggComponents component = NoLaggComponents.CHUNKS;
-                if (component.isEnabled()) {
-                    configuration.warning("[TAG] NoLagg Chunks detected! Disable it you must!");
+        if (!FObfuscator.server_mode) {
+            Plugin protocolpl = pm.getPlugin("ProtocolLib");
+            if (protocolpl != null) {
+                if (protocolpl.isEnabled()) {
+                    FProtocolLib.setupProtocolLib(this);
+                    communicator.log("[TAG] ProtocolLib support enabled!");
+                    protocol = true;
                 }
             }
         }
-        
+
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
         }
         
+        if (FObfuscator.chest_enabled) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                FPlayerListener.hookPlayer(p);
+            }
+        }
+
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
         pm.registerEvents(blockListener, this);
@@ -238,13 +238,15 @@ public class FAntiXRay extends JavaPlugin {
     private int engine0 = 0;
     private int engine1 = 0;
     private int engine2 = 0;
-    private int engine3 = 0;
-    private int engine4 = 0;
     
     private int up0 = 0;
     private int up1 = 0;
     private int up2 = 0;
     private int up3 = 0;
+    
+    private int darkness = 0;
+    private int chesthider = 0;
+    private int fakecaves = 0;
     
     private int blockplace = 0;
     private int explosion = 0;
@@ -256,24 +258,28 @@ public class FAntiXRay extends JavaPlugin {
         try {
             FMetrics metrics = new FMetrics(this);
 
-            if (configuration.engine_mode == 0) {
+            if (FObfuscator.caves_enabled) {
+                fakecaves++;
+            }
+            
+            if (FObfuscator.dark_enabled) {
+                darkness++;
+            }
+            
+            if (FObfuscator.chest_enabled) {
+                chesthider++;
+            }
+            
+            if (FObfuscator.engine_mode == 0) {
                 engine0++;
             }
             
-            if (configuration.engine_mode == 1) {
+            if (FObfuscator.engine_mode == 1) {
                 engine1++;
             }
             
-            if (configuration.engine_mode == 2) {
+            if (FObfuscator.engine_mode == 2) {
                 engine2++;
-            }
-            
-            if (configuration.engine_mode == 3) {
-                engine3++;
-            }
-            
-            if (configuration.engine_mode == 4) {
-                engine4++;
             }
             
             Graph extra = metrics.createGraph("Engine Mode");
@@ -295,20 +301,6 @@ public class FAntiXRay extends JavaPlugin {
                 @Override
                 public int getValue() {
                     return engine2;
-                }
-            });
-            
-            extra.addPlotter(new FMetrics.Plotter("Engine Mode 3") {
-                @Override
-                public int getValue() {
-                    return engine3;
-                }
-            });
-            
-            extra.addPlotter(new FMetrics.Plotter("Engine Mode 4") {
-                @Override
-                public int getValue() {
-                    return engine4;
                 }
             });
             

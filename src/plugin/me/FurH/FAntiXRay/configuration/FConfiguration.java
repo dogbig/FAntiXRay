@@ -23,10 +23,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import me.FurH.FAntiXRay.util.FCommunicator.Type;
-import me.FurH.FAntiXRay.util.FUtil;
-import org.bukkit.Bukkit;
+import me.FurH.FAntiXRay.util.FUtils;
+import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -35,16 +36,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
  * @author FurmigaHumana
  */
 public class FConfiguration {
-    public int              engine_mode     = 1;
     public int              update_radius   = 1;
-    public boolean          caves_enabled   = false;
-    public int              caves_intensity = 50;
-    
-    public boolean          dark_enabled    = false;
+
     public boolean          dark_only       = true;
     public int              dark_radius     = 8;
     public HashSet<Integer> dark_blocks     = new HashSet<>();
-    public HashSet<Integer> dark_extra      = new HashSet<>();
     
     public boolean          block_place     = false;
     public boolean          block_explosion = false;
@@ -52,21 +48,20 @@ public class FConfiguration {
     public boolean          block_piston    = false;
     public boolean          block_physics   = false;
 
+    public int              chest_interval  = 10;
+    public int              chest_radius    = 10;
+    public int              chest_wark      = 1;
+    
     public boolean          ophasperm       = true;
 
     public boolean          updates         = true;
 
-    public Integer[]        random_blocks   = new Integer[] { };
-    public HashSet<Integer> hidden_blocks   = new HashSet<>();
-
-    public HashSet<String>  disabled_worlds = new HashSet<>();
-
     public void load() {
         FCommunicator com    = FAntiXRay.getCommunicator();
-        engine_mode     = getInteger("Options.EngineMode");
-        if (engine_mode > 4) {
-            com.log("[TAG] Engine Mode can't be higher than 4!");
-            engine_mode = 4;
+        int engine_mode     = getInteger("Options.EngineMode");
+        if (engine_mode > 2) {
+            com.log("[TAG] Engine Mode can't be higher than 2!");
+            engine_mode = 2;
         }
         
         update_radius   = getInteger("Options.UpdateRadius");
@@ -74,14 +69,15 @@ public class FConfiguration {
             com.log("[TAG] Update Radius can't be higher than 3!");
             update_radius = 3;
         }
-        caves_enabled   = getBoolean("Options.FakeCaves.Enabled");
-        caves_intensity = getInteger("Options.FakeCaves.Intensity");
+        boolean caves_enabled   = getBoolean("Options.FakeCaves.Enabled");
+        int caves_intensity = getInteger("Options.FakeCaves.Intensity");
 
-        dark_enabled    = getBoolean("Darkness.Enabled");
+        boolean dark_enabled    = getBoolean("Darkness.Enabled");
         dark_only       = getBoolean("Darkness.BrightOnly");
         dark_radius     = getInteger("Darkness.BrightRadius");
         dark_blocks     = getIntegerHash("Darkness.UpdateOn");
         
+        HashSet<Integer> dark_extra;
         if (dark_enabled) {
             dark_extra      = getIntegerHash("Darkness.ExtraBlocks");
         } else {
@@ -94,36 +90,46 @@ public class FConfiguration {
         block_piston    = getBoolean("UpdateEvents.onBlockPiston");
         block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
 
+        boolean chest_enabled   = getBoolean("ChestHider.Enabled");
+        chest_interval  = getInteger("ChestHider.Interval");
+        chest_radius    = getInteger("ChestHider.Radius");
+        chest_wark      = getInteger("ChestHider.WalkMinimum");
+        
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
         updates         = getBoolean("Updater.Enabled");
         
-        random_blocks   = getIntegerList("Lists.RandomBlocks").toArray(new Integer[] {});
+        Integer[] random_blocks   = getIntegerList("Lists.RandomBlocks").toArray(new Integer[] {});
+        
+        if (engine_mode == 2 && caves_enabled) {
+            Integer[] nrnd = new Integer[ random_blocks.length + 3 ];
+            
+            System.arraycopy(random_blocks, 0, nrnd, 0, random_blocks.length);
+
+            nrnd[random_blocks.length] = 1;
+            nrnd[random_blocks.length + 1] = 1;
+            nrnd[random_blocks.length + 2] = 1;
+            
+            random_blocks = nrnd;
+        }
+
         Arrays.sort(random_blocks);
         
-        hidden_blocks   = getIntegerHash("Lists.HiddenBlocks");
+        HashSet<Integer> hidden_blocks   = getIntegerHash("Lists.HiddenBlocks");
         if (hidden_blocks.contains(63)) { hidden_blocks.remove(63); }
         if (hidden_blocks.contains(68)) { hidden_blocks.remove(68); }
         
-        disabled_worlds = getStringHash("Lists.DisabledWorlds");
-        
+        HashSet<String> disabled_worlds = getStringHash("Lists.DisabledWorlds");
+
+        FObfuscator.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled, caves_enabled, caves_intensity, chest_enabled);
+
         try {
-            me.FurH.server.FAntiXRay.FAntiXRay.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled, caves_enabled, caves_intensity);
-        } catch (NoClassDefFoundError ex) {
-            com.error(getClass().getName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
-                    "[TAG] Can't hook into craftbukkit's jar: {0}", ex.getMessage());
-            warning("[TAG] Can't hook into craftbukkit's jar, this plugin will not work and you will not be protected against xray!");
+            Packet51MapChunk.modified = true;
+            com.log("[TAG] Server-side found, threads enabled!");
+            FObfuscator.server_mode = true;
+        } catch (NoSuchFieldError ex) {
+            com.log("[TAG] Server-side not found, using standart mode!");
         }
-    }
-    
-    public void warning(final String msg) {
-        final FCommunicator com = FAntiXRay.getCommunicator();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(FAntiXRay.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                com.log(msg);
-            }
-        }, 0, 20 * 30);
     }
     
     /*
@@ -144,15 +150,15 @@ public class FConfiguration {
      * return a List from the Settings file
      */
     private HashSet<String> getStringHash(String node) {
-        return FUtil.toStringHashSet(Arrays.asList(getSetting(node).replaceAll(" ", "").split(",")));
+        return FUtils.toStringHashSet(Arrays.asList(getSetting(node).replaceAll(" ", "").split(",")));
     }
     
     private HashSet<Integer> getIntegerHash(String node) {
-        return FUtil.toIntegerHashSet(FUtil.toIntegerList(getSetting(node).replaceAll(" ", ""), ","));
+        return FUtils.toIntegerHashSet(FUtils.toIntegerList(getSetting(node).replaceAll(" ", ""), ","));
     }
     
     private List<Integer> getIntegerList(String node) {
-        return FUtil.toIntegerList(getSetting(node).replaceAll(" ", ""), ",");
+        return FUtils.toIntegerList(getSetting(node).replaceAll(" ", ""), ",");
     }
         
     /*
@@ -163,7 +169,7 @@ public class FConfiguration {
         FAntiXRay      plugin = FAntiXRay.getPlugin();
         
         File dir = new File(plugin.getDataFolder(), "settings.yml");
-        if (!dir.exists()) { FUtil.ccFile(plugin.getResource("settings.yml"), dir); }
+        if (!dir.exists()) { FUtils.ccFile(plugin.getResource("settings.yml"), dir); }
 
         YamlConfiguration config = new YamlConfiguration();
         try {

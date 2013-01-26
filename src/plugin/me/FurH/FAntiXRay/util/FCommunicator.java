@@ -71,7 +71,7 @@ public class FCommunicator {
         log(message, type, objects);
 
         FAntiXRay    plugin   = FAntiXRay.getPlugin();
-        log("[TAG] This error is avaliable at: plugins/{0}/error/error-{1}.txt", type, plugin.getDescription().getName(), FUtil.stack(className, line, method, ex, message));
+        log("[TAG] This error is avaliable at: plugins/{0}/error/error-{1}.txt", type, plugin.getDescription().getName(), FUtils.stack(className, line, method, ex, message));
     }
     
     /*

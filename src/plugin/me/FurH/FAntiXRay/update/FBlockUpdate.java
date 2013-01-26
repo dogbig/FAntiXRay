@@ -20,9 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import net.minecraft.server.v1_4_R1.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -38,16 +38,16 @@ public class FBlockUpdate {
     public static void update(Player p, Block b) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
-        if (FAntiXRay.isExempt(p.getName())) {
+        int radius = config.dark_radius;
+        if (radius <= 0) {
             return;
         }
         
-        if (config.disabled_worlds.contains(b.getWorld().getName())) {
+        if (FAntiXRay.isExempt(p.getName())) {
             return;
         }
 
-        int radius = config.dark_radius;
-        if (radius <= 0) {
+        if (FObfuscator.disabled_worlds.contains(b.getWorld().getName())) {
             return;
         }
 
@@ -56,18 +56,32 @@ public class FBlockUpdate {
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
-                    Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
 
-                    if (center.getType() != Material.AIR && center != null) {
-                        if (!config.caves_enabled && config.hidden_blocks.contains(center.getTypeId()) || config.dark_extra.contains(center.getTypeId())) {
-                            update(center, b, radius, worldServer, x, y, z);
-                            if (center.getLocation().distance(b.getLocation()) <= radius) {
-                                if (isBlocksInLight(center)) {
-                                    worldServer.notify(b.getX() + x, b.getY() + y, b.getZ() + z);
-                                }
-                            }
+                    if (x == b.getX() && y == b.getY() && z == b.getZ()) {
+                        continue;
+                    }
+
+                    Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
+                    
+                    if (center == b) {
+                        continue;
+                    }
+                    
+                    if (center == null) {
+                        continue;
+                    }
+
+                    if (center.getTypeId() == 0) {
+                        boolean update = false;
+
+                        if (FObfuscator.caves_enabled && center.getTypeId() == 1) {
+                            update = true;
                         } else
-                        if (config.caves_enabled) {
+                        if (!FObfuscator.caves_enabled && FObfuscator.hidden_blocks.contains(center.getTypeId())) {
+                            update = true;
+                        }
+
+                        if (update) {
                             update(center, b, radius, worldServer, x, y, z);
                         }
                     }
@@ -78,7 +92,17 @@ public class FBlockUpdate {
     
     private static void update(Block center, Block b, int radius, WorldServer worldServer, int x, int y, int z) {
         if (center.getLocation().distance(b.getLocation()) <= radius) {
-            if (isBlocksInLight(center)) {
+            boolean notify = false;
+            
+            if (center.getTypeId() != 1 && isBlocksInLight(center)) {
+                notify = true;
+            }
+            
+            if (center.getTypeId() == 1) {
+                notify = true;
+            }
+            
+            if (notify) {
                 worldServer.notify(b.getX() + x, b.getY() + y, b.getZ() + z);
             }
         }
@@ -112,7 +136,7 @@ public class FBlockUpdate {
         if (blocks.isEmpty()) { return; }
 
         FConfiguration config = FAntiXRay.getConfiguration();
-        if (config.disabled_worlds.contains(w.getName())) {
+        if (FObfuscator.disabled_worlds.contains(w.getName())) {
             return;
         }
 
@@ -148,31 +172,46 @@ public class FBlockUpdate {
         Location location = block.getLocation();
         FConfiguration config = FAntiXRay.getConfiguration();
 
-        if (config.disabled_worlds.contains(block.getWorld().getName())) {
-            return;
-        }
-        
-        if (config.dark_only) {
-            if (!isBlocksInLight(block)) {
-                return;
-            }
-        }
-
         int radius = config.update_radius;
         if (fast) {
             radius = 1;
         }
-        
+
         if (radius <= 0) {
+            return;
+        }
+
+        if (FObfuscator.disabled_worlds.contains(block.getWorld().getName())) {
+            return;
+        }
+        
+        boolean update = false;
+        
+        if (FObfuscator.engine_mode == 2 && block.getTypeId() == 1 || block.getTypeId() == 3 || block.getTypeId() == 13) {
+            update = true;
+        } else
+        if (config.dark_only && !isBlocksInLight(block)) {
+            update = true;
+        }
+
+        if (!update) {
             return;
         }
 
         WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
 
         HashSet<Integer[]> blocks = getBlocks(location, radius);
-        if (!blocks.isEmpty()) {
+        if (blocks != null && !blocks.isEmpty()) {
             for (Integer[] data : blocks) {
-                worldServer.notify(data[0], data[1], data[2]);
+                int x = data[0];
+                int y = data[1];
+                int z = data[2];
+                
+                if (block.getX() == x && block.getY() == y && block.getZ() == z) {
+                    continue;
+                }
+
+                worldServer.notify(x, y, z);
             }
         }
     }
@@ -246,7 +285,7 @@ public class FBlockUpdate {
             blocks.add(newInt(x + 1, y - 1 , z - 1));
             blocks.add(newInt(x - 1, y - 1, z - 1));
         }
-        
+
         return blocks;
     }
     

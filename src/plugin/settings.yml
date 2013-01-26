@@ -9,7 +9,6 @@ Options:
   ## FakeCaves, set Enabled to true to generate fake caves in way to prevent xray texture pack and cavefinders.
   FakeCaves:
     ## It **might** cause fps drops on the client side and also a little bit more of cpu on the server si
-    ## ATTENTTION: If you are using engine mode 2, don't remove the item id 1 from the random blocks list
     Enabled: false
     ## Intensity, the intensity of caves to generate, higher this value is, more fake caves you will have
     Intensity: 50
@@ -37,7 +36,19 @@ Darkness:
     - 54
     - 66
     - 85
+    - 98
     - 101
+
+ChestHider:
+  ## Enabled, if true, all chest will turn into a stone, when the player get close it will turn back into a chest
+  ## This function will create an extra thread for each player, and might use a bit of CPU.
+  Enabled: false
+  ## Interval, the interval in ticks per second to update the chests around the player
+  Interval: 10
+  ## Radius, the radius around the player to search for chests
+  Radius: 10
+  ## WalkMinimum, the minimum distance the player has to walk to fire the update
+  WalkMinimum: 1
 
 ## Set which events will be used to update the blocks (Deobfuscate)
 ## OnBlockBreak is enabled by default and cannot be disabled, those are just extra!
@@ -65,9 +76,22 @@ Updater:
 Lists:
   ## Random Blocks, list here, all the blocks used on engine mode 2
   RandomBlocks:
-    - 1
+    - 5
+    - 14
     - 15
+    - 16
+    - 21
+    - 22
+    - 41
+    - 42
+    - 47
+    - 48
+    - 49
     - 56
+    - 57
+    - 98
+    - 129
+    - 133
   ## Hidden Blocks, list here, all the blocks that will be obfuscated by engine mode 0 and 1
   HiddenBlocks:
     - 14

@@ -7,8 +7,10 @@ import com.comphenix.protocol.events.ConnectionSide;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
+import org.bukkit.craftbukkit.v1_4_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -27,13 +29,13 @@ public class FProtocolLib {
                 if (e.getPacketID() == Packets.Server.MAP_CHUNK) {
                     Packet51MapChunk packet = (Packet51MapChunk) e.getPacket().getHandle();
                     if (!FAntiXRay.isExempt(p.getName())) {
-                        packet.obfuscate = true;
+                        FObfuscator.obfuscate(((CraftPlayer)e.getPlayer()).getHandle(), packet, true);
                     }
                 } else
                 if (e.getPacketID() == Packets.Server.MAP_CHUNK_BULK) {
                     Packet56MapChunkBulk packet = (Packet56MapChunkBulk) e.getPacket().getHandle();
                     if (!FAntiXRay.isExempt(p.getName())) {
-                        packet.obfuscate = true;
+                        FObfuscator.obfuscate(((CraftPlayer)e.getPlayer()).getHandle(), packet, true);
                     }
                 }
             }
