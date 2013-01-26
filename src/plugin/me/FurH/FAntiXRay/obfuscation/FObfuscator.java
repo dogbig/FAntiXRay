@@ -181,16 +181,19 @@ public class FObfuscator {
 
         /* empty chunk?, return */
         if (packet.d == 0 && packet.c == 0) {
+            packet.compress();
             return packet;
         }
 
         /* who sent this packet?, return */
         if (packet.chunk == null) {
+            packet.compress();
             return packet;
         }
 
         /* world is disabled, return */
         if (disabled_worlds.contains(packet.chunk.world.getWorld().getName())) {
+            packet.compress();
             return packet;
         }
 
