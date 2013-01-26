@@ -25,6 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.hook.FProtocolLib;
+import me.FurH.FAntiXRay.hook.manager.FHookManager;
+import me.FurH.FAntiXRay.hook.manager.FHookServer;
+import me.FurH.FAntiXRay.hook.manager.FHookStandart;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
@@ -67,6 +70,7 @@ public class FAntiXRay extends JavaPlugin {
     private static FCommunicator communicator;
     private static FMessages messages;
     private static FConfiguration configuration;
+    private static FHookManager hook;
 
     @Override
     public void onEnable() {
@@ -78,9 +82,15 @@ public class FAntiXRay extends JavaPlugin {
 
         messages.load();
         configuration.load();
+        
+        if (FObfuscator.server_mode) {
+            hook = new FHookServer();
+        } else {
+            hook = new FHookStandart();
+        }
 
         PluginManager pm = getServer().getPluginManager();
-        
+
         if (!FObfuscator.server_mode) {
             Plugin protocolpl = pm.getPlugin("ProtocolLib");
             if (protocolpl != null) {
@@ -98,7 +108,7 @@ public class FAntiXRay extends JavaPlugin {
         
         if (FObfuscator.chest_enabled) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                FPlayerListener.hookPlayer(p);
+                hook.hook(p);
             }
         }
 
@@ -181,6 +191,10 @@ public class FAntiXRay extends JavaPlugin {
             }
         }
         return true;
+    }
+    
+    public static FHookManager getHookManager() {
+        return hook;
     }
     
     public static boolean isProtocolEnabled() {
