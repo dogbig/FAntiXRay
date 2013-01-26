@@ -181,7 +181,6 @@ public class FObfuscator {
 
         /* empty chunk?, return */
         if (packet.d == 0 && packet.c == 0) {
-            packet.compress();
             return packet;
         }
 
