@@ -55,7 +55,7 @@ public class FPlayerListener implements Listener  {
         FAntiXRay.getHookManager().stopTask(e.getPlayer());
     }
     
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 

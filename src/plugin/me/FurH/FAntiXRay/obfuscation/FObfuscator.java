@@ -186,21 +186,28 @@ public class FObfuscator {
 
         /* who sent this packet?, return */
         if (packet.chunk == null) {
-            packet.compress();
             return packet;
         }
 
         /* world is disabled, return */
         if (disabled_worlds.contains(packet.chunk.world.getWorld().getName())) {
-            packet.compress();
             return packet;
         }
 
         byte[] inflatedBuffer = (byte[]) getPrivateField(packet, "inflatedBuffer");
+        byte[] buffer = (byte[]) getPrivateField(packet, "buffer");
         byte[] obfuscated = obfuscate(packet.chunk, inflatedBuffer, packet.e, packet.c, true);
 
-        System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
-        packet.compress();
+        Deflater deflater = new Deflater(-1);
+        try {
+            deflater.setInput(obfuscated, 0, obfuscated.length);
+            deflater.finish();
+            setPrivateField(packet, "size", deflater.deflate(buffer));
+        } finally {
+            deflater.end();
+        }
+
+        inflatedBuffer = null; buffer = null; obfuscated = null;
 
         return packet;
     }

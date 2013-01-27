@@ -45,35 +45,24 @@ public class Packet51MapChunk extends Packet {
         this.b = chunk.z;
         this.e = flag;
         ChunkMap chunkmap = a(chunk, flag, i);
-        inflatedBuffer = chunkmap.a; // FurH ->
-        
+        Deflater deflater = new Deflater(-1);
+
         this.chunk = chunk; // FurH ->
         
         this.d = chunkmap.c;
         this.c = chunkmap.b;
-        //org.bukkit.craftbukkit.OrebfuscatorManager.obfuscateSync(chunk.x, chunk.z, i, chunkmap.a, chunk.world); // Spigot (Orebfuscator)
-        
-        // FurH -> start
-        if (c == 0 && d == 0) {
-            compress();
-        }
-        // FurH -> end
-    }
-    
-    // FurH -> start
-    public void compress() {
-        Deflater deflater = new Deflater(-1);
+        org.bukkit.craftbukkit.OrebfuscatorManager.obfuscateSync(chunk.x, chunk.z, i, chunkmap.a, chunk.world); // Spigot (Orebfuscator)
 
         try {
-            deflater.setInput(inflatedBuffer, 0, inflatedBuffer.length);
+            this.inflatedBuffer = chunkmap.a;
+            deflater.setInput(chunkmap.a, 0, chunkmap.a.length);
             deflater.finish();
-            this.buffer = new byte[ inflatedBuffer.length ];
+            this.buffer = new byte[chunkmap.a.length];
             this.size = deflater.deflate(this.buffer);
         } finally {
             deflater.end();
         }
     }
-    // FurH -> end
 
     public void a(DataInputStream datainputstream) throws IOException { // CraftBukkit - throws IOException
         this.a = datainputstream.readInt();
