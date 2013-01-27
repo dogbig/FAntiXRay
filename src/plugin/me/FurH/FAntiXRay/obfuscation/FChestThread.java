@@ -68,7 +68,8 @@ public class FChestThread implements Runnable {
                     int id = worldServer.getTypeId(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
 
                     if (id == 54) {
-                        worldServer.notify(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
+                        player.sendBlockChange(newLoc, id, (byte) worldServer.getData(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ()));
+                        //worldServer.notify(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
                     }
                 }
             }
