@@ -63,7 +63,7 @@ public class FBlockListener implements Listener {
             FBlockUpdate.update(e.getPlayer(), e.getBlock(), true);
         }
 
-        if (config.dark_only && config.dark_blocks.contains(e.getBlock().getTypeId())) {
+        if (config.dark_update && config.dark_blocks.contains(e.getBlockAgainst().getTypeId())) {
             FBlockUpdate.update(e.getPlayer(), e.getBlock());
         }
     }

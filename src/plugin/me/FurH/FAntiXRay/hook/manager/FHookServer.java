@@ -24,8 +24,6 @@ public class FHookServer extends FHookManager {
                 FObfuscatorHook hook = new FObfuscatorHook();
                 pl.networkManager.a(hook);
             }
-
-            startTask(p, FAntiXRay.getConfiguration().chest_interval);
         }
     }
 }

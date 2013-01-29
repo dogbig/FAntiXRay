@@ -1,6 +1,8 @@
 package me.FurH.FAntiXRay.hook;
 
+import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
+import me.FurH.FAntiXRay.threads.FPacketData;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.INetworkManager;
 import net.minecraft.server.v1_4_R1.MinecraftServer;
@@ -46,6 +48,13 @@ public class FPlayerConnection extends PlayerConnection {
     @Override
     public void sendPacket(Packet packet) {
 
+        if (packet instanceof Packet56MapChunkBulk || packet instanceof Packet56MapChunkBulk) {
+            if (FAntiXRay.getConfiguration().thread_enabled || FAntiXRay.getConfiguration().thread_player) {
+                FAntiXRay.getThreadManager().add(new FPacketData(player, packet));
+                return;
+            }
+        }
+        
         if (packet instanceof Packet56MapChunkBulk) {
             Packet56MapChunkBulk p56 = (Packet56MapChunkBulk)packet;
             packet = FObfuscator.obfuscate(player, p56, false);
@@ -115,7 +124,6 @@ public class FPlayerConnection extends PlayerConnection {
 
     @Override
     public void a(Packet3Chat packet3chat) {
-        FObfuscator.setPrivateField(this.getClass(), "chatThrottle", 0);
         super.a(packet3chat);
     }
 

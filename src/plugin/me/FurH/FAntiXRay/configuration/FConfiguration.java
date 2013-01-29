@@ -38,7 +38,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class FConfiguration {
     public int              update_radius   = 1;
 
-    public boolean          dark_only       = true;
+    public boolean          dark_update     = true;
     public int              dark_radius     = 8;
     public HashSet<Integer> dark_blocks     = new HashSet<>();
     
@@ -51,6 +51,11 @@ public class FConfiguration {
     public int              chest_interval  = 10;
     public int              chest_radius    = 10;
     public int              chest_wark      = 1;
+    public boolean          chest_movement  = false;
+    
+    public boolean          thread_enabled  = false;
+    public int              thread_number   = 2;
+    public boolean          thread_player   = false;
     
     public boolean          ophasperm       = true;
 
@@ -73,7 +78,7 @@ public class FConfiguration {
         int caves_intensity = getInteger("Options.FakeCaves.Intensity");
 
         boolean dark_enabled    = getBoolean("Darkness.Enabled");
-        dark_only       = getBoolean("Darkness.BrightOnly");
+        dark_update     = getBoolean("Darkness.LightUpdate");
         dark_radius     = getInteger("Darkness.BrightRadius");
         dark_blocks     = getIntegerHash("Darkness.UpdateOn");
         
@@ -94,6 +99,11 @@ public class FConfiguration {
         chest_interval  = getInteger("ChestHider.Interval");
         chest_radius    = getInteger("ChestHider.Radius");
         chest_wark      = getInteger("ChestHider.WalkMinimum");
+        chest_movement  = getBoolean("ChestHider.PlayerMoveEvent");
+        
+        thread_enabled  = getBoolean("Threads.Enabled");
+        thread_number   = getInteger("Threads.Amount");
+        thread_player   = getBoolean("Threads.PlayerThread");
         
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
@@ -129,6 +139,17 @@ public class FConfiguration {
             FObfuscator.server_mode = true;
         } catch (NoSuchFieldError ex) {
             com.log("[TAG] Server-side not found, using standart mode!");
+        }
+        
+        if (FObfuscator.server_mode) {
+            if (thread_enabled) {
+                com.log("[TAG] You can't have threads enabled with server-side installed, it is threaded already!");
+                thread_enabled = false;
+            }
+        }
+
+        if (thread_enabled && thread_number <= 0) {
+            thread_enabled = false;
         }
     }
     

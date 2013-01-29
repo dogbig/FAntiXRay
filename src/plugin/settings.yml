@@ -4,7 +4,7 @@ Options:
   ## Engine Mode 1 > Hide all blocks in the HiddenBlocks list that doesn't have air in one of its sides.
   ## Engine Mode 2 > Replace all stones that doesn't have air in one of its sides by a random block.
   EngineMode: 0
-  ## Update Radius, set it between 0 or 3. Higher this value is, higher will be the cpu usage.
+  ## Update Radius, Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1
   ## FakeCaves, set Enabled to true to generate fake caves in way to prevent xray texture pack and cavefinders.
   FakeCaves:
@@ -17,8 +17,8 @@ Darkness:
   ## Enabled, if true, all blocks that is in the dark will be obfuscated (By default, the plugin will check for transparent blocks (air), if this is true, it will check the light level)
   ## This mode will replace all blocks from the HiddenBlocks and ExtraBlocks lists by a stone if the light level is 0.
   Enabled: false
-  ## BrightOnly, if true, the block will be update only if it have a light level higher then 0
-  BrightOnly: false
+  ## LightUpdate, if true, if you place a light souce (listed on UpdateOn) an update will be cast
+  LightUpdate: false
   ## BrightRadius, the radius around the light to be updated, Higher this value is, higher will be the cpu usage.
   BrightRadius: 8
   ## UpdateOn, the block id that will cast the update when placed
@@ -49,6 +49,18 @@ ChestHider:
   Radius: 10
   ## WalkMinimum, the minimum distance the player has to walk to fire the update
   WalkMinimum: 1
+  ## PlayerMoveEvent, if true, player move event will be used, this might be very laggy
+  PlayerMoveEvent: false
+  
+Threads:
+  ## Enabled, if true, the obfuscation process will be made in a separate thread, if you can't modify your craftbukkit.jar and want to use threads you may wanna check this out.
+  ## If you have too much players online and are speriencing slow chunk seding, increase the amount of thread, but never put it higher than your number of cpu cores
+  ## This option should not change the cpu usage, but it will require more memory. This is not compatible with the server-side module.
+  Enabled: false
+  ## Amount of threads to obfuscate chunks
+  Amount: 2
+  ## PlayerThread, if true, each player will have his own processing thread
+  PlayerThread: false
 
 ## Set which events will be used to update the blocks (Deobfuscate)
 ## OnBlockBreak is enabled by default and cannot be disabled, those are just extra!

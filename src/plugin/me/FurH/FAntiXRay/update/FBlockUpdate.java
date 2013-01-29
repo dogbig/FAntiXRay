@@ -57,57 +57,32 @@ public class FBlockUpdate {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
 
-                    if (x == b.getX() && y == b.getY() && z == b.getZ()) {
+                    if ((b.getX() + x) == b.getX() && (b.getY() + y) == b.getY() && (b.getZ() + z) == b.getZ()) {
                         continue;
                     }
 
                     Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
                     
-                    if (center == b) {
+                    if (center.getLocation().distance(b.getLocation()) > radius) {
                         continue;
                     }
                     
-                    if (center == null) {
-                        continue;
+                    boolean update = false;
+                    if (FObfuscator.caves_enabled && center.getTypeId() == 1) {
+                        update = true;
+                    } else
+                    if (!FObfuscator.caves_enabled && FObfuscator.hidden_blocks.contains(center.getTypeId()) && isBlocksInLight(center)) {
+                        update = true;
                     }
 
-                    if (center.getTypeId() == 0) {
-                        boolean update = false;
-
-                        if (FObfuscator.caves_enabled && center.getTypeId() == 1) {
-                            update = true;
-                        } else
-                        if (!FObfuscator.caves_enabled && FObfuscator.hidden_blocks.contains(center.getTypeId())) {
-                            update = true;
-                        }
-
-                        if (update) {
-                            update(center, b, radius, worldServer, x, y, z);
-                        }
+                    if (update) {
+                        worldServer.notify(center.getX(), center.getY(), center.getZ());
                     }
                 }
             }
         }
     }
-    
-    private static void update(Block center, Block b, int radius, WorldServer worldServer, int x, int y, int z) {
-        if (center.getLocation().distance(b.getLocation()) <= radius) {
-            boolean notify = false;
-            
-            if (center.getTypeId() != 1 && isBlocksInLight(center)) {
-                notify = true;
-            }
-            
-            if (center.getTypeId() == 1) {
-                notify = true;
-            }
-            
-            if (notify) {
-                worldServer.notify(b.getX() + x, b.getY() + y, b.getZ() + z);
-            }
-        }
-    }
-    
+
     private static boolean isBlocksInLight(Block center) {
         if (center.getRelative(BlockFace.UP).getLightLevel() > 0) {
             return true;
@@ -147,7 +122,7 @@ public class FBlockUpdate {
 
         for (Block block : blocks) {
             if (block.getTypeId() != 0) {
-                HashSet<Integer[]> bls = getBlocks(block.getLocation(), 1);
+                HashSet<Integer[]> bls = getBlocks(block.getLocation());
                 for (Integer[] ints : bls) {
                     if (!hash.contains(ints)) {
                         hash.add(ints);
@@ -162,129 +137,75 @@ public class FBlockUpdate {
         }
     }
 
-    public static void update(Player p, Block b, boolean fast) {
-        if (!FAntiXRay.isExempt(p.getName())) {
-            update(b, fast);
-        }
+    public static void update(Block b, boolean fast) {
+        update(null, b, fast);
     }
     
-    public static void update(Block block, boolean fast) {        
-        Location location = block.getLocation();
+    public static void update(Player p, Block b, boolean fast) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
         int radius = config.update_radius;
+        if (radius <= 0) {
+            return;
+        }
+        
         if (fast) {
             radius = 1;
         }
 
-        if (radius <= 0) {
+        if (FObfuscator.disabled_worlds.contains(b.getWorld().getName())) {
             return;
         }
 
-        if (FObfuscator.disabled_worlds.contains(block.getWorld().getName())) {
-            return;
-        }
-        
-        boolean update = false;
-        
-        if (FObfuscator.engine_mode == 2 && block.getTypeId() == 1 || block.getTypeId() == 3 || block.getTypeId() == 13) {
-            update = true;
-        } else
-        if (config.dark_only && !isBlocksInLight(block)) {
-            update = true;
-        }
+        WorldServer worldServer = ((CraftWorld) b.getWorld()).getHandle();
 
-        if (!update) {
-            return;
-        }
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
 
-        WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
+                    if ((b.getX() + x) == b.getX() && (b.getY() + y) == b.getY() && (b.getZ() + z) == b.getZ()) {
+                        continue;
+                    }
 
-        HashSet<Integer[]> blocks = getBlocks(location, radius);
-        if (blocks != null && !blocks.isEmpty()) {
-            for (Integer[] data : blocks) {
-                int x = data[0];
-                int y = data[1];
-                int z = data[2];
-                
-                if (block.getX() == x && block.getY() == y && block.getZ() == z) {
-                    continue;
+                    Block center = b.getWorld().getBlockAt(b.getX() + x, b.getY() + y, b.getZ() + z);
+                    
+                    if (center.getLocation().distance(b.getLocation()) > radius) {
+                        continue;
+                    }
+
+                    boolean update = false;
+                    if (FObfuscator.caves_enabled && center.getTypeId() == 1) {
+                        update = true;
+                    } else
+                    if (!FObfuscator.caves_enabled && FObfuscator.hidden_blocks.contains(center.getTypeId())) {
+                        update = true;
+                    } else
+                    if (FObfuscator.engine_mode == 2) {
+                        if (center.getTypeId() == 1 || center.getTypeId() == 3 || center.getTypeId() == 13) {
+                            update = true;
+                        }
+                    }
+
+                    if (update) {
+                        worldServer.notify(center.getX(), center.getY(), center.getZ());
+                    }
                 }
-
-                worldServer.notify(x, y, z);
             }
         }
     }
-    
-    private static HashSet<Integer[]> getBlocks(Location loc, int radius) {
+
+    private static HashSet<Integer[]> getBlocks(Location loc) {
         HashSet<Integer[]> blocks = new HashSet<>();
 
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
 
-        /*
-         * old school but efficient! Rather than making a loop, with this I only get the blocks I want.
-         */
-        if (radius >= 1) {
-            blocks.add(newInt(x + 1, y - 1, z));
-            blocks.add(newInt(x - 1, y - 1, z));
-            blocks.add(newInt(x, y - 1, z));
-            blocks.add(newInt(x, y - 1, z + 1));
-            blocks.add(newInt(x, y - 1, z - 1));
-        }
-
-        if (radius >= 2) {
-            blocks.add(newInt(x + 1, y - 2, z));
-            blocks.add(newInt(x - 1, y - 2, z));
-            blocks.add(newInt(x, y - 2, z));
-            blocks.add(newInt(x, y - 2, z + 1));
-            blocks.add(newInt(x, y - 2, z - 1));
-            
-            blocks.add(newInt(x, y - 1, z));
-            blocks.add(newInt(x, y - 1, z - 1));
-            blocks.add(newInt(x, y - 1, z + 1));
-            
-            blocks.add(newInt(x + 2, y, z));
-            blocks.add(newInt(x - 2, y, z));
-            blocks.add(newInt(x, y, z + 2));
-            blocks.add(newInt(x, y, z - 2));
- 
-            blocks.add(newInt(x + 1, y, z + 1));
-            blocks.add(newInt(x - 1, y, z + 1));
-            blocks.add(newInt(x + 1, y , z - 1));
-            blocks.add(newInt(x - 1, y, z - 1));
-            
-            blocks.add(newInt(x + 1, y - 1, z + 1));
-            blocks.add(newInt(x - 1, y - 1, z + 1));
-            blocks.add(newInt(x + 1, y - 1 , z - 1));
-            blocks.add(newInt(x - 1, y - 1, z - 1));
-            
-            blocks.add(newInt(x + 1, y + 1, z + 1));
-            blocks.add(newInt(x - 1, y + 1, z + 1));
-            blocks.add(newInt(x + 1, y + 1, z - 1));
-            blocks.add(newInt(x - 1, y + 1, z - 1));
-            blocks.add(newInt(x + 2, y + 1, z));
-            blocks.add(newInt(x - 2, y + 1, z));
-            blocks.add(newInt(x, y + 1, z + 2));
-            blocks.add(newInt(x, y + 1, z - 2));
-            blocks.add(newInt(x, y + 2, z - 1));
-            blocks.add(newInt(x, y + 2, z + 1));
-            blocks.add(newInt(x + 1, y + 2, z));
-            blocks.add(newInt(x - 1, y + 2, z));
-        }
-
-        if (radius >= 3) {
-            blocks.add(newInt(x + 2, y - 1, z));
-            blocks.add(newInt(x - 2, y - 1, z));
-            blocks.add(newInt(x, y - 1, z + 2));
-            blocks.add(newInt(x, y - 1, z - 2));
-            
-            blocks.add(newInt(x + 1, y - 1, z + 1));
-            blocks.add(newInt(x - 1, y - 1, z + 1));
-            blocks.add(newInt(x + 1, y - 1 , z - 1));
-            blocks.add(newInt(x - 1, y - 1, z - 1));
-        }
+        blocks.add(newInt(x + 1, y - 1, z));
+        blocks.add(newInt(x - 1, y - 1, z));
+        blocks.add(newInt(x, y - 1, z));
+        blocks.add(newInt(x, y - 1, z + 1));
+        blocks.add(newInt(x, y - 1, z - 1));
 
         return blocks;
     }

@@ -57,7 +57,7 @@ public class FObfuscator {
         byte[][] inflatedBuffers = (byte[][]) getPrivateField(packet, "inflatedBuffers");
         byte[] buildBuffer = (byte[]) getPrivateField(packet, "buildBuffer");
         byte[] obfuscated; // obfuscated data
-
+        
         /* spigot compatibility */
         if (buildBuffer == null) {
             buildBuffer = new byte [ 196864 ];
@@ -158,9 +158,11 @@ public class FObfuscator {
         byte[] buffer = (byte[]) getPrivateField(packet, "buffer");
         byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c, true);
 
+        System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
+        
         Deflater deflater = new Deflater(-1);
         try {
-            deflater.setInput(obfuscated, 0, obfuscated.length);
+            deflater.setInput(inflatedBuffer, 0, inflatedBuffer.length);
             deflater.finish();
             setPrivateField(packet, "size", deflater.deflate(buffer));
         } finally {
@@ -186,28 +188,23 @@ public class FObfuscator {
 
         /* who sent this packet?, return */
         if (packet.chunk == null) {
+            packet.compress();
             return packet;
         }
 
         /* world is disabled, return */
         if (disabled_worlds.contains(packet.chunk.world.getWorld().getName())) {
+            packet.compress();
             return packet;
         }
 
         byte[] inflatedBuffer = (byte[]) getPrivateField(packet, "inflatedBuffer");
-        byte[] buffer = (byte[]) getPrivateField(packet, "buffer");
         byte[] obfuscated = obfuscate(packet.chunk, inflatedBuffer, packet.e, packet.c, true);
 
-        Deflater deflater = new Deflater(-1);
-        try {
-            deflater.setInput(obfuscated, 0, obfuscated.length);
-            deflater.finish();
-            setPrivateField(packet, "size", deflater.deflate(buffer));
-        } finally {
-            deflater.end();
-        }
+        System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
+        packet.compress();
 
-        inflatedBuffer = null; buffer = null; obfuscated = null;
+        inflatedBuffer = null; obfuscated = null;
 
         return packet;
     }
@@ -408,5 +405,19 @@ public class FObfuscator {
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             ex.printStackTrace();
         }
+    }
+    
+    public static void setPrivateField(Class<?> objClass, String fieldName, Object value) {
+        try {
+            Field field = objClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(objClass, value);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public static String toString(int x, int y, int z) {
+        return (x) + "" + (y) + "" + (z);
     }
 }

@@ -28,9 +28,17 @@ public class FChestThread implements Runnable {
     public void setId(int id) {
         this.id = id;
     }
+    
+    public void setLastLoc(Location loc) {
+        this.lastLoc = loc;
+    }
 
     @Override
     public void run() {
+        execute();
+    }
+    
+    public void execute() {
         FConfiguration config = FAntiXRay.getConfiguration();
 
         boolean update = false;
@@ -44,7 +52,7 @@ public class FChestThread implements Runnable {
 
         if (update) {
             update();
-        }        
+        }
     }
     
     public void update() {
@@ -68,7 +76,7 @@ public class FChestThread implements Runnable {
                     int id = worldServer.getTypeId(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
 
                     if (id == 54) {
-                        player.sendBlockChange(newLoc, id, (byte) worldServer.getData(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ()));
+                        player.sendBlockChange(newLoc, 54, (byte) worldServer.getData(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ()));
                         //worldServer.notify(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
                     }
                 }

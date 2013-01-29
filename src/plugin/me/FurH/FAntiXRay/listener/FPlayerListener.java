@@ -19,6 +19,7 @@ package me.FurH.FAntiXRay.listener;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.hook.manager.FHookManager;
+import me.FurH.FAntiXRay.obfuscation.FChestThread;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,7 +42,9 @@ public class FPlayerListener implements Listener  {
         
         FHookManager hook = FAntiXRay.getHookManager();
         if (hook.tasks.containsKey(e.getPlayer().getName())) {
-            hook.tasks.get(e.getPlayer().getName()).update();
+            FChestThread thread = hook.tasks.get(e.getPlayer().getName());
+            thread.setLastLoc(e.getFrom());
+            thread.update();
         }
     }
     
@@ -73,6 +76,10 @@ public class FPlayerListener implements Listener  {
         }
         
         FAntiXRay.getHookManager().hook(p);
+        if (!FAntiXRay.isExempt(p.getName())) {
+            FAntiXRay.getHookManager().startTask(p, FAntiXRay.getConfiguration().chest_interval);
+            FAntiXRay.getHookManager().startThread(p);
+        }
         
         if (plugin.hasUpdate) {
             if (plugin.hasPerm(p, "Updates")) {

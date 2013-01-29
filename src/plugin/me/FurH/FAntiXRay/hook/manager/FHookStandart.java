@@ -28,8 +28,6 @@ public class FHookStandart extends FHookManager {
                     pl = handler;
                 }
             }
-
-            startTask(p, FAntiXRay.getConfiguration().chest_interval);
         }
     }
 }
