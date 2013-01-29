@@ -294,6 +294,20 @@ public class FObfuscator {
                                 buffer[index] = 1;
                             }
                         }
+                    } else
+                    if (engine_mode == 3) {
+                        if (isObfuscable(id)) {
+                            if (id == 1) {
+                                if (rnd.nextInt(101) <= 20) {
+                                    if (!isBlocksTransparent(chunk, wx, wy, wz)) {
+                                        buffer[index] = (byte) getRandom();
+                                    }
+                                }
+                            } else
+                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                                buffer[index] = 1;
+                            }
+                        }
                     }
                     index++;
                 }

@@ -180,7 +180,7 @@ public class FBlockUpdate {
                     if (!FObfuscator.caves_enabled && FObfuscator.hidden_blocks.contains(center.getTypeId())) {
                         update = true;
                     } else
-                    if (FObfuscator.engine_mode == 2) {
+                    if (FObfuscator.engine_mode >= 2) {
                         if (center.getTypeId() == 1 || center.getTypeId() == 3 || center.getTypeId() == 13) {
                             update = true;
                         }

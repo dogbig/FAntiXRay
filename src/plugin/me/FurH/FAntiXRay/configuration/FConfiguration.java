@@ -64,7 +64,7 @@ public class FConfiguration {
     public void load() {
         FCommunicator com    = FAntiXRay.getCommunicator();
         int engine_mode     = getInteger("Options.EngineMode");
-        if (engine_mode > 2) {
+        if (engine_mode > 3) {
             com.log("[TAG] Engine Mode can't be higher than 2!");
             engine_mode = 2;
         }
