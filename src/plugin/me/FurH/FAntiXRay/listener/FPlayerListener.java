@@ -44,7 +44,6 @@ public class FPlayerListener implements Listener  {
         if (hook.tasks.containsKey(e.getPlayer().getName())) {
             FChestThread thread = hook.tasks.get(e.getPlayer().getName());
             thread.setLastLoc(e.getFrom());
-            thread.update();
         }
     }
     
