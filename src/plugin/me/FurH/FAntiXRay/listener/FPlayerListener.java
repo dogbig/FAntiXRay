@@ -49,12 +49,12 @@ public class FPlayerListener implements Listener  {
     
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
-        FAntiXRay.getHookManager().stopTask(e.getPlayer());
+        FAntiXRay.getHookManager().unhook(e.getPlayer());
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerKickEvent e) {
-        FAntiXRay.getHookManager().stopTask(e.getPlayer());
+        FAntiXRay.getHookManager().unhook(e.getPlayer());
     }
     
     @EventHandler(priority = EventPriority.MONITOR)

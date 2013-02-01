@@ -35,6 +35,10 @@ import org.bukkit.scheduler.BukkitTask;
 public class FHookManager {
     public HashMap<String, FChestThread> tasks = new HashMap<>();
 
+    public void unhook(Player p) {
+        stopTask(p);
+    }
+    
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
