@@ -54,15 +54,11 @@ public class FReflectField {
     }
     
     /* set a private field */
-    public static void setPrivateField(Object object, String fieldName, Object value) {
-        setPrivateField(object.getClass(), fieldName, value);
-    }
-    
-    public static void setPrivateField(Class<?> objClass, String fieldName, Object value) {
+    public static void setPrivateField(Object object, String fieldName, Object value) {    
         try {
-            Field field = objClass.getDeclaredField(fieldName);
+            Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            field.set(objClass, value);
+            field.set(object, value);
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             ex.printStackTrace();
         }
