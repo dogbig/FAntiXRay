@@ -37,10 +37,12 @@ public class FHookManager {
 
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
-            EntityPlayer player = ((CraftPlayer) p).getHandle();
-
+            EntityPlayer player = ((CraftPlayer)p).getHandle();
+            
             FReflectField.setFinalField(player.playerConnection.networkManager, "highPriorityQueue", new FPriorityQueue(player));
             FReflectField.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", new FPriorityQueue(player));
+            
+            startTask(p, FAntiXRay.getConfiguration().chest_interval);
         }
     }
 

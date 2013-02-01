@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 public class FChestThread implements Runnable {
     private Location lastLoc;
     private Player player;
-    private int id;
+    private int taskId;
 
     public FChestThread(Player player) {
         this.player = player;
@@ -38,11 +38,11 @@ public class FChestThread implements Runnable {
     }
     
     public int getId() {
-        return id;
+        return taskId;
     }
     
     public void setId(int id) {
-        this.id = id;
+        this.taskId = id;
     }
     
     public void setLastLoc(Location loc) {

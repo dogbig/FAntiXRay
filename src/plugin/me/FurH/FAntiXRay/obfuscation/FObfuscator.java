@@ -60,7 +60,7 @@ public class FObfuscator {
     }
 
     /* initialize the Packet56MapChunkBulk */
-    public static Packet56MapChunkBulk obfuscate(EntityPlayer player, Packet56MapChunkBulk packet, boolean send) {
+    public static Packet56MapChunkBulk obfuscate(EntityPlayer player, Packet56MapChunkBulk packet) {
         
         /* world is disabled, return */
         if (disabled_worlds.contains(player.world.getWorld().getName())) {
@@ -83,7 +83,7 @@ public class FObfuscator {
         for (int i = 0; i < packet.d(); i++) {
             Chunk chunk = player.world.getChunkAt(c[i], d[i]);
 
-            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, packet.a[i], false);
+            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, packet.a[i]);
 
             /* spigot compatibility */
             if (obfuscated.length + index > buildBuffer.length) {
@@ -97,17 +97,13 @@ public class FObfuscator {
         /* might be better for gc */
         inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
         index = 0; //packet.chunks.clear(); packet.chunks = null;
-
-        if (send) {
-            player.playerConnection.networkManager.queue(packet);
-        }
         
         /* return the obfuscated packet */
         return packet;
     }
 
     /* initialize the Packet51MapChunk */
-    public static Packet51MapChunk obfuscate(EntityPlayer player, Packet51MapChunk packet, boolean send) {
+    public static Packet51MapChunk obfuscate(EntityPlayer player, Packet51MapChunk packet) {
         
         /* empty chunk?, return */
         if (packet.d == 0 && packet.c == 0) {
@@ -122,7 +118,7 @@ public class FObfuscator {
         Chunk chunk = player.world.getChunkAt(packet.a, packet.b);
         byte[] inflatedBuffer = (byte[]) FReflectField.getPrivateField(packet, "inflatedBuffer");
         byte[] buffer = (byte[]) FReflectField.getPrivateField(packet, "buffer");
-        byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c, true);
+        byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c);
 
         System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
         
@@ -136,16 +132,11 @@ public class FObfuscator {
         }
         
         inflatedBuffer = null; buffer = null; obfuscated = null;
-        
-        if (send) {
-            player.playerConnection.networkManager.queue(packet);
-        }
-
         return packet;
     }
 
     /* initialize the chunk */
-    public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i, boolean p51) {
+    public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i) {
         
         int index = 0;
         byte[] obfuscated;
