@@ -3,7 +3,7 @@ Options:
   ## Engine Mode 0 > Hide all block in the HiddenBlocks list even if there is nothing blocking your view from it.
   ## Engine Mode 1 > Hide all blocks in the HiddenBlocks list that doesn't have air in one of its sides.
   ## Engine Mode 2 > Replace all stones that doesn't have air in one of its sides by a random block.
-  ## Engine Mode 3 > Almost like 2 but with less random ores [faster than engine mode 2]
+  ## Engine Mode 3 > Almost like 2 but with less random ores.
   EngineMode: 0
   ## Update Radius, Higher this value is, higher will be the cpu usage.
   UpdateRadius: 1

@@ -118,6 +118,12 @@ public class FAntiXRay extends JavaPlugin {
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
         }
+        
+        if (FObfuscator.chest_enabled) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                hook.hook(p);
+            }
+        }
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
