@@ -168,7 +168,7 @@ public class FObfuscator {
                 for (int k = 0; k < 16; ++k) {
 
                     int wx = (chunk.x << 4) + i;
-                    int wy = (i << 4) + j;
+                    int wy = (l << 4) + j;
                     int wz = (chunk.z << 4) + k;
 
                     int index = j << 8 | k << 4 | i;

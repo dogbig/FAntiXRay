@@ -54,9 +54,7 @@ public class FPriorityQueue extends ArrayList<Packet> {
         if (packet != null) {
             if (packet instanceof Packet56MapChunkBulk) {
                 Packet56MapChunkBulk p56 = (Packet56MapChunkBulk)packet;
-                long start = System.currentTimeMillis();
                 packet = FObfuscator.obfuscate(player, p56);
-                System.out.println("Took: " + (System.currentTimeMillis() - start));
             } else
             if (packet instanceof Packet51MapChunk) {
                 Packet51MapChunk p51 = (Packet51MapChunk)packet;
