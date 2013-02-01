@@ -77,7 +77,6 @@ public class FPlayerListener implements Listener  {
         FAntiXRay.getHookManager().hook(p);
         if (!FAntiXRay.isExempt(p.getName())) {
             FAntiXRay.getHookManager().startTask(p, FAntiXRay.getConfiguration().chest_interval);
-            FAntiXRay.getHookManager().startThread(p);
         }
         
         if (plugin.hasUpdate) {

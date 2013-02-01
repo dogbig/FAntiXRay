@@ -26,8 +26,6 @@ import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.hook.FProtocolLib;
 import me.FurH.FAntiXRay.hook.manager.FHookManager;
-import me.FurH.FAntiXRay.hook.manager.FHookServer;
-import me.FurH.FAntiXRay.hook.manager.FHookStandart;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FMoveListener;
@@ -35,7 +33,6 @@ import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
-import me.FurH.FAntiXRay.threads.FThreadManager;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -64,7 +61,6 @@ public class FAntiXRay extends JavaPlugin {
     public boolean hasUpdate = false;
     public int currentVersion = 0;
     public int newVersion = 0;
-    public static int threads = 0;
 
     private static boolean protocol = false;
 
@@ -74,36 +70,27 @@ public class FAntiXRay extends JavaPlugin {
     private static FMessages messages;
     private static FConfiguration configuration;
     private static FHookManager hook;
-    private static FThreadManager threadManager;
 
     @Override
     public void onEnable() {
         plugin = this;
-        
+
         communicator = new FCommunicator();
         messages = new FMessages();
         configuration = new FConfiguration();
-        threadManager = new FThreadManager();
 
         messages.load();
         configuration.load();
-        
-        if (FObfuscator.server_mode) {
-            hook = new FHookServer();
-        } else {
-            hook = new FHookStandart();
-        }
+        hook = new FHookManager();
 
         PluginManager pm = getServer().getPluginManager();
 
-        if (!FObfuscator.server_mode) {
-            Plugin protocolpl = pm.getPlugin("ProtocolLib");
-            if (protocolpl != null) {
-                if (protocolpl.isEnabled()) {
-                    FProtocolLib.setupProtocolLib(this);
-                    communicator.log("[TAG] ProtocolLib support enabled!");
-                    protocol = true;
-                }
+        Plugin protocolpl = pm.getPlugin("ProtocolLib");
+        if (protocolpl != null) {
+            if (protocolpl.isEnabled()) {
+                FProtocolLib.setupProtocolLib(this);
+                communicator.log("[TAG] ProtocolLib support enabled!");
+                protocol = true;
             }
         }
 
@@ -131,11 +118,6 @@ public class FAntiXRay extends JavaPlugin {
             updateThread();
         }
         
-        if (configuration.thread_enabled && !configuration.thread_player) {
-            threadManager.start();
-            communicator.log("[TAG] Obfuscation Threads Enabled!");
-        }
-
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Enabled");
     }
@@ -145,22 +127,12 @@ public class FAntiXRay extends JavaPlugin {
 
         Bukkit.getScheduler().cancelTasks(this);
 
-        if (configuration.thread_enabled && !configuration.thread_player) {
-            threadManager.stopQueue();
-            communicator.log("[TAG] Obfuscation Threads Disabled!");
-        }
-        
         configuration.load();
         messages.load();
 
         PluginManager pm = getServer().getPluginManager();
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
-        }
-        
-        if (configuration.thread_enabled && !configuration.thread_player) {
-            threadManager.start();
-            communicator.log("[TAG] Obfuscation Threads Enabled!");
         }
 
         FBlockListener blockListener = new FBlockListener();
@@ -179,11 +151,6 @@ public class FAntiXRay extends JavaPlugin {
     public void onDisable() {
         Bukkit.getScheduler().cancelTasks(this);
 
-        if (configuration.thread_enabled) {
-            threadManager.stopQueue();
-            communicator.log("[TAG] Obfuscation Threads Disabled!");
-        }
-        
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");
     }
@@ -239,10 +206,6 @@ public class FAntiXRay extends JavaPlugin {
 
     public static FMessages getMessages() {
         return messages;
-    }
-    
-    public static FThreadManager getThreadManager() {
-        return threadManager;
     }
 
     public static FAntiXRay getPlugin() {

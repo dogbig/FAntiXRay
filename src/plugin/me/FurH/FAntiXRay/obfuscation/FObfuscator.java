@@ -1,15 +1,16 @@
 package me.FurH.FAntiXRay.obfuscation;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.zip.Deflater;
+import me.FurH.FAntiXRay.util.FReflectField;
 import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkSection;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
+import net.minecraft.server.v1_4_R1.World;
 
 /**
  *
@@ -26,7 +27,6 @@ public class FObfuscator {
     public static int caves_intensity = 50;
     private static Random rnd = new Random(101);
 
-    public static boolean server_mode = false;
     public static boolean chest_enabled = false;
     
     /* load the configurations */
@@ -51,11 +51,11 @@ public class FObfuscator {
             return packet;
         }
 
-        int[] c = (int[]) getPrivateField(packet, "c"); //X
-        int[] d = (int[]) getPrivateField(packet, "d"); //Z
+        int[] c = (int[]) FReflectField.getPrivateField(packet, "c"); //X
+        int[] d = (int[]) FReflectField.getPrivateField(packet, "d"); //Z
 
-        byte[][] inflatedBuffers = (byte[][]) getPrivateField(packet, "inflatedBuffers");
-        byte[] buildBuffer = (byte[]) getPrivateField(packet, "buildBuffer");
+        byte[][] inflatedBuffers = (byte[][]) FReflectField.getPrivateField(packet, "inflatedBuffers");
+        byte[] buildBuffer = (byte[]) FReflectField.getPrivateField(packet, "buildBuffer");
         byte[] obfuscated; // obfuscated data
         
         /* spigot compatibility */
@@ -89,57 +89,7 @@ public class FObfuscator {
         /* return the obfuscated packet */
         return packet;
     }
-    
-    /* initialize the Packet56MapChunkBulk */
-    public static Packet56MapChunkBulk obfuscate56(Packet56MapChunkBulk packet) {
 
-        /* who sent this packet?, return */
-        if (packet.chunks == null) {
-            return packet;
-        }
-
-        /* no chunks to obfuscate, return */
-        if (packet.chunks.isEmpty()) {
-            return packet;
-        }
-
-        /* world is disabled, return */
-        if (disabled_worlds.contains(((Chunk)packet.chunks.get(0)).world.getWorld().getName())) {
-            return packet;
-        }
-
-        byte[][] inflatedBuffers = (byte[][]) getPrivateField(packet, "inflatedBuffers");
-        byte[] buildBuffer = (byte[]) getPrivateField(packet, "buildBuffer");
-        byte[] obfuscated; // obfuscated data
-
-        /* spigot compatibility */
-        if (buildBuffer == null) {
-            buildBuffer = new byte [ 196864 ];
-        }
-
-        int index = 0;
-        for (int i = 0; i < packet.chunks.size(); i++) {
-            Chunk chunk = (Chunk) packet.chunks.get(i);
-
-            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, packet.a[i], false);
-
-            /* spigot compatibility */
-            if (obfuscated.length + index > buildBuffer.length) {
-                buildBuffer = new byte [ obfuscated.length + index ];
-            }
-
-            System.arraycopy(obfuscated, 0, buildBuffer, index, inflatedBuffers[i].length);
-            index += inflatedBuffers[i].length;
-        }
-
-        /* might be better for gc */
-        inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
-        index = 0; //packet.chunks.clear(); packet.chunks = null;
-        
-        /* return the obfuscated packet */
-        return packet;
-    }
-    
     /* initialize the Packet51MapChunk */
     public static Packet51MapChunk obfuscate(EntityPlayer player, Packet51MapChunk packet, boolean send) {
         
@@ -154,8 +104,8 @@ public class FObfuscator {
         }
 
         Chunk chunk = player.world.getChunkAt(packet.a, packet.b);
-        byte[] inflatedBuffer = (byte[]) getPrivateField(packet, "inflatedBuffer");
-        byte[] buffer = (byte[]) getPrivateField(packet, "buffer");
+        byte[] inflatedBuffer = (byte[]) FReflectField.getPrivateField(packet, "inflatedBuffer");
+        byte[] buffer = (byte[]) FReflectField.getPrivateField(packet, "buffer");
         byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c, true);
 
         System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
@@ -164,7 +114,7 @@ public class FObfuscator {
         try {
             deflater.setInput(inflatedBuffer, 0, inflatedBuffer.length);
             deflater.finish();
-            setPrivateField(packet, "size", deflater.deflate(buffer));
+            FReflectField.setPrivateField(packet, "size", deflater.deflate(buffer));
         } finally {
             deflater.end();
         }
@@ -177,38 +127,7 @@ public class FObfuscator {
 
         return packet;
     }
-    
-    /* initialize the Packet51MapChunk */
-    public static Packet51MapChunk obfuscate51(Packet51MapChunk packet) {
 
-        /* empty chunk?, return */
-        if (packet.d == 0 && packet.c == 0) {
-            return packet;
-        }
-
-        /* who sent this packet?, return */
-        if (packet.chunk == null) {
-            packet.compress();
-            return packet;
-        }
-
-        /* world is disabled, return */
-        if (disabled_worlds.contains(packet.chunk.world.getWorld().getName())) {
-            packet.compress();
-            return packet;
-        }
-
-        byte[] inflatedBuffer = (byte[]) getPrivateField(packet, "inflatedBuffer");
-        byte[] obfuscated = obfuscate(packet.chunk, inflatedBuffer, packet.e, packet.c, true);
-
-        System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
-        packet.compress();
-
-        inflatedBuffer = null; obfuscated = null;
-
-        return packet;
-    }
-    
     /* initialize the chunk */
     public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i, boolean p51) {
         
@@ -298,7 +217,7 @@ public class FObfuscator {
                     if (engine_mode == 3) {
                         if (isObfuscable(id)) {
                             if (id == 1) {
-                                if (rnd.nextInt(101) <= 20) {
+                                if (rnd.nextInt(101) <= 15) {
                                     if (!isBlocksTransparent(chunk, wx, wy, wz)) {
                                         buffer[index] = (byte) getRandom();
                                     }
@@ -332,22 +251,26 @@ public class FObfuscator {
 
     /* return true if the block have light in one of its faces */
     private static boolean isBlocksInLight(Chunk chunk, int x, int y, int z) {
-        if (chunk.world.getLightLevel(x + 1, y, z) > 0) {
+        return isBlocksInLight(chunk.world, x, y, z);
+    }
+    
+    public static boolean isBlocksInLight(World world, int x, int y, int z) {
+        if (world.getLightLevel(x + 1, y, z) > 0) {
             return true;
         } else
-        if (chunk.world.getLightLevel(x - 1, y, z) > 0) {
+        if (world.getLightLevel(x - 1, y, z) > 0) {
             return true;
         } else
-        if (chunk.world.getLightLevel(x, y + 1, z) > 0) {
+        if (world.getLightLevel(x, y + 1, z) > 0) {
             return true;
         } else
-        if (chunk.world.getLightLevel(x, y - 1, z) > 0) {
+        if (world.getLightLevel(x, y - 1, z) > 0) {
             return true;
         } else
-        if (chunk.world.getLightLevel(x, y, z + 1) > 0) {
+        if (world.getLightLevel(x, y, z + 1) > 0) {
             return true;
         } else
-        if (chunk.world.getLightLevel(x, y, z - 1) > 0) {
+        if (world.getLightLevel(x, y, z - 1) > 0) {
             return true;
         }
         return false;
@@ -396,39 +319,6 @@ public class FObfuscator {
         }
         
         return !net.minecraft.server.v1_4_R1.Block.i(id);
-    }
-    
-    /* get a private field */
-    public static Object getPrivateField(Object obj, String x) {
-        try {
-            Field f = obj.getClass().getDeclaredField(x);
-            f.setAccessible(true);
-            return f.get(obj);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-    
-    /* set a private field */
-    public static void setPrivateField(Object object, String fieldName, Object value) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(object, value);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    public static void setPrivateField(Class<?> objClass, String fieldName, Object value) {
-        try {
-            Field field = objClass.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(objClass, value);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
     }
     
     public static String toString(int x, int y, int z) {

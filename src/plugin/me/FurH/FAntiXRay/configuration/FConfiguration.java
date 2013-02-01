@@ -27,7 +27,6 @@ import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import me.FurH.FAntiXRay.util.FCommunicator.Type;
 import me.FurH.FAntiXRay.util.FUtils;
-import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -52,11 +51,7 @@ public class FConfiguration {
     public int              chest_radius    = 10;
     public int              chest_wark      = 1;
     public boolean          chest_movement  = false;
-    
-    public boolean          thread_enabled  = false;
-    public int              thread_number   = 2;
-    public boolean          thread_player   = false;
-    
+
     public boolean          ophasperm       = true;
 
     public boolean          updates         = true;
@@ -100,11 +95,7 @@ public class FConfiguration {
         chest_radius    = getInteger("ChestHider.Radius");
         chest_wark      = getInteger("ChestHider.WalkMinimum");
         chest_movement  = getBoolean("ChestHider.PlayerMoveEvent");
-        
-        thread_enabled  = getBoolean("Threads.Enabled");
-        thread_number   = getInteger("Threads.Amount");
-        thread_player   = getBoolean("Threads.PlayerThread");
-        
+
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
         updates         = getBoolean("Updater.Enabled");
@@ -132,27 +123,8 @@ public class FConfiguration {
         HashSet<String> disabled_worlds = getStringHash("Lists.DisabledWorlds");
 
         FObfuscator.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled, caves_enabled, caves_intensity, chest_enabled);
-
-        try {
-            Packet51MapChunk.modified = true;
-            com.log("[TAG] Server-side found, threads enabled!");
-            FObfuscator.server_mode = true;
-        } catch (NoSuchFieldError ex) {
-            com.log("[TAG] Server-side not found, using standart mode!");
-        }
-        
-        if (FObfuscator.server_mode) {
-            if (thread_enabled) {
-                com.log("[TAG] You can't have threads enabled with server-side installed, it is threaded already!");
-                thread_enabled = false;
-            }
-        }
-
-        if (thread_enabled && thread_number <= 0) {
-            thread_enabled = false;
-        }
     }
-    
+
     /*
      * return a Boolean from the settings file
      */
