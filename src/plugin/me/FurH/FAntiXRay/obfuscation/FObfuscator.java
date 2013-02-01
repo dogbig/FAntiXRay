@@ -163,24 +163,22 @@ public class FObfuscator {
 
         int incrm = 5;
         int index = 0;
-        
-        for (int y = 0; y < 16; y++) {
-            for (int z = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++) {
 
+        for (int y = 0; y < 16; ++y) {
+            for (int z = 0; z < 16; ++z) {
+                for (int x = 0; x < 16; ++x) {
+                    
                     int wx = (chunk.x << 4) + x;
                     int wy = (i << 4) + y;
                     int wz = (chunk.z << 4) + z;
 
-                    int id = section.a(x, y, z);
+                    //j << 8 | k << 4 | i
+                    // j > x
+                    // k > y
+                    // i > z
+                    int id = buffer[index] & 0xFF;//section.a(x, y, z);
                     boolean air = false;
-                    
-                    if (chest_enabled && id == 54) {
-                        buffer[index] = 0;
-                        index++;
-                        continue;
-                    }
-                    
+
                     if (caves_enabled && id == 1) {
                         if (rnd.nextInt(1001) <= caves_intensity) {
                             incrm = rnd.nextInt(5);
@@ -192,6 +190,9 @@ public class FObfuscator {
                         }
                     }
 
+                    if (chest_enabled && id == 54) {
+                        buffer[index] = 0;
+                    } else
                     if (air) {
                         if (isToObfuscate(chunk, wx, wy, wz)) {
                             buffer[index] = 0;
@@ -323,6 +324,10 @@ public class FObfuscator {
         
         if (id == 1) {
             return false;
+        }
+        
+        if (id > 255) {
+            return true;
         }
         
         return !net.minecraft.server.v1_4_R1.Block.i(id);
