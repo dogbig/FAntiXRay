@@ -8,16 +8,27 @@ import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
 
 public class FPriorityQueue extends ArrayList<Packet> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1546534712446462L;
 
     private EntityPlayer player;
+    
     public FPriorityQueue(EntityPlayer player) {
         this.player = player;
     }
 
     @Override
+    public boolean contains(Object o) {
+        return super.contains(o);
+    }
+    
+    @Override
     public boolean add(Packet packet) {
         return super.add(packet);
+    }
+    
+    @Override
+    public boolean remove(Object o) {
+        return super.remove(o);
     }
     
     @Override
@@ -34,7 +45,7 @@ public class FPriorityQueue extends ArrayList<Packet> {
                 packet = FObfuscator.obfuscate(player, p51, false);
             }
         }
-        
+
         return packet;
     }
     
@@ -46,5 +57,10 @@ public class FPriorityQueue extends ArrayList<Packet> {
     @Override
     public Packet get(int index) {
         return super.get(index);
+    }
+    
+    @Override
+    public void clear() {
+        super.clear();
     }
 }
