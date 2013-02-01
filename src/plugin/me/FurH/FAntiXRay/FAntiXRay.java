@@ -24,11 +24,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
-import me.FurH.FAntiXRay.hook.FProtocolLib;
-import me.FurH.FAntiXRay.hook.manager.FHookManager;
+import me.FurH.FAntiXRay.hook.FHookManager;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
-import me.FurH.FAntiXRay.listener.FMoveListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
@@ -39,7 +37,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,11 +55,10 @@ public class FAntiXRay extends JavaPlugin {
     public static final Logger log = Logger.getLogger("minecraft");
     private static HashSet<String> exempt = new HashSet<>();
     public static String tag = "[FAntiXRay]: ";
+
     public boolean hasUpdate = false;
     public int currentVersion = 0;
     public int newVersion = 0;
-
-    private static boolean protocol = false;
 
     /* classes */
     private static FAntiXRay plugin;
@@ -85,15 +81,6 @@ public class FAntiXRay extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
 
-        Plugin protocolpl = pm.getPlugin("ProtocolLib");
-        if (protocolpl != null) {
-            if (protocolpl.isEnabled()) {
-                FProtocolLib.setupProtocolLib(this);
-                communicator.log("[TAG] ProtocolLib support enabled!");
-                protocol = true;
-            }
-        }
-
         if (configuration.block_explosion) {
             pm.registerEvents(new FEntityListener(), this);
         }
@@ -108,9 +95,6 @@ public class FAntiXRay extends JavaPlugin {
         pm.registerEvents(new FPlayerListener(), this);
         pm.registerEvents(blockListener, this);
         blockListener.loadListeners(this);
-        if (configuration.chest_movement) {
-            pm.registerEvents(new FMoveListener(), this);
-        }
 
         startMetrics();
 
@@ -191,11 +175,7 @@ public class FAntiXRay extends JavaPlugin {
     public static FHookManager getHookManager() {
         return hook;
     }
-    
-    public static boolean isProtocolEnabled() {
-        return protocol;
-    }
-    
+
     public static FConfiguration getConfiguration() {
         return configuration;
     }

@@ -18,7 +18,7 @@ package me.FurH.FAntiXRay.listener;
 
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FMessages;
-import me.FurH.FAntiXRay.hook.manager.FHookManager;
+import me.FurH.FAntiXRay.hook.FHookManager;
 import me.FurH.FAntiXRay.obfuscation.FChestThread;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package me.FurH.FAntiXRay.hook.manager;
+package me.FurH.FAntiXRay.hook;
 
 import java.util.HashMap;
 import me.FurH.FAntiXRay.FAntiXRay;

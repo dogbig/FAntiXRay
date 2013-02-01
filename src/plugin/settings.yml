@@ -50,8 +50,6 @@ ChestHider:
   Radius: 10
   ## WalkMinimum, the minimum distance the player has to walk to fire the update
   WalkMinimum: 1
-  ## PlayerMoveEvent, if true, player move event will be used, this might be very laggy
-  PlayerMoveEvent: false
 
 ## Set which events will be used to update the blocks (Deobfuscate)
 ## OnBlockBreak is enabled by default and cannot be disabled, those are just extra!
