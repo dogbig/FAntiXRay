@@ -91,8 +91,6 @@ Lists:
     - 56
     - 57
     - 98
-    - 129
-    - 133
   ## Hidden Blocks, list here, all the blocks that will be obfuscated by engine mode 0 and 1
   HiddenBlocks:
     - 14

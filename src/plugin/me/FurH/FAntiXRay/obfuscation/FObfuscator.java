@@ -66,7 +66,7 @@ public class FObfuscator {
         if (disabled_worlds.contains(player.world.getWorld().getName())) {
             return packet;
         }
-
+        
         int[] c = (int[]) FReflectField.getPrivateField(packet, "c"); //X
         int[] d = (int[]) FReflectField.getPrivateField(packet, "d"); //Z
 
@@ -158,25 +158,22 @@ public class FObfuscator {
     }
     
     /* obfuscated the chunk */
-    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int i) {
+    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l) {
         byte[] buffer = section.g().clone();
 
         int incrm = 5;
-        int index = 0;
 
-        for (int y = 0; y < 16; ++y) {
-            for (int z = 0; z < 16; ++z) {
-                for (int x = 0; x < 16; ++x) {
+        for (int i = 0; i < 16; ++i) {
+            for (int j = 0; j < 16; ++j) {
+                for (int k = 0; k < 16; ++k) {
+
+                    int wx = (chunk.x << 4) + i;
+                    int wy = (i << 4) + j;
+                    int wz = (chunk.z << 4) + k;
+
+                    int index = j << 8 | k << 4 | i;
+                    int id = buffer[index] & 0xFF;
                     
-                    int wx = (chunk.x << 4) + x;
-                    int wy = (i << 4) + y;
-                    int wz = (chunk.z << 4) + z;
-
-                    //j << 8 | k << 4 | i
-                    // j > x
-                    // k > y
-                    // i > z
-                    int id = buffer[index] & 0xFF;//section.a(x, y, z);
                     boolean air = false;
 
                     if (caves_enabled && id == 1) {
@@ -194,7 +191,7 @@ public class FObfuscator {
                         buffer[index] = 0;
                     } else
                     if (air) {
-                        if (isToObfuscate(chunk, wx, wy, wz)) {
+                        if (isToObfuscate(chunk, wx, wy, wz, buffer, i, j, k)) {
                             buffer[index] = 0;
                         }
                     } else
@@ -205,7 +202,7 @@ public class FObfuscator {
                     } else
                     if (engine_mode == 1) {
                         if (hidden_blocks.contains(id)) {
-                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                            if (isToObfuscate(chunk, wx, wy, wz, buffer, i, j, k)) {
                                 buffer[index] = 1;
                             }
                         }
@@ -213,11 +210,11 @@ public class FObfuscator {
                     if (engine_mode == 2) {
                         if (isObfuscable(id)) {
                             if (id == 1) {
-                                if (!isBlocksTransparent(chunk, wx, wy, wz)) {
-                                    buffer[index] = (byte) getRandom();
+                                if (!isBlocksTransparent(buffer, i, j, k)) {
+                                    buffer[index] = (byte) getRandomId();
                                 }
                             } else
-                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                            if (isToObfuscate(chunk, wx, wy, wz, buffer, i, j, k)) {
                                 buffer[index] = 1;
                             }
                         }
@@ -225,18 +222,17 @@ public class FObfuscator {
                     if (engine_mode == 3) {
                         if (isObfuscable(id)) {
                             if (id == 1) {
-                                if (rnd.nextInt(101) <= 15) {
-                                    if (!isBlocksTransparent(chunk, wx, wy, wz)) {
-                                        buffer[index] = (byte) getRandom();
+                                if (rnd.nextInt(101) <= 20) {
+                                    if (!isBlocksTransparent(buffer, i, j, k)) {
+                                        buffer[index] = (byte) getRandomId();
                                     }
                                 }
                             } else
-                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                            if (isToObfuscate(chunk, wx, wy, wz, buffer, i, j, k)) {
                                 buffer[index] = 1;
                             }
                         }
                     }
-                    index++;
                 }
             }
         }
@@ -244,24 +240,19 @@ public class FObfuscator {
     }
 
     /* get random item */
-    public static int getRandom() {
-        int random = ((int)(Math.random() * random_blocks.length));
-        return random_blocks[ random ];
+    public static int getRandomId() {
+        return random_blocks[ (int) ((Math.random() * random_blocks.length)) ];
     }
     
-    public static boolean isToObfuscate(Chunk chunk, int x, int y, int z) {
+    public static boolean isToObfuscate(Chunk chunk, int x, int y, int z, byte[] buffer, int i, int j, int k) {
         if (dark_enabled) {
-            return !isBlocksInLight(chunk, x, y, z);
+            return !isBlocksInLight(chunk.world, x, y, z);
         } else {
-            return !isBlocksTransparent(chunk, x, y, z);
+            return !isBlocksTransparent(buffer, i, j, k);
         }
     }
 
     /* return true if the block have light in one of its faces */
-    private static boolean isBlocksInLight(Chunk chunk, int x, int y, int z) {
-        return isBlocksInLight(chunk.world, x, y, z);
-    }
-    
     public static boolean isBlocksInLight(World world, int x, int y, int z) {
         if (world.getLightLevel(x + 1, y, z) > 0) {
             return true;
@@ -285,23 +276,23 @@ public class FObfuscator {
     }
 
     /* return true if the block have a transparent block in one of its faces */
-    private static boolean isBlocksTransparent(Chunk chunk, int x, int y, int z) {
-        if (isTransparent(chunk.world.getTypeId(x + 1, y, z))) {
+    private static boolean isBlocksTransparent(byte[] buffer, int i, int j, int k) {
+        if (isTransparent(buffer, ((j + 1) << 8 | k << 4 | i & 0xFF))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x - 1, y, z))) {
+        if (isTransparent(buffer, ((j - 1) << 8 | k << 4 | i & 0xFF))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y + 1, z))) {
+        if (isTransparent(buffer, (j << 8 | (k + 1) << 4 | i & 0xFF))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y - 1, z))) {
+        if (isTransparent(buffer, (j << 8 | (k - 1) << 4 | i & 0xFF))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y, z + 1))) {
+        if (isTransparent(buffer, (j << 8 | k << 4 | (i + 1) & 0xFF))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y, z - 1))) {
+        if (isTransparent(buffer, (j << 8 | k << 4 | (i - 1) & 0xFF))) {
             return true;
         }
         return false;
@@ -317,7 +308,13 @@ public class FObfuscator {
     }
     
     /* return true if the id is a transparent block */
-    public static boolean isTransparent(int id) {
+    public static boolean isTransparent(byte[] buffer, int index) {
+        int id = 1;
+
+        try {
+            id = buffer[index];
+        } catch (Exception ex) { }
+
         if (id == 0) {
             return true;
         }

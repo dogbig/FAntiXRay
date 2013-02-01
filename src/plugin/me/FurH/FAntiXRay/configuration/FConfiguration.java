@@ -19,6 +19,7 @@ package me.FurH.FAntiXRay.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -98,7 +99,16 @@ public class FConfiguration {
         
         updates         = getBoolean("Updater.Enabled");
         
-        Integer[] random_blocks   = getIntegerList("Lists.RandomBlocks").toArray(new Integer[] {});
+        List<Integer> ids = getIntegerList("Lists.RandomBlocks");
+        List<Integer> toAdd = new ArrayList<>();
+        
+        for (int i : ids) {
+            if (i < 128) {
+                toAdd.add(i);
+            }
+        }
+        
+        Integer[] random_blocks   = toAdd.toArray(new Integer[] {});
         
         if (engine_mode == 2 && caves_enabled) {
             Integer[] nrnd = new Integer[ random_blocks.length + 3 ];
