@@ -50,7 +50,6 @@ public class FConfiguration {
     public int              chest_interval  = 10;
     public int              chest_radius    = 10;
     public int              chest_wark      = 1;
-    public boolean          chest_movement  = false;
 
     public boolean          ophasperm       = true;
 
@@ -94,7 +93,6 @@ public class FConfiguration {
         chest_interval  = getInteger("ChestHider.Interval");
         chest_radius    = getInteger("ChestHider.Radius");
         chest_wark      = getInteger("ChestHider.WalkMinimum");
-        chest_movement  = getBoolean("ChestHider.PlayerMoveEvent");
 
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         
