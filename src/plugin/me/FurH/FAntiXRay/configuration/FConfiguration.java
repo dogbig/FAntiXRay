@@ -103,7 +103,7 @@ public class FConfiguration {
         List<Integer> toAdd = new ArrayList<>();
         
         for (int i : ids) {
-            if (i < 256) {
+            if (i < 128) {
                 toAdd.add(i);
             }
         }
