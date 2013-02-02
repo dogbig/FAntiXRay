@@ -52,7 +52,7 @@ public class FPriorityQueue extends ArrayList<Packet> {
         
         Packet packet = super.remove(index);
         if (packet != null) {
-            if (packet instanceof Packet56MapChunkBulk) {
+            if (packet instanceof Packet56MapChunkBulk) {                
                 Packet56MapChunkBulk p56 = (Packet56MapChunkBulk)packet;
                 packet = FObfuscator.obfuscate(player, p56);
             } else
