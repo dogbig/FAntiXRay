@@ -16,7 +16,6 @@
 
 package me.FurH.FAntiXRay.hook;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,26 +44,26 @@ public class FHookManager {
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
-            
+
             List highPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
             List lowPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
-            
+
             if ((highPriorityQueue instanceof FPriorityQueue) && (lowPriorityQueue instanceof FPriorityQueue)) {
                 return;
             }
-                        
+
             List newhighPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
             List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
-            
+
             newhighPriorityQueue.addAll(highPriorityQueue);
             newlowPriorityQueue.addAll(lowPriorityQueue);
-            
+
             FReflectField.setFinalField(player.playerConnection.networkManager, "highPriorityQueue", newhighPriorityQueue);
             FReflectField.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
-            
+
             highPriorityQueue.clear();
             lowPriorityQueue.clear();
-            
+
             startTask(p, FAntiXRay.getConfiguration().chest_interval);
         }
     }
