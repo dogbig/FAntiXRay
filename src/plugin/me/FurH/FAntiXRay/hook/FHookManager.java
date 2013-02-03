@@ -40,19 +40,22 @@ public class FHookManager {
 
     public void unhook(Player p) {
         stopTask(p);
+        
+        EntityPlayer player = ((CraftPlayer)p).getHandle();
+        player.world.removeEntity(player);
     }
     
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
             
-            List highPriorityQueue = Collections.synchronizedList(new ArrayList());
-            List lowPriorityQueue = Collections.synchronizedList(new ArrayList());
+            List highPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
+            List lowPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
             
             if ((highPriorityQueue instanceof FPriorityQueue) && (lowPriorityQueue instanceof FPriorityQueue)) {
                 return;
             }
-            
+                        
             List newhighPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
             List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
             

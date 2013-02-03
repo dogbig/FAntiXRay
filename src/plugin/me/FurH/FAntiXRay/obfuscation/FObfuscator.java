@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2011-2013 FurmigaHumana.  All rights reserved.
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package me.FurH.FAntiXRay.obfuscation;
 
 import java.util.Arrays;
@@ -44,7 +28,7 @@ public class FObfuscator {
     private static Random rnd = new Random(101);
 
     public static boolean chest_enabled = false;
-    
+
     /* load the configurations */
     public static void load(Integer[] random_blocks, HashSet<Integer> hidden_blocks, HashSet<String> disabled_worlds, HashSet<Integer> dark_extra, int engine_mode, boolean dark_enabled, boolean caves_enabled, int caves_intensity, boolean chest_enabled) {        
         FObfuscator.random_blocks = random_blocks;
@@ -66,7 +50,7 @@ public class FObfuscator {
         if (disabled_worlds.contains(player.world.getWorld().getName())) {
             return packet;
         }
-        
+
         int[] c = (int[]) FReflectField.getPrivateField(packet, "c"); //X
         int[] d = (int[]) FReflectField.getPrivateField(packet, "d"); //Z
 
@@ -97,7 +81,7 @@ public class FObfuscator {
         /* might be better for gc */
         inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
         index = 0; //packet.chunks.clear(); packet.chunks = null;
-        
+
         /* return the obfuscated packet */
         return packet;
     }
@@ -132,6 +116,7 @@ public class FObfuscator {
         }
         
         inflatedBuffer = null; buffer = null; obfuscated = null;
+
         return packet;
     }
 
@@ -156,7 +141,7 @@ public class FObfuscator {
 
         return buildBuffer;
     }
-
+    
     /* obfuscated the chunk */
     public static byte[] obfuscate(ChunkSection section, Chunk chunk, int i) {
         byte[] buffer = section.g().clone();
@@ -174,13 +159,7 @@ public class FObfuscator {
 
                     int id = section.a(x, y, z);
                     boolean air = false;
-                    
-                    if (chest_enabled && id == 54) {
-                        buffer[index] = 0;
-                        index++;
-                        continue;
-                    }
-                    
+
                     if (caves_enabled && id == 1) {
                         if (rnd.nextInt(1001) <= caves_intensity) {
                             incrm = rnd.nextInt(5);
@@ -192,6 +171,9 @@ public class FObfuscator {
                         }
                     }
 
+                    if (chest_enabled && id == 54) {
+                        buffer[index] = 0;
+                    } else
                     if (air) {
                         if (isToObfuscate(chunk, wx, wy, wz)) {
                             buffer[index] = 0;
