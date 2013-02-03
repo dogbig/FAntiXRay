@@ -40,9 +40,6 @@ public class FHookManager {
 
     public void unhook(Player p) {
         stopTask(p);
-        
-        EntityPlayer player = ((CraftPlayer)p).getHandle();
-        player.world.removeEntity(player);
     }
     
     public void hook(Player p) {
