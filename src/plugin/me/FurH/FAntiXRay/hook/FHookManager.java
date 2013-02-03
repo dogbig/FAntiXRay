@@ -41,9 +41,12 @@ public class FHookManager {
         stopTask(p);
     }
     
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
+            
+            startTask(p, FAntiXRay.getConfiguration().chest_interval);
 
             List highPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
             List lowPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
@@ -63,8 +66,6 @@ public class FHookManager {
 
             highPriorityQueue.clear();
             lowPriorityQueue.clear();
-
-            startTask(p, FAntiXRay.getConfiguration().chest_interval);
         }
     }
 

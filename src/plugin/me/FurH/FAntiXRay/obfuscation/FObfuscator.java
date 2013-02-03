@@ -143,21 +143,21 @@ public class FObfuscator {
     }
     
     /* obfuscated the chunk */
-    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int i) {
+    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l) {
         byte[] buffer = section.g().clone();
 
         int incrm = 5;
         int index = 0;
         
-        for (int y = 0; y < 16; y++) {
-            for (int z = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++) {
+        for (int j = 0; j < 16; j++) {
+            for (int k = 0; k < 16; k++) {
+                for (int i = 0; i < 16; i++) {
 
-                    int wx = (chunk.x << 4) + x;
-                    int wy = (i << 4) + y;
-                    int wz = (chunk.z << 4) + z;
+                    int x = (chunk.x << 4) + i;
+                    int y = (l << 4) + j;
+                    int z = (chunk.z << 4) + k;
 
-                    int id = section.a(x, y, z);
+                    int id = section.a(i, j, k);
                     boolean air = false;
 
                     if (caves_enabled && id == 1) {
@@ -175,7 +175,7 @@ public class FObfuscator {
                         buffer[index] = 0;
                     } else
                     if (air) {
-                        if (isToObfuscate(chunk, wx, wy, wz)) {
+                        if (isToObfuscate(chunk, x, y, z)) {
                             buffer[index] = 0;
                         }
                     } else
@@ -186,7 +186,7 @@ public class FObfuscator {
                     } else
                     if (engine_mode == 1) {
                         if (hidden_blocks.contains(id)) {
-                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                            if (isToObfuscate(chunk, x, y, z)) {
                                 buffer[index] = 1;
                             }
                         }
@@ -194,11 +194,11 @@ public class FObfuscator {
                     if (engine_mode == 2) {
                         if (isObfuscable(id)) {
                             if (id == 1) {
-                                if (!isBlocksTransparent(chunk, wx, wy, wz)) {
+                                if (!isBlocksTransparent(chunk, x, y, z)) {
                                     buffer[index] = (byte) getRandom();
                                 }
                             } else
-                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                            if (isToObfuscate(chunk, x, y, z)) {
                                 buffer[index] = 1;
                             }
                         }
@@ -207,12 +207,12 @@ public class FObfuscator {
                         if (isObfuscable(id)) {
                             if (id == 1) {
                                 if (rnd.nextInt(101) <= 20) {
-                                    if (!isBlocksTransparent(chunk, wx, wy, wz)) {
+                                    if (!isBlocksTransparent(chunk, x, y, z)) {
                                         buffer[index] = (byte) getRandom();
                                     }
                                 }
                             } else
-                            if (isToObfuscate(chunk, wx, wy, wz)) {
+                            if (isToObfuscate(chunk, x, y, z)) {
                                 buffer[index] = 1;
                             }
                         }
@@ -230,59 +230,59 @@ public class FObfuscator {
         return random_blocks[ random ];
     }
     
-    public static boolean isToObfuscate(Chunk chunk, int x, int y, int z) {
+    public static boolean isToObfuscate(Chunk chunk, int i, int j, int k) {
         if (dark_enabled) {
-            return !isBlocksInLight(chunk, x, y, z);
+            return !isBlocksInLight(chunk, i, j, k);
         } else {
-            return !isBlocksTransparent(chunk, x, y, z);
+            return !isBlocksTransparent(chunk, i, j, k);
         }
     }
 
     /* return true if the block have light in one of its faces */
-    private static boolean isBlocksInLight(Chunk chunk, int x, int y, int z) {
-        return isBlocksInLight(chunk.world, x, y, z);
+    private static boolean isBlocksInLight(Chunk chunk, int i, int j, int k) {
+        return isBlocksInLight(chunk.world, i, j, k);
     }
     
-    public static boolean isBlocksInLight(World world, int x, int y, int z) {
-        if (world.getLightLevel(x + 1, y, z) > 0) {
+    public static boolean isBlocksInLight(World world, int i, int j, int k) {
+        if (world.getLightLevel(i + 1, j, k) > 0) {
             return true;
         } else
-        if (world.getLightLevel(x - 1, y, z) > 0) {
+        if (world.getLightLevel(i - 1, j, k) > 0) {
             return true;
         } else
-        if (world.getLightLevel(x, y + 1, z) > 0) {
+        if (world.getLightLevel(i, j + 1, k) > 0) {
             return true;
         } else
-        if (world.getLightLevel(x, y - 1, z) > 0) {
+        if (world.getLightLevel(i, j - 1, k) > 0) {
             return true;
         } else
-        if (world.getLightLevel(x, y, z + 1) > 0) {
+        if (world.getLightLevel(i, j, k + 1) > 0) {
             return true;
         } else
-        if (world.getLightLevel(x, y, z - 1) > 0) {
+        if (world.getLightLevel(i, j, k - 1) > 0) {
             return true;
         }
         return false;
     }
 
     /* return true if the block have a transparent block in one of its faces */
-    private static boolean isBlocksTransparent(Chunk chunk, int x, int y, int z) {
-        if (isTransparent(chunk.world.getTypeId(x + 1, y, z))) {
+    private static boolean isBlocksTransparent(Chunk chunk, int i, int j, int k) {
+        if (isTransparent(chunk.world.getTypeId(i + 1, j, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x - 1, y, z))) {
+        if (isTransparent(chunk.world.getTypeId(i - 1, j, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y + 1, z))) {
+        if (isTransparent(chunk.world.getTypeId(i, j + 1, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y - 1, z))) {
+        if (isTransparent(chunk.world.getTypeId(i, j - 1, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y, z + 1))) {
+        if (isTransparent(chunk.world.getTypeId(i, j, k + 1))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(x, y, z - 1))) {
+        if (isTransparent(chunk.world.getTypeId(i, j, k - 1))) {
             return true;
         }
         return false;

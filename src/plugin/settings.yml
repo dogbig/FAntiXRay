@@ -26,19 +26,13 @@ Darkness:
   UpdateOn: 50, 51, 89
   ## ExtraBlocks, the extra blocks to be obfuscated if it is in the dark
   ExtraBlocks:
-    - 5
     - 4
-    - 30
-    - 46
     - 47
     - 48
     - 49
     - 52
     - 54
-    - 66
-    - 85
     - 98
-    - 101
 
 ChestHider:
   ## Enabled, if true, all chest will turn into a stone, when the player get close it will turn back into a chest
