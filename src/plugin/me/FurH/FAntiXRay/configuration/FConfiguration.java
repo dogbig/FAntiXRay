@@ -48,7 +48,7 @@ public class FConfiguration {
     public boolean          block_piston    = false;
     public boolean          block_physics   = false;
     
-    public boolean          cache_enabled   = true;
+    public boolean          cache_enabled   = false;
     public int              file_call_gc    = 100;
     public double           size_limit      = 5120;
     public int              writes_sec      = 50;
