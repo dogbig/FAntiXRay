@@ -47,6 +47,12 @@ public class FConfiguration {
     public boolean          block_damage    = false;
     public boolean          block_piston    = false;
     public boolean          block_physics   = false;
+    
+    public boolean          cache_enabled   = true;
+    public int              file_call_gc    = 100;
+    public double           size_limit      = 5120;
+    public int              writes_sec      = 50;
+    public int              compress_level  = 1;
 
     public int              chest_interval  = 10;
     public int              chest_radius    = 10;
@@ -90,6 +96,16 @@ public class FConfiguration {
         block_piston    = getBoolean("UpdateEvents.onBlockPiston");
         block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
 
+        cache_enabled   = getBoolean("Cache.Enabled");
+        file_call_gc    = getInteger("Cache.FileCallGC");
+        size_limit      = (((double) getInteger("Cache.SizeLimit")) * 1024 * 1024);
+        writes_sec      = getInteger("Cache.WritesPerSec");
+        compress_level  = getInteger("Cache.Compress.Level");
+        if (compress_level > 9) {
+            com.log("[TAG] The compression level can't be higher then 9!");
+            compress_level = 9;
+        }
+
         boolean chest_enabled   = getBoolean("ChestHider.Enabled");
         chest_interval  = getInteger("ChestHider.Interval");
         chest_radius    = getInteger("ChestHider.Radius");
@@ -130,7 +146,7 @@ public class FConfiguration {
         
         HashSet<String> disabled_worlds = getStringHash("Lists.DisabledWorlds");
 
-        FObfuscator.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled, caves_enabled, caves_intensity, chest_enabled);
+        FObfuscator.load(random_blocks, hidden_blocks, disabled_worlds, dark_extra, engine_mode, dark_enabled, caves_enabled, caves_intensity, chest_enabled, cache_enabled);
     }
 
     /*

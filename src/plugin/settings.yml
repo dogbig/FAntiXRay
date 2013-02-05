@@ -13,6 +13,19 @@ Options:
     Enabled: false
     ## Intensity, the intensity of caves to generate, higher this value is, more fake caves you will have
     Intensity: 50
+    
+Cache:
+  ## Enabled, if true, the cache system will be activated
+  ## ATTENTION: SSD USERS MUST AVOID THIS OPTION!
+  Enabled: false
+  ## FileCallGC, the amount of files to process before suggesting a gc [prevent too many open files]
+  FileCallGC: 100
+  ## SizeLimit, set the size limit of the cache folder in MB, 0 Will disable it.
+  SizeLimit: 5120
+  ## The level of compression used on the cache, higher this value is, slower the cache will be and more resources will be required to read/write.
+  Compress:
+    ## 0 = No Compression (Ultra fast, higher sizes), 9 = Maximum compression (Slower, more resources needed, smaller sizes)
+    Level: 1
 
 Darkness:
   ## Enabled, if true, all blocks that is in the dark will be obfuscated (By default, the plugin will check for transparent blocks (air), if this is true, it will check the light level)

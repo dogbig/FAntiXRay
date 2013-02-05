@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.zip.Deflater;
+import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.util.FReflectField;
+import me.FurH.FAntiXRay.util.FUtils;
 import net.minecraft.server.v1_4_R1.Chunk;
 import net.minecraft.server.v1_4_R1.ChunkSection;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
@@ -28,9 +31,11 @@ public class FObfuscator {
     private static Random rnd = new Random(101);
 
     public static boolean chest_enabled = false;
+    
+    public static boolean cache_enabled = false;
 
     /* load the configurations */
-    public static void load(Integer[] random_blocks, HashSet<Integer> hidden_blocks, HashSet<String> disabled_worlds, HashSet<Integer> dark_extra, int engine_mode, boolean dark_enabled, boolean caves_enabled, int caves_intensity, boolean chest_enabled) {        
+    public static void load(Integer[] random_blocks, HashSet<Integer> hidden_blocks, HashSet<String> disabled_worlds, HashSet<Integer> dark_extra, int engine_mode, boolean dark_enabled, boolean caves_enabled, int caves_intensity, boolean chest_enabled, boolean cache_enabled) {        
         FObfuscator.random_blocks = random_blocks;
         FObfuscator.hidden_blocks = hidden_blocks;
         FObfuscator.disabled_worlds = disabled_worlds;
@@ -41,6 +46,7 @@ public class FObfuscator {
         FObfuscator.caves_enabled = caves_enabled;
         FObfuscator.caves_intensity = caves_intensity;
         FObfuscator.chest_enabled = chest_enabled;
+        FObfuscator.cache_enabled = cache_enabled;
     }
 
     /* initialize the Packet56MapChunkBulk */
@@ -123,8 +129,26 @@ public class FObfuscator {
     /* initialize the chunk */
     public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i) {
         
+        FChunkCache cache = FAntiXRay.getCache();
+        boolean savecache = false;
+        long hash = 0L;
+
         int index = 0;
-        byte[] obfuscated;
+        byte[] obfuscated = null;
+        
+        if (cache_enabled) {
+            hash = FUtils.getHash(buildBuffer);
+
+            obfuscated = cache.read(chunk.world, chunk.x, chunk.z, hash, engine_mode);
+            if (obfuscated != null) {
+
+                System.arraycopy(obfuscated, 0, buildBuffer, index, obfuscated.length);
+
+                return buildBuffer;
+            } else {
+                savecache = true;
+            }
+        }
 
         ChunkSection[] sections = chunk.i();
         for (int j1 = 0; j1 < sections.length; ++j1) {
@@ -134,6 +158,10 @@ public class FObfuscator {
                 System.arraycopy(obfuscated, 0, buildBuffer, index, obfuscated.length);
                 index += obfuscated.length;
             }
+        }
+
+        if (savecache) {
+            cache.write(chunk.world, chunk.x, chunk.z, obfuscated, hash, engine_mode);
         }
 
         /* might be better for gc */

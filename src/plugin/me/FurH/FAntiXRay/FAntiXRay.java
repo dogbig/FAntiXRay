@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import me.FurH.FAntiXRay.cache.FCacheManager;
+import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.hook.FHookManager;
@@ -32,6 +34,7 @@ import me.FurH.FAntiXRay.metrics.FMetrics;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.util.FCommunicator;
+import me.FurH.FAntiXRay.util.FUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -66,6 +69,7 @@ public class FAntiXRay extends JavaPlugin {
     private static FMessages messages;
     private static FConfiguration configuration;
     private static FHookManager hook;
+    private static FChunkCache cache;
 
     @Override
     public void onEnable() {
@@ -74,6 +78,7 @@ public class FAntiXRay extends JavaPlugin {
         communicator = new FCommunicator();
         messages = new FMessages();
         configuration = new FConfiguration();
+        cache = new FChunkCache();
 
         messages.load();
         configuration.load();
@@ -90,6 +95,8 @@ public class FAntiXRay extends JavaPlugin {
                 hook.hook(p);
             }
         }
+        
+        loadCache();
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
@@ -101,7 +108,7 @@ public class FAntiXRay extends JavaPlugin {
         if (configuration.updates) {
             updateThread();
         }
-        
+
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Enabled");
     }
@@ -124,6 +131,8 @@ public class FAntiXRay extends JavaPlugin {
                 hook.hook(p);
             }
         }
+        
+        loadCache();
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
@@ -134,6 +143,24 @@ public class FAntiXRay extends JavaPlugin {
 
         if (configuration.updates) {
             updateThread();
+        }
+    }
+    
+    public void loadCache() {
+        if (configuration.cache_enabled) {
+            if (configuration.size_limit > 0) {
+                FCacheManager.getCacheSizeTask();
+            }
+        
+            double size = FCacheManager.getCacheSize();
+            double limit = configuration.size_limit;
+
+            communicator.log("[TAG] Cache Size: {0} of {1} allowed in {2} files", FUtils.format(size), FUtils.format(limit), FCacheManager.files.size());
+            
+            if (size > limit) {
+                FAntiXRay.getCommunicator().log("[TAG] The cache is too big, cleaning up!");
+                FCacheManager.clearCache();
+            }
         }
     }
 
@@ -149,15 +176,51 @@ public class FAntiXRay extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (cmd.getName().equalsIgnoreCase("fantixray")) {
             if (args.length <= 0) {
+                communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
                 communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                 return true;
             } else if (args.length > 0) {
                 if (args.length > 1) {
-                    communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
-                    return true;
+                    if (args.length > 2) {
+                        communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                        return true;
+                    } else {
+                        if (args[1].equalsIgnoreCase("clear")) {
+                            if (!sender.hasPermission("FAntiXRay.ClearCache")) {
+                                communicator.msg(sender, "&4You don't have permission to use this command");
+                                return true;
+                            } else {
+                                communicator.msg(sender, "&7Cleaning cache...");
+                                int left = FCacheManager.clearCache();
+                                if (left > 0) {
+                                    communicator.msg(sender, "&a{0}&7 files could not be deleted!", left);
+                                    return true;
+                                } else {
+                                    communicator.msg(sender, "&aCache cleared successfully!");
+                                    return true;
+                                }
+                            }
+                        } else {
+                            communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
+                            return true;
+                        }
+                    }
                 } else {
+                    if (args[0].equalsIgnoreCase("cache")) {
+                        if (!sender.hasPermission("FAntiXRay.SeeCache")) {
+                            communicator.msg(sender, "&4You don't have permission to use this command");
+                            return true;
+                        } else {
+                            double size = FCacheManager.getCacheSize();
+                            double limit = configuration.size_limit;
+
+                            communicator.msg(sender, "&7Current cache size: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", FUtils.format(size), FUtils.format(limit), FCacheManager.files.size());
+                            return true;
+                        }
+                    } else
                     if (args[0].equalsIgnoreCase("reload")) {
-                        if (!sender.hasPermission("FAntiXRay.ReloadConfig")) {
+                        if (!sender.hasPermission("FAntiXRay.Reload")) {
                             communicator.msg(sender, "&4You don't have permission to use this command");
                             return true;
                         } else {
@@ -166,11 +229,15 @@ public class FAntiXRay extends JavaPlugin {
                             return true;
                         }
                     } else {
+                        communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                        communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
                         communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                         return true;
                     }
                 }
             } else {
+                communicator.msg(sender, "&a/axr cache &8-&7 Shows the current cache size");
+                communicator.msg(sender, "&a/axr cache clear &8-&7 Clear the cache");
                 communicator.msg(sender, "&a/axr reload &8-&7 Reload the configuration");
                 return true;
             }
@@ -188,6 +255,10 @@ public class FAntiXRay extends JavaPlugin {
 
     public static FCommunicator getCommunicator() {
         return communicator;
+    }
+    
+    public static FChunkCache getCache() {
+        return cache;
     }
 
     public static FMessages getMessages() {

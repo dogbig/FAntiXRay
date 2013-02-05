@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 import me.FurH.FAntiXRay.FAntiXRay;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -207,5 +209,12 @@ public class FUtils {
             com.error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
                     "[TAG] Failed to copy the file {0}, {1}", file.getName(), ex.getMessage());
         }
+    }
+
+    public static long getHash(byte[] buildBuffer) {
+        Checksum checksum = new CRC32();
+        checksum.reset();
+        checksum.update(buildBuffer, 0, buildBuffer.length);
+        return checksum.getValue();
     }
 }
