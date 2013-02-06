@@ -77,6 +77,7 @@ public class FChunkCache {
 
             callgc++;
         } catch (IOException | ClassNotFoundException ex) {
+            return null;
         } finally {
             if (zis != null) {
                 try {

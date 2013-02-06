@@ -139,12 +139,9 @@ public class FObfuscator {
         if (cache_enabled) {
             hash = FUtils.getHash(buildBuffer);
 
-            obfuscated = cache.read(chunk.world, chunk.x, chunk.z, hash, engine_mode);
-            if (obfuscated != null) {
-
-                System.arraycopy(obfuscated, 0, buildBuffer, index, obfuscated.length);
-
-                return buildBuffer;
+            byte[] cached = cache.read(chunk.world, chunk.x, chunk.z, hash, engine_mode);
+            if (cached != null) {
+                return cached;
             } else {
                 savecache = true;
             }
@@ -161,7 +158,7 @@ public class FObfuscator {
         }
 
         if (savecache) {
-            cache.write(chunk.world, chunk.x, chunk.z, obfuscated, hash, engine_mode);
+            cache.write(chunk.world, chunk.x, chunk.z, buildBuffer, hash, engine_mode);
         }
 
         /* might be better for gc */
