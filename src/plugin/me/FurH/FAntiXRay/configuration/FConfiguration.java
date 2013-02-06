@@ -51,7 +51,6 @@ public class FConfiguration {
     public boolean          cache_enabled   = false;
     public int              file_call_gc    = 100;
     public double           size_limit      = 5120;
-    public int              writes_sec      = 50;
     public int              compress_level  = 1;
 
     public int              chest_interval  = 10;
@@ -99,7 +98,6 @@ public class FConfiguration {
         cache_enabled   = getBoolean("Cache.Enabled");
         file_call_gc    = getInteger("Cache.FileCallGC");
         size_limit      = (((double) getInteger("Cache.SizeLimit")) * 1024 * 1024);
-        writes_sec      = getInteger("Cache.WritesPerSec");
         compress_level  = getInteger("Cache.Compress.Level");
         if (compress_level > 9) {
             com.log("[TAG] The compression level can't be higher then 9!");
@@ -201,7 +199,7 @@ public class FConfiguration {
                     com.log("[TAG] Settings file updated, check at: {0}", node);
                 } else {
                     config.set(node, node);
-                    com.log("[TAG] Can't get setting node: {0}, contact the developer.", Type.SEVERE, node);
+                    com.log("[TAG] Can't get setting node: {0}, contact the developer.", node);
                 }
 
                 try {
