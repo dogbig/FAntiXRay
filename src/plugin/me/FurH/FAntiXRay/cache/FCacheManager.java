@@ -12,8 +12,8 @@ import org.bukkit.Bukkit;
  * @author FurmigaHumana
  */
 public class FCacheManager {
-    public static List<File> directories = new ArrayList<>();
-    public static List<File> files = new ArrayList<>();
+    public static List<File> directories = new ArrayList<File>();
+    public static List<File> files = new ArrayList<File>();
 
     public static void getCacheSizeTask() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(FAntiXRay.getPlugin(), new Runnable() {
@@ -68,7 +68,7 @@ public class FCacheManager {
     }
 
     private static List<File> getCacheDirectories() {
-        List<File> dirs = new ArrayList<>();
+        List<File> dirs = new ArrayList<File>();
 
         files.clear();
         directories.clear();

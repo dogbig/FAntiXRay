@@ -40,7 +40,7 @@ public class FConfiguration {
 
     public boolean          dark_update     = true;
     public int              dark_radius     = 8;
-    public HashSet<Integer> dark_blocks     = new HashSet<>();
+    public HashSet<Integer> dark_blocks     = new HashSet<Integer>();
     
     public boolean          block_place     = false;
     public boolean          block_explosion = false;
@@ -87,7 +87,7 @@ public class FConfiguration {
         if (dark_enabled) {
             dark_extra      = getIntegerHash("Darkness.ExtraBlocks");
         } else {
-            dark_extra = new HashSet<>();
+            dark_extra = new HashSet<Integer>();
         }
 
         block_place     = getBoolean("UpdateEvents.onBlockPlace");
@@ -116,7 +116,7 @@ public class FConfiguration {
         updates         = getBoolean("Updater.Enabled");
         
         List<Integer> ids = getIntegerList("Lists.RandomBlocks");
-        List<Integer> toAdd = new ArrayList<>();
+        List<Integer> toAdd = new ArrayList<Integer>();
         
         for (int i : ids) {
             if (i < 255) {

@@ -45,7 +45,7 @@ public class FUtils {
      * return a HashSet of the List contends
      */
     public static HashSet<String> toStringHashSet(List<String> list) {
-        HashSet<String> set = new HashSet<>();
+        HashSet<String> set = new HashSet<String>();
         set.addAll(list);
         return set;
     }
@@ -54,7 +54,7 @@ public class FUtils {
      * return a HashSet of the List contends
      */
     public static HashSet<Integer> toIntegerHashSet(List<Integer> list) {
-        HashSet<Integer> set = new HashSet<>();
+        HashSet<Integer> set = new HashSet<Integer>();
         set.addAll(list);
         return set;
     }
@@ -67,7 +67,7 @@ public class FUtils {
         try {
             string = string.replaceAll("\\[", "").replaceAll("\\]", "");
             if (string.contains(split) && !"[]".equals(string)) {
-                List<Integer> ints = new ArrayList<>();
+                List<Integer> ints = new ArrayList<Integer>();
                 String[] splits = string.split(split);
 
                 for (String str : splits) {
@@ -85,13 +85,13 @@ public class FUtils {
                 if (string != null && !"".equals(string) && !"null".equals(string) && !"[]".equals(string)) {
                     return Arrays.asList(new Integer[] { Integer.parseInt(string) });
                 } else {
-                    return new ArrayList<>();
+                    return new ArrayList<Integer>();
                 }
             }
         } catch (Exception ex) {
             com.error(Thread.currentThread().getStackTrace()[1].getClassName(), Thread.currentThread().getStackTrace()[1].getLineNumber(), Thread.currentThread().getStackTrace()[1].getMethodName(), ex, 
                     "[TAG] Failed to parse string to list: {0}, split: {1}, {2}", string, split, ex.getMessage());
-            return new ArrayList<>();
+            return new ArrayList<Integer>();
         }
     }
 

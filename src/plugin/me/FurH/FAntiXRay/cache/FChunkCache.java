@@ -76,7 +76,9 @@ public class FChunkCache {
             data = (byte[]) ois.readObject();
 
             callgc++;
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (IOException ex) {
+            return null;
+        } catch (ClassNotFoundException ex) {
             return null;
         } finally {
             if (zis != null) {

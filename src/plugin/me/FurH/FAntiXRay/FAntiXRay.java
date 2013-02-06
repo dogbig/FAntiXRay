@@ -57,7 +57,7 @@ import org.xml.sax.SAXException;
  */
 public class FAntiXRay extends JavaPlugin {
     public static final Logger log = Logger.getLogger("minecraft");
-    private static HashSet<String> exempt = new HashSet<>();
+    private static HashSet<String> exempt = new HashSet<String>();
     public static String tag = "[FAntiXRay]: ";
 
     public boolean hasUpdate = false;
@@ -520,7 +520,7 @@ public class FAntiXRay extends JavaPlugin {
                     return firstNodes.item(0).getNodeValue();
                 }
             }
-        } catch (ParserConfigurationException | IOException | SAXException | DOMException e) {
+        } catch (Exception e) {
             return current;
         }
         return current;

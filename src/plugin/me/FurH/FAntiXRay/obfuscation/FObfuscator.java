@@ -21,8 +21,8 @@ import net.minecraft.server.v1_4_R1.World;
  */
 public class FObfuscator {
     public static Integer[] random_blocks = new Integer[] { 5, 15, 48, 56 };
-    public static HashSet<Integer> hidden_blocks = new HashSet<>(Arrays.asList(new Integer[] { 14, 15, 16, 21, 56, 73, 74, 129 }));
-    public static HashSet<String> disabled_worlds = new HashSet<>();
+    public static HashSet<Integer> hidden_blocks = new HashSet<Integer>(Arrays.asList(new Integer[] { 14, 15, 16, 21, 56, 73, 74, 129 }));
+    public static HashSet<String> disabled_worlds = new HashSet<String>();
 
     public static int engine_mode = 0;
     public static boolean dark_enabled = false;

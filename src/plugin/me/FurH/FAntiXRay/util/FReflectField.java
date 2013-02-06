@@ -36,7 +36,7 @@ public class FReflectField {
             modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
             field.set(obj, value);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -47,7 +47,7 @@ public class FReflectField {
             Field f = obj.getClass().getDeclaredField(x);
             f.setAccessible(true);
             return f.get(obj);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
@@ -59,7 +59,7 @@ public class FReflectField {
             Field field = object.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             field.set(object, value);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

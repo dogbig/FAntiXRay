@@ -106,7 +106,7 @@ public class FBlockUpdate {
     }
 
     public static void update(World w, List<Block> blocks) {
-        HashSet<Integer[]> hash = new HashSet<>();
+        HashSet<Integer[]> hash = new HashSet<Integer[]>();
 
         if (blocks.isEmpty()) { return; }
 
@@ -195,7 +195,7 @@ public class FBlockUpdate {
     }
 
     private static HashSet<Integer[]> getBlocks(Location loc) {
-        HashSet<Integer[]> blocks = new HashSet<>();
+        HashSet<Integer[]> blocks = new HashSet<Integer[]>();
 
         int x = loc.getBlockX();
         int y = loc.getBlockY();

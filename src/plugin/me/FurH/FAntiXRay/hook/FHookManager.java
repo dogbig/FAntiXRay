@@ -35,7 +35,7 @@ import org.bukkit.scheduler.BukkitTask;
  * @author FurmigaHumana
  */
 public class FHookManager {
-    public HashMap<String, FChestThread> tasks = new HashMap<>();
+    public HashMap<String, FChestThread> tasks = new HashMap<String, FChestThread>();
 
     public void unhook(Player p) {
         stopTask(p);
