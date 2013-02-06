@@ -96,7 +96,7 @@ public class FConfiguration {
         block_piston    = getBoolean("UpdateEvents.onBlockPiston");
         block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
 
-        cache_enabled   = getBoolean("Cache.Enabled");
+        //cache_enabled   = getBoolean("Cache.Enabled");
         file_call_gc    = getInteger("Cache.FileCallGC");
         size_limit      = (((double) getInteger("Cache.SizeLimit")) * 1024 * 1024);
         writes_sec      = getInteger("Cache.WritesPerSec");

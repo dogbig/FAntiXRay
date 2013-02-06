@@ -40,6 +40,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -96,6 +97,19 @@ public class FAntiXRay extends JavaPlugin {
             }
         }
         
+        Plugin nolagg = Bukkit.getPluginManager().getPlugin("NoLagg");
+        if (nolagg != null && nolagg.isEnabled()) {
+            boolean buffered = nolagg.getConfig().getBoolean("chunks.bufferedLoader.enabled");
+            if (buffered) {
+                Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        communicator.log("[TAG] NoLagg bufferedLoader enabled! X-Ray will work!");
+                    }
+                }, 20 * 3, 20 * 3);
+            }
+        }
+                
         loadCache();
 
         FBlockListener blockListener = new FBlockListener();
@@ -145,7 +159,7 @@ public class FAntiXRay extends JavaPlugin {
             updateThread();
         }
     }
-    
+
     public void loadCache() {
         if (configuration.cache_enabled) {
             if (configuration.size_limit > 0) {
