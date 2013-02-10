@@ -16,7 +16,6 @@
 
 package me.FurH.FAntiXRay;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.logging.Logger;
@@ -29,8 +28,7 @@ import me.FurH.FAntiXRay.hook.FHookManager;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
-import me.FurH.FAntiXRay.metrics.FMetrics;
-import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
+import me.FurH.FAntiXRay.metrics.FMetricsModule;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.util.FCommunicator;
 import me.FurH.FAntiXRay.util.FUtils;
@@ -116,7 +114,8 @@ public class FAntiXRay extends JavaPlugin {
         }
         blockListener.loadListeners(this);
 
-        startMetrics();
+        FMetricsModule metrics = new FMetricsModule();
+        metrics.setupMetrics(this);
 
         if (configuration.updates) {
             updateThread();
@@ -154,7 +153,6 @@ public class FAntiXRay extends JavaPlugin {
         }
         blockListener.loadListeners(this);
 
-        startMetrics();
 
         if (configuration.updates) {
             updateThread();
@@ -315,181 +313,7 @@ public class FAntiXRay extends JavaPlugin {
 
         return (p.hasPermission("FAntiXRay."+perm));
     }
-    
-    private int engine0 = 0;
-    private int engine1 = 0;
-    private int engine2 = 0;
-    
-    private int up0 = 0;
-    private int up1 = 0;
-    private int up2 = 0;
-    private int up3 = 0;
-    
-    private int darkness = 0;
-    private int chesthider = 0;
-    private int fakecaves = 0;
-    
-    private int blockplace = 0;
-    private int explosion = 0;
-    private int damage = 0;
-    private int piston = 0;
-    private int physics = 0;
-    
-    private void startMetrics() {
-        try {
-            FMetrics metrics = new FMetrics(this);
 
-            if (FObfuscator.caves_enabled) {
-                fakecaves++;
-            }
-            
-            if (FObfuscator.dark_enabled) {
-                darkness++;
-            }
-            
-            if (FObfuscator.chest_enabled) {
-                chesthider++;
-            }
-            
-            if (FObfuscator.engine_mode == 0) {
-                engine0++;
-            }
-            
-            if (FObfuscator.engine_mode == 1) {
-                engine1++;
-            }
-            
-            if (FObfuscator.engine_mode == 2) {
-                engine2++;
-            }
-            
-            Graph extra = metrics.createGraph("Engine Mode");
-            extra.addPlotter(new FMetrics.Plotter("Engine Mode 0") {
-                @Override
-                public int getValue() {
-                    return engine0;
-                }
-            });
-            
-            extra.addPlotter(new FMetrics.Plotter("Engine Mode 1") {
-                @Override
-                public int getValue() {
-                    return engine1;
-                }
-            });
-            
-            extra.addPlotter(new FMetrics.Plotter("Engine Mode 2") {
-                @Override
-                public int getValue() {
-                    return engine2;
-                }
-            });
-            
-            if (configuration.update_radius == 0) {
-                up3++;
-            }
-            
-            if (configuration.update_radius == 1) {
-                up0++;
-            }
-            
-            if (configuration.update_radius == 2) {
-                up1++;
-            }
-            
-            if (configuration.update_radius == 3) {
-                up2++;
-            }
-            
-            Graph upa = metrics.createGraph("Update Radius");
-            upa.addPlotter(new FMetrics.Plotter("Update Radius 1") {
-                @Override
-                public int getValue() {
-                    return up0;
-                }
-            });
-            
-            upa.addPlotter(new FMetrics.Plotter("Update Radius 2") {
-                @Override
-                public int getValue() {
-                    return up1;
-                }
-            });
-            
-            upa.addPlotter(new FMetrics.Plotter("Update Radius 3") {
-                @Override
-                public int getValue() {
-                    return up2;
-                }
-            });
-            
-            upa.addPlotter(new FMetrics.Plotter("Update Radius 0") {
-                @Override
-                public int getValue() {
-                    return up3;
-                }
-            });
-            
-            if (configuration.block_place) {
-                blockplace++;
-            }
-            
-            Graph update = metrics.createGraph("Update On");
-            update.addPlotter(new FMetrics.Plotter("Block Place") {
-                @Override
-                public int getValue() {
-                    return blockplace;
-                }
-            });
-            
-            if (configuration.block_explosion) {
-                explosion++;
-            }
-            
-            update.addPlotter(new FMetrics.Plotter("Explosion") {
-                @Override
-                public int getValue() {
-                    return explosion;
-                }
-            });
-            
-            if (configuration.block_damage) {
-                damage++;
-            }
-            
-            update.addPlotter(new FMetrics.Plotter("Block Damage") {
-                @Override
-                public int getValue() {
-                    return damage;
-                }
-            });
-            
-            if (configuration.block_piston) {
-                piston++;
-            }
-            
-            update.addPlotter(new FMetrics.Plotter("Block Piston") {
-                @Override
-                public int getValue() {
-                    return piston;
-                }
-            });
-            
-            if (configuration.block_physics) {
-                physics++;
-            }
-            
-            update.addPlotter(new FMetrics.Plotter("Block Physics") {
-                @Override
-                public int getValue() {
-                    return physics;
-                }
-            });
-            metrics.start();
-        } catch (IOException e) {
-        }
-    }
-    
     public void updateThread() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
             @Override
