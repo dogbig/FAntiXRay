@@ -48,18 +48,27 @@ public class FHookManager {
             
             startTask(p, FAntiXRay.getConfiguration().chest_interval);
 
-            List highPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
-            List lowPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
-
-            if ((highPriorityQueue instanceof FPriorityQueue) && (lowPriorityQueue instanceof FPriorityQueue)) {
-                return;
-            }
-
             List newhighPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
             List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
 
-            newhighPriorityQueue.addAll(highPriorityQueue);
-            newlowPriorityQueue.addAll(lowPriorityQueue);
+            List highPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
+            List lowPriorityQueue = (List) FReflectField.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
+
+            if (highPriorityQueue != null) {
+                if (highPriorityQueue instanceof FPriorityQueue) {
+                    return;
+                }
+
+                newhighPriorityQueue.addAll(highPriorityQueue);
+            }
+            
+            if (lowPriorityQueue != null) {
+                if (lowPriorityQueue instanceof FPriorityQueue) {
+                    return;
+                }
+
+                newlowPriorityQueue.addAll(lowPriorityQueue);
+            }
 
             FReflectField.setFinalField(player.playerConnection.networkManager, "highPriorityQueue", newhighPriorityQueue);
             FReflectField.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
