@@ -44,9 +44,24 @@ public class FHookManager {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
-            EntityPlayer player = ((CraftPlayer)p).getHandle();
+            final EntityPlayer player = ((CraftPlayer)p).getHandle();
             
             startTask(p, FAntiXRay.getConfiguration().chest_interval);
+
+            boolean natty = false;
+            try {
+                org.spigotmc.netty.NettyNetworkManager nattyManager = null;
+                natty = true;
+            } catch (NoClassDefFoundError ex) {
+                natty = false;
+            }
+
+            if (natty) {
+                io.netty.channel.Channel channel = (io.netty.channel.Channel) FReflectField.getPrivateField(player.playerConnection.networkManager, "channel");
+                channel.pipeline().remove("encoder");
+                channel.pipeline().addLast("encoder", new FPacketEncoder(player));
+                return;
+            }
 
             List newhighPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
             List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));

@@ -25,7 +25,6 @@ import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
 
 public class FPriorityQueue extends ArrayList<Packet> {
     private static final long serialVersionUID = 1546534712446462L;
-
     private EntityPlayer player;
     
     public FPriorityQueue(EntityPlayer player) {
