@@ -60,6 +60,8 @@ public class FHookManager {
                 }
 
                 newhighPriorityQueue.addAll(highPriorityQueue);
+                
+                highPriorityQueue.clear();
             }
             
             if (lowPriorityQueue != null) {
@@ -68,13 +70,12 @@ public class FHookManager {
                 }
 
                 newlowPriorityQueue.addAll(lowPriorityQueue);
+                
+                lowPriorityQueue.clear();
             }
 
             FReflectField.setFinalField(player.playerConnection.networkManager, "highPriorityQueue", newhighPriorityQueue);
             FReflectField.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
-
-            highPriorityQueue.clear();
-            lowPriorityQueue.clear();
         }
     }
 
