@@ -16,10 +16,16 @@
 
 package me.FurH.FAntiXRay.listener;
 
+import java.util.ArrayList;
+import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
+import net.minecraft.server.v1_4_R1.ChunkPosition;
+import net.minecraft.server.v1_4_R1.WorldServer;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -41,7 +47,7 @@ public class FBlockListener implements Listener {
         FConfiguration config = FAntiXRay.getConfiguration();
         PluginManager pm = plugin.getServer().getPluginManager();
         
-        if (config.block_damage) {
+        if (!config.block_threaded && config.block_damage) {
             pm.registerEvents(new FBlockDamage(), plugin);
         }
         
@@ -59,12 +65,12 @@ public class FBlockListener implements Listener {
         if (e.isCancelled()) { return; }
 
         FConfiguration config = FAntiXRay.getConfiguration();
-        if (config.block_place) {
-            FBlockUpdate.update(e.getPlayer(), e.getBlock(), true);
+        if (!config.block_threaded && config.block_place) {
+            FBlockUpdate.update(e.getPlayer(), e.getBlock().getLocation(), true);
         }
 
-        if (config.dark_update && config.dark_blocks.contains(e.getBlockAgainst().getTypeId())) {
-            FBlockUpdate.update(e.getPlayer(), e.getBlock());
+        if (!config.block_threaded && config.dark_update && config.dark_blocks.contains(e.getBlockAgainst().getTypeId())) {
+            FBlockUpdate.update(e.getPlayer(), e.getBlock().getLocation());
         }
     }
 
@@ -72,15 +78,21 @@ public class FBlockListener implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) { return; }
 
-        FBlockUpdate.update(e.getPlayer(), e.getBlock(), false);
+        FConfiguration config = FAntiXRay.getConfiguration();
+        if (!config.block_threaded) {
+            FBlockUpdate.update(e.getPlayer(), e.getBlock().getLocation(), false);
+        }
     }
 
     public class FBlockDamage implements Listener {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
         public void onBlockDamage(BlockDamageEvent e) {
             if (e.isCancelled()) { return; }
-            
-            FBlockUpdate.update(e.getPlayer(), e.getBlock(), true);
+
+            FConfiguration config = FAntiXRay.getConfiguration();
+            if (!config.block_threaded) {
+                FBlockUpdate.update(e.getPlayer(), e.getBlock().getLocation(), true);
+            }
         }
     }
     
@@ -89,14 +101,21 @@ public class FBlockListener implements Listener {
         public void onBlockPistonExtend(BlockPistonExtendEvent e) {
             if (e.isCancelled()) { return; }
             
-            FBlockUpdate.update(e.getBlock().getWorld(), e.getBlocks());
+            List<ChunkPosition> positions = new ArrayList<ChunkPosition>();
+            WorldServer worldServer = ((CraftWorld) e.getBlock().getWorld()).getHandle();
+
+            for (Block b : e.getBlocks()) {
+                positions.add(new ChunkPosition(b.getX(), b.getY(), b.getZ()));
+            }
+
+            FBlockUpdate.update(worldServer, positions);
         }
         
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
         public void onBlockPistonRetract(BlockPistonRetractEvent e) {
             if (e.isCancelled()) { return; }
 
-            FBlockUpdate.update(e.getBlock(), true);
+            FBlockUpdate.update(e.getBlock().getLocation(), true);
         }
     }
     
@@ -106,7 +125,7 @@ public class FBlockListener implements Listener {
             if (e.isCancelled()) { return; }
             
             if (e.getBlock().getType() == Material.GRAVEL || e.getBlock().getType() == Material.SAND) {
-                FBlockUpdate.update(e.getBlock(), true);
+                FBlockUpdate.update(e.getBlock().getLocation(), true);
             }
         }
     }

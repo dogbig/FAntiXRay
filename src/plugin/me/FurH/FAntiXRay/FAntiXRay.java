@@ -84,7 +84,7 @@ public class FAntiXRay extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
 
-        if (configuration.block_explosion) {
+        if (configuration.block_explosion && !configuration.block_threaded) {
             pm.registerEvents(new FEntityListener(), this);
         }
         
@@ -111,7 +111,9 @@ public class FAntiXRay extends JavaPlugin {
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
-        pm.registerEvents(blockListener, this);
+        if (!configuration.block_threaded) {
+            pm.registerEvents(blockListener, this);
+        }
         blockListener.loadListeners(this);
 
         startMetrics();
@@ -133,7 +135,7 @@ public class FAntiXRay extends JavaPlugin {
         messages.load();
 
         PluginManager pm = getServer().getPluginManager();
-        if (configuration.block_explosion) {
+        if (configuration.block_explosion && !configuration.block_threaded) {
             pm.registerEvents(new FEntityListener(), this);
         }
         
@@ -147,7 +149,9 @@ public class FAntiXRay extends JavaPlugin {
 
         FBlockListener blockListener = new FBlockListener();
         pm.registerEvents(new FPlayerListener(), this);
-        pm.registerEvents(blockListener, this);
+        if (!configuration.block_threaded) {
+            pm.registerEvents(blockListener, this);
+        }
         blockListener.loadListeners(this);
 
         startMetrics();

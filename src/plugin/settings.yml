@@ -72,6 +72,8 @@ UpdateEvents:
   onBlockPiston: false
   ## Update blocks on physics
   onBlockPhysics: false
+  ## ThreadedUpdate, if true, the block update will be threaded.
+  ThreadedUpdate: false
 
 Permissions:
   ## OpHasPerm, if true, op players will have all permissions

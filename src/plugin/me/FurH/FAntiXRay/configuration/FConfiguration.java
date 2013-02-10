@@ -47,6 +47,7 @@ public class FConfiguration {
     public boolean          block_damage    = false;
     public boolean          block_piston    = false;
     public boolean          block_physics   = false;
+    public boolean          block_threaded  = true;
     
     public boolean          cache_enabled   = false;
     public int              file_call_gc    = 100;
@@ -94,6 +95,7 @@ public class FConfiguration {
         block_damage    = getBoolean("UpdateEvents.onBlockDamage");
         block_piston    = getBoolean("UpdateEvents.onBlockPiston");
         block_physics   = getBoolean("UpdateEvents.onBlockPhysics");
+        block_threaded  = getBoolean("UpdateEvents.ThreadedUpdate");
 
         cache_enabled   = getBoolean("Cache.Enabled");
         file_call_gc    = getInteger("Cache.FileCallGC");

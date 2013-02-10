@@ -16,7 +16,13 @@
 
 package me.FurH.FAntiXRay.listener;
 
+import java.util.ArrayList;
+import java.util.List;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
+import net.minecraft.server.v1_4_R1.ChunkPosition;
+import net.minecraft.server.v1_4_R1.WorldServer;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,6 +38,13 @@ public class FEntityListener implements Listener {
     public void onEntityExplode(EntityExplodeEvent e) {
         if (e.isCancelled()) { return; }
 
-        FBlockUpdate.update(e.getLocation().getWorld(), e.blockList());
+        List<ChunkPosition> positions = new ArrayList<ChunkPosition>();
+        WorldServer worldServer = ((CraftWorld) e.getLocation().getWorld()).getHandle();
+        
+        for (Block b : e.blockList()) {
+            positions.add(new ChunkPosition(b.getX(), b.getY(), b.getZ()));
+        }
+        
+        FBlockUpdate.update(worldServer, positions);
     }
 }
