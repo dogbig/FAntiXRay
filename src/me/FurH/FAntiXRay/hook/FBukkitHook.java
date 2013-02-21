@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
  *
  * @author FurmigaHumana
  */
-public class FNormalHook extends FHookManager {
+public class FBukkitHook extends FHookManager {
     
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})

@@ -26,7 +26,7 @@ import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.configuration.FMessages;
 import me.FurH.FAntiXRay.hook.FHookManager;
 import me.FurH.FAntiXRay.hook.FNattyHook;
-import me.FurH.FAntiXRay.hook.FNormalHook;
+import me.FurH.FAntiXRay.hook.FBukkitHook;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FEntityListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
@@ -92,7 +92,7 @@ public class FAntiXRay extends JavaPlugin {
             hook = new FNattyHook();
             communicator.log("[TAG] Natty support enabled!");
         } else {
-            hook = new FNormalHook();
+            hook = new FBukkitHook();
         }
 
         PluginManager pm = getServer().getPluginManager();
