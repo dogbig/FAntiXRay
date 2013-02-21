@@ -63,12 +63,6 @@ public class FPriorityQueue extends ArrayList<Packet> {
                 Packet51MapChunk p51 = (Packet51MapChunk)packet;
                 packet = FObfuscator.obfuscate(player, p51);
             } else
-            if (packet instanceof Packet15Place) {
-                FBlockUpdate.update(player, (Packet15Place)packet);
-            } else
-            if (packet instanceof Packet14BlockDig) {
-                FBlockUpdate.update(player, (Packet14BlockDig)packet);
-            } else
             if (packet instanceof Packet60Explosion) {
                 FBlockUpdate.update(player, (Packet60Explosion)packet);
             }
