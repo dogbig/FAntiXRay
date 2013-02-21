@@ -21,8 +21,6 @@ import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
 import net.minecraft.server.v1_4_R1.EntityPlayer;
 import net.minecraft.server.v1_4_R1.Packet;
-import net.minecraft.server.v1_4_R1.Packet14BlockDig;
-import net.minecraft.server.v1_4_R1.Packet15Place;
 import net.minecraft.server.v1_4_R1.Packet51MapChunk;
 import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
 import net.minecraft.server.v1_4_R1.Packet60Explosion;
