@@ -12,7 +12,7 @@ Options:
     ## It **might** cause fps drops on the client side and also a little bit more of cpu on the server si
     Enabled: false
     ## Intensity, the intensity of caves to generate, higher this value is, more fake caves you will have
-    Intensity: 50
+    Intensity: 10
     
 Cache:
   ## Enabled, if true, the cache system will be activated
