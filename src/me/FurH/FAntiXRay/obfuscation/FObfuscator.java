@@ -233,28 +233,18 @@ public class FObfuscator {
                         }
                     } else
                     if (engine_mode == 2) {
-                        if (isObfuscable(id)) {
-                            if (id == 1) {
-                                if (!isBlocksTransparent(chunk, x, y, z)) {
-                                    buffer[index] = (byte) getRandomId();
-                                }
-                            } else
-                            if (isToObfuscate(chunk, x, y, z)) {
-                                buffer[index] = 1;
+                        if (id == 1) {
+                            if (!isBlocksTransparent(chunk, x, y, z)) {
+                                buffer[index] = (byte) getRandomId();
                             }
                         }
                     } else
                     if (engine_mode == 3) {
-                        if (isObfuscable(id)) {
-                            if (id == 1) {
-                                if (rnd.nextInt(101) <= 20) {
-                                    if (!isBlocksTransparent(chunk, x, y, z)) {
-                                        buffer[index] = (byte) getRandomId();
-                                    }
+                        if (id == 1) {
+                            if (rnd.nextInt(101) <= 20) {
+                                if (!isBlocksTransparent(chunk, x, y, z)) {
+                                    buffer[index] = (byte) getRandomId();
                                 }
-                            } else
-                            if (isToObfuscate(chunk, x, y, z)) {
-                                buffer[index] = 1;
                             }
                         }
                     } else
