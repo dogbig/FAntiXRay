@@ -90,9 +90,9 @@ public class FChestThread implements Runnable {
 
                     WorldServer worldServer = ((CraftWorld) lastLoc.getWorld()).getHandle();
                     int id = worldServer.getTypeId(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
-
-                    if (id == 54) {
-                        player.sendBlockChange(newLoc, 54, (byte) worldServer.getData(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ()));
+                    
+                    if (id == 54 || config.chest_obf && FObfuscator.hidden_blocks.contains(id)) {
+                        player.sendBlockChange(newLoc, id, (byte) worldServer.getData(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ()));
                         //worldServer.notify(newLoc.getBlockX(), newLoc.getBlockY(), newLoc.getBlockZ());
                     }
                 }

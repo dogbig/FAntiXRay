@@ -145,6 +145,7 @@ public class FAntiXRay extends JavaPlugin {
 
         Bukkit.getScheduler().cancelTasks(this);
 
+        cache.stop();
         configuration.load();
         messages.load();
 
@@ -176,6 +177,8 @@ public class FAntiXRay extends JavaPlugin {
 
     public void loadCache() {
         if (configuration.cache_enabled) {
+            cache.cacheWriteTask();
+            
             if (configuration.size_limit > 0) {
                 FCacheManager.getCacheSizeTask();
             }
@@ -195,6 +198,8 @@ public class FAntiXRay extends JavaPlugin {
     @Override
     public void onDisable() {
         Bukkit.getScheduler().cancelTasks(this);
+        
+        cache.stop();
 
         PluginDescriptionFile desc = getDescription();
         log.info("[FAntiXRay] FAntiXRay V"+desc.getVersion()+" Disabled");

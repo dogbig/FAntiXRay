@@ -236,7 +236,7 @@ public class FObfuscator {
                         if (isObfuscable(id)) {
                             if (id == 1) {
                                 if (!isBlocksTransparent(chunk, x, y, z)) {
-                                    buffer[index] = (byte) getRandom();
+                                    buffer[index] = (byte) getRandomId();
                                 }
                             } else
                             if (isToObfuscate(chunk, x, y, z)) {
@@ -249,7 +249,7 @@ public class FObfuscator {
                             if (id == 1) {
                                 if (rnd.nextInt(101) <= 20) {
                                     if (!isBlocksTransparent(chunk, x, y, z)) {
-                                        buffer[index] = (byte) getRandom();
+                                        buffer[index] = (byte) getRandomId();
                                     }
                                 }
                             } else
@@ -257,7 +257,19 @@ public class FObfuscator {
                                 buffer[index] = 1;
                             }
                         }
+                    } else
+                    if (engine_mode == 4) {
+                        if (id == 1) {
+                            if (rnd.nextInt(101) <= 20) {
+                                if (!isBlocksTransparent(chunk, x, y, z)) {
+                                    buffer[index] = (byte) getRandomId();
+                                }
+                            }
+                        } else if (hidden_blocks.contains(id)) {
+                            buffer[index] = 1;
+                        }
                     }
+                    
                     index++;
                 }
             }
@@ -266,9 +278,8 @@ public class FObfuscator {
     }
 
     /* get random item */
-    public static int getRandom() {
-        int random = ((int)(Math.random() * random_blocks.length));
-        return random_blocks[ random ];
+    public static int getRandomId() {
+        return random_blocks[ (int)(Math.random() * random_blocks.length) ];
     }
     
     public static boolean isToObfuscate(Chunk chunk, int i, int j, int k) {

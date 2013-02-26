@@ -45,7 +45,7 @@ public class FCacheManager {
             }
         }, 3600 * 20, 3600 * 20);
     }
-
+    
     public static int clearCache() {
         int total = 0;
         

@@ -57,6 +57,7 @@ public class FConfiguration {
     public int              chest_interval  = 10;
     public int              chest_radius    = 10;
     public int              chest_wark      = 1;
+    public boolean          chest_obf       = false;
 
     public boolean          ophasperm       = true;
 
@@ -65,9 +66,9 @@ public class FConfiguration {
     public void load() {
         FCommunicator com    = FAntiXRay.getCommunicator();
         int engine_mode     = getInteger("Options.EngineMode");
-        if (engine_mode > 3) {
-            com.log("[TAG] Engine Mode can't be higher than 2!");
-            engine_mode = 2;
+        if (engine_mode > 4) {
+            com.log("[TAG] Engine Mode can't be higher than 4!");
+            engine_mode = 4;
         }
         
         update_radius   = getInteger("Options.UpdateRadius");
@@ -110,6 +111,7 @@ public class FConfiguration {
         chest_interval  = getInteger("ChestHider.Interval");
         chest_radius    = getInteger("ChestHider.Radius");
         chest_wark      = getInteger("ChestHider.WalkMinimum");
+        chest_obf       = getBoolean("ChestHider.Obfuscated");
 
         ophasperm       = getBoolean("Permissions.OpHasPerm");
         

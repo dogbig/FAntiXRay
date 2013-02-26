@@ -22,6 +22,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import static java.lang.Thread.sleep;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -34,8 +38,76 @@ import net.minecraft.server.v1_4_R1.World;
  * @author FurmigaHumana
  */
 public class FChunkCache {
+    public ConcurrentHashMap<String, FCacheData> cache = new ConcurrentHashMap<String, FCacheData>();
+    public AtomicBoolean lock = new AtomicBoolean(false);
     private int callgc = 0;
+    
+    public void stop() {
+        lock.set(true);
 
+        while (!cache.isEmpty()) {
+            try {
+                FCacheData data = cache.remove(cache.keySet().iterator().next());
+                if (data != null) {
+                    write(data);
+                }
+            } catch (NoSuchElementException ex) { }
+        }
+    }
+    
+    public void overload() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                int run = 0;
+
+                while (run < 100) {
+                    try {
+                        FCacheData data = cache.remove(cache.keySet().iterator().next());
+                        if (data != null) {
+                            write(data);
+                        }
+                    } catch (NoSuchElementException ex) {
+                        interrupt();
+                    }
+                }
+            }
+        };
+        thread.setName("FAntiXRay Overload Task");
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.start();
+    }
+
+    public void cacheWriteTask() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while (!lock.get()) {
+                    try {
+                        FCacheData data = cache.remove(cache.keySet().iterator().next());
+                        if (data == null) {
+                            sleep(10000);
+                        } else {
+                            write(data);
+                            sleep(500);
+
+                            if (cache.size() > 500) {
+                                overload();
+                            }
+                        }
+                    } catch (NoSuchElementException ex) {
+                        try {
+                            sleep(10000);
+                        } catch (InterruptedException ex1) { }
+                    } catch (InterruptedException ex) { }
+                }
+            }
+        };
+        thread.setName("FAntiXRay Write Task");
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.start();
+    }
+    
     public byte[] read(World world, int x1, int z1, long hash1, int engine1) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
@@ -43,6 +115,12 @@ public class FChunkCache {
             System.runFinalization();
             System.gc();
             callgc = 0;
+        }
+        
+        boolean cached = cache.containsKey(toString(x1, z1));
+
+        if (cached) {
+            return cache.remove(toString(x1, z1)).obfuscated;
         }
 
         File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x1 >> 5) + "." + (z1 >> 5));
@@ -118,7 +196,11 @@ public class FChunkCache {
         return data;
     }
     
-    public void write(World world, int x, int z, byte[] obfuscated, long hash, int engine) {        
+    public void write(World world, int x, int z, byte[] obfuscated, long hash, int engine) {
+        cache.put(toString(x, z), new FCacheData(world, x, z, obfuscated, hash, engine));
+    }
+
+    public void write(FCacheData data) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
         if (callgc >= config.file_call_gc) {
@@ -126,14 +208,14 @@ public class FChunkCache {
             System.gc();
             callgc = 0;
         }
-
-        File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + world.getWorld().getName() + File.separator + "r." + (x >> 5) + "." + (z >> 5));
+        
+        File dir = new File(FAntiXRay.getPlugin().getDataFolder() + File.separator + data.world.getWorld().getName() + File.separator + "r." + (data.x >> 5) + "." + (data.z >> 5));
         if (!dir.exists()) { dir.mkdirs(); }
 
-        File file = new File(dir, "r." + x + "." + z + ".udat");
+        File file = new File(dir, "r." + data.x + "." + data.z + ".udat");
 
         if (config.compress_level > 0) {
-            file = new File(dir, "r." + x + "." + z + ".cdat");
+            file = new File(dir, "r." + data.x + "." + data.z + ".cdat");
         }
 
         FileOutputStream fos = null;
@@ -150,18 +232,18 @@ public class FChunkCache {
             if (config.compress_level > 0) {
                 zos = new ZipOutputStream(fos);
                 zos.setLevel(config.compress_level);
-                entry = new ZipEntry("c." + x + "." + z + ".chunk");
+                entry = new ZipEntry("c." + data.x + "." + data.z + ".chunk");
                 zos.putNextEntry(entry);
                 oos = new ObjectOutputStream(zos);
             } else {
                 oos = new ObjectOutputStream(fos);
             }
 
-            oos.writeInt(engine);
-            oos.writeInt(x);
-            oos.writeInt(z);
-            oos.writeLong(hash);
-            oos.writeObject(obfuscated);
+            oos.writeInt(data.engine);
+            oos.writeInt(data.x);
+            oos.writeInt(data.z);
+            oos.writeLong(data.hash);
+            oos.writeObject(data.obfuscated);
 
             callgc++;
         } catch (IOException ex) {
@@ -188,5 +270,23 @@ public class FChunkCache {
 
     private String toString(int x, int z) {
         return (x) + "" +(z);
+    }
+
+    public class FCacheData {
+        public World world; 
+        public int x; 
+        public int z; 
+        public byte[] obfuscated; 
+        public long hash; 
+        public int engine;
+        
+        public FCacheData(World world, int x, int z, byte[] obfuscated, long hash, int engine) {
+            this.world = world;
+            this.x = x;
+            this.z = z;
+            this.obfuscated = obfuscated;
+            this.hash = hash;
+            this.engine = engine;
+        }
     }
 }
