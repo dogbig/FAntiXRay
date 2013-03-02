@@ -101,7 +101,7 @@ public class FAntiXRay extends JavaPlugin {
             pm.registerEvents(new FEntityListener(), this);
         }
         
-        if (FObfuscator.chest_enabled) {
+        if (FObfuscator.chest_enabled || configuration.chest_obf) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 hook.hook(p);
             }
@@ -154,7 +154,7 @@ public class FAntiXRay extends JavaPlugin {
             pm.registerEvents(new FEntityListener(), this);
         }
         
-        if (FObfuscator.chest_enabled) {
+        if (FObfuscator.chest_enabled || configuration.chest_obf) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 hook.hook(p);
             }

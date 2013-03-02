@@ -38,7 +38,7 @@ public abstract class FHookManager {
     public abstract void hook(Player p);
 
     public void startTask(Player p, int interval) {
-        if (FObfuscator.chest_enabled) {
+        if (FObfuscator.chest_enabled || FAntiXRay.getConfiguration().chest_obf) {
             stopTask(p);
 
             FChestThread thread = new FChestThread(p);
