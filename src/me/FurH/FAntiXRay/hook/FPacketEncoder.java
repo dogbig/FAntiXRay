@@ -20,18 +20,18 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.Packet;
-import net.minecraft.server.v1_4_R1.Packet51MapChunk;
-import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
-import net.minecraft.server.v1_4_R1.Packet60Explosion;
-import org.spigotmc.netty.PacketEncoder;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R1.Packet;
+import net.minecraft.server.v1_5_R1.Packet51MapChunk;
+import net.minecraft.server.v1_5_R1.Packet56MapChunkBulk;
+import net.minecraft.server.v1_5_R1.Packet60Explosion;
+//import org.spigotmc.netty.PacketEncoder;
 
 /**
  *
  * @author FurmigaHumana
  */
-public class FPacketEncoder extends PacketEncoder {
+public class FPacketEncoder {/*extends PacketEncoder {
     private EntityPlayer player;
     
     public FPacketEncoder(EntityPlayer player) {
@@ -56,5 +56,5 @@ public class FPacketEncoder extends PacketEncoder {
         }
 
         super.encode(ctx, packet, out);
-    }
+    }*/
 }

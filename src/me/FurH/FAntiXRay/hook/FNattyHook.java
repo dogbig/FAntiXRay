@@ -20,9 +20,9 @@ import java.util.Queue;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.queue.FPacketQueue;
 import me.FurH.FAntiXRay.util.FReflectField;
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.Packet;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftPlayer;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R1.Packet;
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -33,7 +33,7 @@ public class FNattyHook extends FHookManager {
 
     @Override
     public void hook(Player p) {
-        if (!FAntiXRay.isExempt(p.getName())) {
+        /*if (!FAntiXRay.isExempt(p.getName())) {
             final EntityPlayer player = ((CraftPlayer)p).getHandle();
             
             startTask(p, FAntiXRay.getConfiguration().chest_interval);
@@ -48,6 +48,7 @@ public class FNattyHook extends FHookManager {
             newSyncPackets.addAll(syncPackets);
 
             FReflectField.setFinalField(player.playerConnection.networkManager, "syncPackets", newSyncPackets);
-        }
+        }*/
+        throw new UnsupportedOperationException("Natty Support is currently disabled!");
     }
 }

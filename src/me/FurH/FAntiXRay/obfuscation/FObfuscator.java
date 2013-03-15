@@ -24,12 +24,13 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.util.FReflectField;
 import me.FurH.FAntiXRay.util.FUtils;
-import net.minecraft.server.v1_4_R1.Chunk;
-import net.minecraft.server.v1_4_R1.ChunkSection;
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.Packet51MapChunk;
-import net.minecraft.server.v1_4_R1.Packet56MapChunkBulk;
-import net.minecraft.server.v1_4_R1.World;
+import net.minecraft.server.v1_5_R1.Block;
+import net.minecraft.server.v1_5_R1.Chunk;
+import net.minecraft.server.v1_5_R1.ChunkSection;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R1.Packet51MapChunk;
+import net.minecraft.server.v1_5_R1.Packet56MapChunkBulk;
+import net.minecraft.server.v1_5_R1.World;
 
 /**
  *
@@ -349,7 +350,7 @@ public class FObfuscator {
             return false;
         }
         
-        return !net.minecraft.server.v1_4_R1.Block.i(id);
+        return !Block.l(id);
     }
     
     public static String toString(int x, int y, int z) {

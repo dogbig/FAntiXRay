@@ -21,14 +21,14 @@ import java.util.List;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
-import net.minecraft.server.v1_4_R1.ChunkPosition;
-import net.minecraft.server.v1_4_R1.EntityPlayer;
-import net.minecraft.server.v1_4_R1.Packet14BlockDig;
-import net.minecraft.server.v1_4_R1.Packet15Place;
-import net.minecraft.server.v1_4_R1.Packet60Explosion;
-import net.minecraft.server.v1_4_R1.WorldServer;
+import net.minecraft.server.v1_5_R1.ChunkPosition;
+import net.minecraft.server.v1_5_R1.EntityPlayer;
+import net.minecraft.server.v1_5_R1.Packet14BlockDig;
+import net.minecraft.server.v1_5_R1.Packet15Place;
+import net.minecraft.server.v1_5_R1.Packet60Explosion;
+import net.minecraft.server.v1_5_R1.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 /**
