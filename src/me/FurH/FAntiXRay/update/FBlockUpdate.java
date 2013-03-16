@@ -95,7 +95,7 @@ public class FBlockUpdate {
                     Location center = new Location(loc.getWorld(), loc.getBlockX() + x, loc.getBlockY() + y, loc.getBlockZ() + z);
                     int id = worldServer.getTypeId(center.getBlockX(), center.getBlockY(), center.getBlockZ());
 
-                    if (center.distance(loc) > radius) {
+                    if (center.distanceSquared(loc) > radius) {
                         continue;
                     }
 
@@ -207,7 +207,7 @@ public class FBlockUpdate {
                     Location center = new Location(loc.getWorld(), loc.getBlockX() + x, loc.getBlockY() + y, loc.getBlockZ() + z);
                     int id = worldServer.getTypeId(loc.getBlockX() + x, loc.getBlockY() + y, loc.getBlockZ() + z);
 
-                    if (center.distance(loc) > radius) {
+                    if (center.distanceSquared(loc) > radius) {
                         continue;
                     }
 

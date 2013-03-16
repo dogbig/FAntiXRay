@@ -62,7 +62,7 @@ public class FChestThread implements Runnable {
         if (lastLoc.getWorld() != player.getWorld()) {
             update = true;
         } else
-        if (lastLoc.distance(player.getLocation()) >= config.chest_wark) {
+        if (lastLoc.distanceSquared(player.getLocation()) >= config.chest_wark) {
             update = true;
         }
 
@@ -84,7 +84,7 @@ public class FChestThread implements Runnable {
                     }
 
                     Location newLoc = new Location(lastLoc.getWorld(), lastLoc.getBlockX() + x, lastLoc.getBlockY() + y, lastLoc.getBlockZ() + z);
-                    if (lastLoc.distance(newLoc) >= config.chest_radius) {
+                    if (lastLoc.distanceSquared(newLoc) >= config.chest_radius) {
                         continue;
                     }
 
