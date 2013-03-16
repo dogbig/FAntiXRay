@@ -33,7 +33,7 @@ public class FNattyHook extends FHookManager {
 
     @Override
     public void hook(Player p) {
-        /*if (!FAntiXRay.isExempt(p.getName())) {
+        if (!FAntiXRay.isExempt(p.getName())) {
             final EntityPlayer player = ((CraftPlayer)p).getHandle();
             
             startTask(p, FAntiXRay.getConfiguration().chest_interval);
@@ -48,7 +48,6 @@ public class FNattyHook extends FHookManager {
             newSyncPackets.addAll(syncPackets);
 
             FReflectField.setFinalField(player.playerConnection.networkManager, "syncPackets", newSyncPackets);
-        }*/
-        throw new UnsupportedOperationException("Natty Support is currently disabled!");
+        }
     }
 }

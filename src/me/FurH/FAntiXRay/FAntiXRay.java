@@ -81,12 +81,12 @@ public class FAntiXRay extends JavaPlugin {
         messages.load();
         configuration.load();
 
-        boolean natty = false;
-        /*try {
+        boolean natty = true;
+        try {
             org.spigotmc.netty.NettyNetworkManager nattyManager = new org.spigotmc.netty.NettyNetworkManager();
         } catch (NoClassDefFoundError ex) {
             natty = false;
-        }*/
+        }
 
         if (natty) {
             hook = new FNattyHook();
