@@ -65,19 +65,19 @@ public class FPlayerListener implements Listener  {
         FMessages messages = FAntiXRay.getMessages();
         FAntiXRay plugin = FAntiXRay.getPlugin();
 
-        if (plugin.hasPerm(p, "Deobfuscate")) {
+        if (plugin.hasPerm(p, "FAntiXRay.Deobfuscate")) {
             com.msg(p, messages.deobfuscated);
             FAntiXRay.exempt(p.getName());
         }
 
-        if (plugin.hasPerm(p, "Quiet.Deobfuscate")) {
+        if (plugin.hasPerm(p, "FAntiXRay.Quiet.Deobfuscate")) {
             FAntiXRay.exempt(p.getName());
         }
         
         FAntiXRay.getHookManager().hook(p);
 
         if (plugin.hasUpdate) {
-            if (plugin.hasPerm(p, "Updates")) {
+            if (plugin.hasPerm(p, "FAntiXRay.Updates")) {
                 com.msg(p, messages.update1, plugin.newVersion, plugin.currentVersion);
                 com.msg(p, messages.update2);
             }

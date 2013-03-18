@@ -331,7 +331,7 @@ public class FAntiXRay extends JavaPlugin {
             }
         }
 
-        return (p.hasPermission("FAntiXRay."+perm));
+        return p.hasPermission(perm);
     }
 
     public void updateThread() {
