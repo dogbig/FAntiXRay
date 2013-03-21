@@ -31,7 +31,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import net.minecraft.server.v1_5_R1.World;
+import net.minecraft.server.v1_5_R2.World;
 
 /**
  *

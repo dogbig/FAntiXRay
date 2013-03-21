@@ -24,13 +24,13 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.util.FReflectField;
 import me.FurH.FAntiXRay.util.FUtils;
-import net.minecraft.server.v1_5_R1.Block;
-import net.minecraft.server.v1_5_R1.Chunk;
-import net.minecraft.server.v1_5_R1.ChunkSection;
-import net.minecraft.server.v1_5_R1.EntityPlayer;
-import net.minecraft.server.v1_5_R1.Packet51MapChunk;
-import net.minecraft.server.v1_5_R1.Packet56MapChunkBulk;
-import net.minecraft.server.v1_5_R1.World;
+import net.minecraft.server.v1_5_R2.Block;
+import net.minecraft.server.v1_5_R2.Chunk;
+import net.minecraft.server.v1_5_R2.ChunkSection;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
+import net.minecraft.server.v1_5_R2.Packet51MapChunk;
+import net.minecraft.server.v1_5_R2.Packet56MapChunkBulk;
+import net.minecraft.server.v1_5_R2.World;
 
 /**
  *

@@ -20,11 +20,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
-import net.minecraft.server.v1_5_R1.EntityPlayer;
-import net.minecraft.server.v1_5_R1.Packet;
-import net.minecraft.server.v1_5_R1.Packet51MapChunk;
-import net.minecraft.server.v1_5_R1.Packet56MapChunkBulk;
-import net.minecraft.server.v1_5_R1.Packet60Explosion;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
+import net.minecraft.server.v1_5_R2.Packet;
+import net.minecraft.server.v1_5_R2.Packet51MapChunk;
+import net.minecraft.server.v1_5_R2.Packet56MapChunkBulk;
+import net.minecraft.server.v1_5_R2.Packet60Explosion;
 import org.spigotmc.netty.PacketEncoder;
 
 /**

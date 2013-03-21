@@ -20,9 +20,9 @@ import java.util.Queue;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.queue.FPacketQueue;
 import me.FurH.FAntiXRay.util.FReflectField;
-import net.minecraft.server.v1_5_R1.EntityPlayer;
-import net.minecraft.server.v1_5_R1.Packet;
-import org.bukkit.craftbukkit.v1_5_R1.entity.CraftPlayer;
+import net.minecraft.server.v1_5_R2.EntityPlayer;
+import net.minecraft.server.v1_5_R2.Packet;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
