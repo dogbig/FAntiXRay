@@ -1,0 +1,80 @@
+EngineOptions:
+  ## EngineMode, the engine mode to be used to hide ores, see the plugin description for more information
+  EngineMode: 0
+  ## NetherEngine, the engine mode to be used in the nether, see the plugin description for more information
+  NetherEngine: 3
+  ## HideOnDark, if true, all blocks that are in the dark will be obfuscated
+  HideOnDark: false
+  ## FakeCaves, if true, this function will be enabled
+  FakeCaves:
+    Enabled: false
+    ## Intensity, the intensity of air packets to prevent cavefinders, this option causes fps lag on client side.
+    Intensity: 10
+  ## HideChests, if true, all chests will turn into air, if this option is true, proximity will be enabled too.
+  HideChests: false
+
+Cache:
+  ## Enabled, if true, the cache system will be activated
+  Enabled: true
+  ## MemoryCache, the size of the memory cache, this may use a lot of memory, each slot takes ~68 KB.
+  MemoryCache: 3600
+  ## FileCallGC, the amount of files to process before suggesting a gc [prevent too many open files]
+  FileCallGC: 64
+  ## SizeLimit, set the size limit of the cache folder in MB, 0 Will disable it.
+  SizeLimit: 5120
+  ## Compression, the cache compression, 0 = No Compression (Ultra fast, higher sizes), 9 = Maximum compression (Slower, more resources needed, smaller sizes)
+  Compression: 1
+
+BlockUpdate:
+  ## UpdateRadius, the area around the block to update when the player breaks it, higher values means higher resource usage and better gameplay.
+  UpdateRadius: 1
+  ## LightUpdate, if true, if the player places a light source, all blocks around it will be deobfuscated
+  LightUpdate:
+    ## Enabled, if true, this function will be activated.
+    Enabled: false
+    ## LightRadius, the area around the block to update when the player places a light source, higher = more resource usage.
+    LightRadius: 8
+  UpdateOn:
+    ## BlockExplosion, if true, blocks will be updated on explosions [Threaded]
+    BlockExplosion: false
+    ## BlockPiston, if true, blocks will be updated if a piston moves it [Threaded]
+    BlockPiston: false
+    ## BlockPhysics, if true, blocks will be updated on physics [Threaded]
+    BlockPhysics: false
+  Proximity:
+    ## Proximity, if true, blocks will be deobfuscated when the player gets close to it
+    Enabled: false
+    ## Interval, the time in ticks per secont to update blocks around the player
+    Interval: 10
+    ## Radius, the radius around the player to update the blocks
+    Radius: 10
+    ## Distance, the minimum distance the player has to walk to cast a new update
+    Distance: 1
+    ## SingleThread, if true, all players will be updated in the same thread, if false, each player will have its own thread.
+    SingleThread: true
+
+Permissions:
+  ## OpHasPerm, if true, ops will have all permissions.
+  OpHasPerm: false
+
+Updater:
+  ## Updater, if true, this plugin will check for updates
+  Enabled: true
+  
+RandomBlocks:
+  ## World, list here, all block ids to be used with engine mode 2 and up in the normal world.
+  World: 5, 14, 15, 16, 21, 22, 41, 42, 47, 48, 49, 56, 57, 98, 129, 133
+  ## Nether, list here, all block ids to be used with engine mode 2 and up in the nether world.
+  Nether: 49, 87, 88, 112, 153, 155
+  
+HiddenBlocks:
+  ## World, list here, all blocks to be obfuscated by engine mode 0, 1 and 4 in the normal world.
+  World: 14, 15, 16, 21, 56, 73, 74, 129
+  ## Nether, list here, all blocks to be obufscated by engine mode 0, 1 and 4 in the nether world.
+  Nether: 153
+
+Worlds:
+  ## Disabled, list here, the exact name of all worlds that will not be protected by this plugin.
+  Disabled:
+    - world_flat
+    - world_the_end
