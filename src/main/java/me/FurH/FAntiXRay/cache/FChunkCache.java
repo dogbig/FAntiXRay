@@ -295,4 +295,9 @@ public class FChunkCache {
     private String toString(int x, int z, String world) {
         return (x) + "" + (z) + "" + world;
     }
+
+    public void clear() {
+        queue.clear();
+        cache.clear();
+    }
 }

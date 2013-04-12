@@ -16,6 +16,7 @@
 
 package me.FurH.FAntiXRay;
 
+import java.util.HashSet;
 import me.FurH.Core.CorePlugin;
 import me.FurH.Core.updater.CoreUpdater;
 import me.FurH.Core.util.Utils;
@@ -51,6 +52,8 @@ public class FAntiXRay extends CorePlugin {
     private static FHookManager hook;
     private static FChunkCache cache;
     public CoreUpdater updater;
+    
+    private static HashSet<String> exempt = new HashSet<String>();
 
     @Override
     public void onEnable() {
@@ -218,7 +221,7 @@ public class FAntiXRay extends CorePlugin {
         
         return true;
     }
-    
+
     public static FHookManager getHookManager() {
         return hook;
     }
@@ -236,12 +239,14 @@ public class FAntiXRay extends CorePlugin {
     }
 
     public static void exempt(String player) {
+        exempt.add(player);
     }
 
     public static void unexempt(String player) {
+        exempt.remove(player);
     }
 
     public static boolean isExempt(String player) {
-        return false;
+        return exempt.contains(player);
     }
 }
