@@ -82,8 +82,8 @@ public class FObfuscator {
         }
 
         /* might be better for gc */
-        //inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
-        //index = 0; //packet.chunks.clear(); packet.chunks = null;
+        inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
+        index = 0; //packet.chunks.clear(); packet.chunks = null;
 
         /* return the obfuscated packet */
         return packet;
@@ -124,7 +124,7 @@ public class FObfuscator {
             deflater.end();
         }
 
-        //inflatedBuffer = null; buffer = null; obfuscated = null;
+        inflatedBuffer = null; buffer = null; obfuscated = null;
 
         return packet;
     }

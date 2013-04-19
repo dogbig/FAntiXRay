@@ -21,6 +21,7 @@ import me.FurH.FAntiXRay.update.FBlockUpdate;
 import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.Packet;
 import net.minecraft.server.v1_5_R2.Packet14BlockDig;
+import net.minecraft.server.v1_5_R2.Packet15Place;
 
 /**
  *
@@ -37,6 +38,9 @@ public class FPacketQueue extends ConcurrentLinkedQueue<Packet> {
     @Override
     public boolean add(Packet packet) {
 
+        if (packet instanceof Packet15Place) {
+            FBlockUpdate.update(player, (Packet15Place)packet);
+        } else
         if (packet instanceof Packet14BlockDig) {
             FBlockUpdate.update(player, (Packet14BlockDig)packet);
         }

@@ -19,8 +19,10 @@ package me.FurH.FAntiXRay.update;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.Packet14BlockDig;
+import net.minecraft.server.v1_5_R2.Packet15Place;
 import net.minecraft.server.v1_5_R2.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
@@ -79,6 +81,16 @@ public class FBlockUpdate {
         }
     }
     
+    public static void update(EntityPlayer player, Packet15Place packet) {
+        FConfiguration config = FAntiXRay.getConfiguration();
+        
+        if (!config.light_enabled) {
+            return;
+        }
+
+        update(player.o(), packet.d(), packet.f(), packet.g(), false, false, true);
+    }
+    
     public static void update(Player p, Location loc, boolean fast) {
 
         if (FAntiXRay.isExempt(p.getName())) {
@@ -89,13 +101,17 @@ public class FBlockUpdate {
     }
 
     public static void update(Location loc, boolean fast, boolean walk) {
-        update(((CraftWorld) loc.getWorld()).getHandle(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), fast, walk);
+        update(((CraftWorld) loc.getWorld()).getHandle(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), fast, walk, false);
     }
     
-    public static void update(WorldServer world, int x, int y, int z, boolean fast, boolean walk) {
+    public static void update(WorldServer world, int x, int y, int z, boolean fast, boolean walk, boolean light) {
 
         FConfiguration config = FAntiXRay.getConfiguration();
         int radius = fast ? 1 : walk ? config.proximity_radius : config.update_radius;
+        
+        if (light) {
+            radius = config.light_radius;
+        }
         
         if (radius <= 0) {
             return;
@@ -126,7 +142,11 @@ public class FBlockUpdate {
                         continue;
                     }
 
-                    world.notify(center.getBlockX(), center.getBlockY(), center.getBlockZ());
+                    if (light) { if (FObfuscator.isBlocksInLight(world, a + x, b + y, c + z)) {
+                        world.notify(center.getBlockX(), center.getBlockY(), center.getBlockZ());
+                    } } else {
+                        world.notify(center.getBlockX(), center.getBlockY(), center.getBlockZ());
+                    }
                 }
             }
         }
