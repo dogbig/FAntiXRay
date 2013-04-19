@@ -43,19 +43,19 @@ public class FBukkitHook extends FHookManager {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
 
             List newhighPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
-            //List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
-            //Queue newinboundQueue = new FPacketQueue(player);
+            List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
+            Queue newinboundQueue = new FPacketQueue(player);
 
             List highPriorityQueue = (List) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
-            //List lowPriorityQueue = (List) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
-            //Queue inboundQueue = (Queue) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "inboundQueue");
+            List lowPriorityQueue = (List) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
+            Queue inboundQueue = (Queue) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "inboundQueue");
 
             if (highPriorityQueue != null) {
                 newhighPriorityQueue.addAll(highPriorityQueue);
                 highPriorityQueue.clear();
             }
             
-            /*if (lowPriorityQueue != null) {
+            if (lowPriorityQueue != null) {
                 newlowPriorityQueue.addAll(lowPriorityQueue);
                 lowPriorityQueue.clear();
             }
@@ -63,11 +63,11 @@ public class FBukkitHook extends FHookManager {
             if (inboundQueue != null) {
                 newinboundQueue.addAll(inboundQueue);
                 inboundQueue.clear();
-            }*/
+            }
 
             ReflectionUtils.setFinalField(player.playerConnection.networkManager, "highPriorityQueue", newhighPriorityQueue);
-            //ReflectionUtils.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
-            //ReflectionUtils.setFinalField(player.playerConnection.networkManager, "inboundQueue", newinboundQueue);
+            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
+            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "inboundQueue", newinboundQueue);
             
             startTask(p, config.proximity_interval);
         }
