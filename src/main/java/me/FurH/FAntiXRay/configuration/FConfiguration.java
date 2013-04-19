@@ -48,6 +48,7 @@ public class FConfiguration extends Configuration {
     
     public boolean          light_enabled       = false;
     public int              light_radius        = 8;
+    public HashSet<Integer> light_blocks        = new HashSet<Integer>();
     
     public boolean          update_explosion    = false;
     public boolean          update_piston       = false;
@@ -90,6 +91,7 @@ public class FConfiguration extends Configuration {
     
         light_enabled       = getBoolean("BlockUpdate.LightUpdate.Enabled");
         light_radius        = getInteger("BlockUpdate.LightUpdate.LightRadius");
+        light_blocks        = getStringAsIntegerSet("BlockUpdate.LightUpdate.LightSource");
     
         update_explosion    = getBoolean("BlockUpdate.UpdateOn.BlockExplosion");
         update_piston       = getBoolean("BlockUpdate.UpdateOn.BlockPiston");

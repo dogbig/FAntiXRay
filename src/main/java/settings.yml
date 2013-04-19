@@ -34,6 +34,8 @@ BlockUpdate:
     Enabled: false
     ## LightRadius, the area around the block to update when the player places a light source, higher = more resource usage.
     LightRadius: 8
+    ## LightSource, the block ids that will update blocks around by checking the light level.
+    LightSource: 10, 11, 50, 51, 76, 89, 91
   UpdateOn:
     ## BlockExplosion, if true, blocks will be updated on explosions [Threaded]
     BlockExplosion: false
