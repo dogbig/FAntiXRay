@@ -25,7 +25,7 @@ import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.hook.FBukkitHook;
 import me.FurH.FAntiXRay.hook.FHookManager;
-import me.FurH.FAntiXRay.hook.FNattyHook;
+import me.FurH.FAntiXRay.hook.FNettyHook;
 import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.metrics.FMetricsModule;
@@ -79,8 +79,8 @@ public class FAntiXRay extends CorePlugin {
         }
 
         if (natty) {
-            hook = new FNattyHook();
-            log("[TAG] Natty support enabled!");
+            hook = new FNettyHook();
+            log("[TAG] Netty support enabled!");
         } else {
             hook = new FBukkitHook();
         }

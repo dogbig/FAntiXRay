@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
  *
  * @author FurmigaHumana
  */
-public class FNattyHook extends FHookManager {
+public class FNettyHook extends FHookManager {
 
     @Override
     public void hook(Player p) {
