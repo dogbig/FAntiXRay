@@ -65,7 +65,7 @@ public class FAntiXRay extends CorePlugin {
 
         configuration = new FConfiguration(this);
         configuration.load();
-
+        
         cache = new FChunkCache();
         
         boolean natty = true;
@@ -131,20 +131,26 @@ public class FAntiXRay extends CorePlugin {
         if (configuration.cache_enabled) {
             cache.setup();
 
-            long limit = configuration.cache_size;
+            final long limit = configuration.cache_size;
             
-            if (limit > 0) {
-                FCacheManager.getCacheSizeTask();
-            }
-        
-            long size = FCacheManager.getCacheSize();
+            Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
-            log("[TAG] Cache Size: {0} of {1} allowed in {2} files", Utils.getFormatedBytes(size), Utils.getFormatedBytes(limit), FCacheManager.files.size());
+                @Override
+                public void run() {
+                    if (limit > 0) {
+                        FCacheManager.getCacheSizeTask();
+                    }
 
-            if (limit > 0 && size > limit) {
-                log("[TAG] The cache is too big, cleaning up!");
-                FCacheManager.clearCache();
-            }
+                    long size = FCacheManager.getCacheSize();
+
+                    log("[TAG] Cache Size: {0} of {1} allowed in {2} files", Utils.getFormatedBytes(size), Utils.getFormatedBytes(limit), FCacheManager.files.size());
+
+                    if (limit > 0 && size > limit) {
+                        log("[TAG] The cache is too big, cleaning up!");
+                        FCacheManager.clearCache();
+                    }
+                }
+            });
         }
     }
 

@@ -65,8 +65,13 @@ public class FObfuscator {
         for (int i = 0; i < packet.d(); i++) {
             Chunk chunk = player.world.getChunkAt(c[i], d[i]);
 
-            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, packet.a[i]);
+            obfuscated = obfuscate(chunk, inflatedBuffers[i], true, packet.a[i], false);
 
+            if (obfuscated == null) {
+                System.out.println("Null Packet56MapChunk Obfuscation!");
+                return packet;
+            }
+            
             /* spigot compatibility */
             if (obfuscated.length + index > buildBuffer.length) {
                 buildBuffer = new byte [ obfuscated.length + index ];
@@ -77,8 +82,8 @@ public class FObfuscator {
         }
 
         /* might be better for gc */
-        inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
-        index = 0; //packet.chunks.clear(); packet.chunks = null;
+        //inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
+        //index = 0; //packet.chunks.clear(); packet.chunks = null;
 
         /* return the obfuscated packet */
         return packet;
@@ -101,8 +106,13 @@ public class FObfuscator {
         Chunk chunk = player.world.getChunkAt(packet.a, packet.b);
         byte[] inflatedBuffer = (byte[]) ReflectionUtils.getPrivateField(packet, "inflatedBuffer");
         byte[] buffer = (byte[]) ReflectionUtils.getPrivateField(packet, "buffer");
-        byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c);
+        byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c, true);
 
+        if (obfuscated == null) {
+            System.out.println("Null Packet51MapChunk Obfuscation!");
+            return packet;
+        }
+        
         System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
         
         Deflater deflater = new Deflater(0);
@@ -114,13 +124,13 @@ public class FObfuscator {
             deflater.end();
         }
 
-        inflatedBuffer = null; buffer = null; obfuscated = null;
+        //inflatedBuffer = null; buffer = null; obfuscated = null;
 
         return packet;
     }
 
     /* initialize the chunk */
-    public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i) {
+    public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i, boolean p51) {
         
         FConfiguration config = FAntiXRay.getConfiguration();
         FChunkCache cache = FAntiXRay.getCache();
@@ -148,7 +158,7 @@ public class FObfuscator {
         ChunkSection[] sections = chunk.i();
         for (int j1 = 0; j1 < sections.length; ++j1) {
             if (sections[j1] != null && (!flag || !sections[j1].a()) && (i & 1 << j1) != 0) {
-                obfuscated = obfuscate(sections[j1], chunk, j1, nether);
+                obfuscated = obfuscate(sections[j1], chunk, j1, nether, p51);
 
                 System.arraycopy(obfuscated, 0, buildBuffer, index, obfuscated.length);
                 index += obfuscated.length;
@@ -160,17 +170,17 @@ public class FObfuscator {
         }
 
         /* might be better for gc */
-        obfuscated = null; sections = null; index = 0;
+        //obfuscated = null; sections = null; index = 0;
 
         return buildBuffer;
     }
     
     /* obfuscated the chunk */
-    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l, boolean nether) {
+    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l, boolean nether, boolean p51) {
         FConfiguration config = FAntiXRay.getConfiguration();
         
         byte[] buffer = section.g().clone();
-
+        
         int incrm = 5;
         int index = 0;
         
@@ -185,7 +195,7 @@ public class FObfuscator {
                     int id = section.a(i, j, k);
                     boolean air = false;
 
-                    if (config.cave_enabled && id == 1) {
+                    if (!p51 && config.cave_enabled && id == 1) {
                         
                         if (rnd.nextInt(1001) <= config.cave_intensity) {
                             incrm = rnd.nextInt(5);
@@ -197,7 +207,7 @@ public class FObfuscator {
                         }
                     }
 
-                    if (config.proximity_enabled && id == 54) {
+                    if (!p51 && config.proximity_enabled && id == 54) {
                         buffer[index] = 0;
                     } else
                     if (air) {
@@ -206,7 +216,9 @@ public class FObfuscator {
                         }
                     } else
                     if (config.engine_mode == 0) {
-                        if (isHiddenBlock(id, nether)) {
+                        if (!p51 && isHiddenBlock(id, nether)) {
+                            buffer[index] = (byte) (nether ? 87 : 1);
+                        } else if (p51 && isToObfuscate(chunk, x, y, z)) {
                             buffer[index] = (byte) (nether ? 87 : 1);
                         }
                     } else
@@ -241,7 +253,11 @@ public class FObfuscator {
                                 }
                             }
                         } else if (isHiddenBlock(id, nether)) {
-                            buffer[index] = (byte) (nether ? 87 : 1);
+                            if (p51 && !isBlocksTransparent(chunk, x, y, z)) {
+                                buffer[index] = (byte) getRandomId(nether);
+                            } else {
+                                buffer[index] = (byte) (nether ? 87 : 1);
+                            }
                         }
                     }
                     

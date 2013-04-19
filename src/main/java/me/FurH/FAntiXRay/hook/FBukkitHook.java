@@ -40,52 +40,36 @@ public class FBukkitHook extends FHookManager {
         FConfiguration config = FAntiXRay.getConfiguration();
         
         if (!FAntiXRay.isExempt(p.getName())) {
-            final EntityPlayer player = ((CraftPlayer)p).getHandle();
-            
-            startTask(p, config.proximity_interval);
+            EntityPlayer player = ((CraftPlayer)p).getHandle();
 
             List newhighPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
-            List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
-            
-            Queue newinboundQueue = new FPacketQueue(player);
+            //List newlowPriorityQueue = Collections.synchronizedList(new FPriorityQueue(player));
+            //Queue newinboundQueue = new FPacketQueue(player);
 
             List highPriorityQueue = (List) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "highPriorityQueue");
-            List lowPriorityQueue = (List) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
-            Queue inboundQueue = (Queue) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "inboundQueue");
+            //List lowPriorityQueue = (List) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "lowPriorityQueue");
+            //Queue inboundQueue = (Queue) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "inboundQueue");
 
             if (highPriorityQueue != null) {
-                if (highPriorityQueue instanceof FPriorityQueue) {
-                    return;
-                }
-
                 newhighPriorityQueue.addAll(highPriorityQueue);
-                
                 highPriorityQueue.clear();
             }
             
-            if (lowPriorityQueue != null) {
-                if (lowPriorityQueue instanceof FPriorityQueue) {
-                    return;
-                }
-
+            /*if (lowPriorityQueue != null) {
                 newlowPriorityQueue.addAll(lowPriorityQueue);
-                
                 lowPriorityQueue.clear();
             }
             
             if (inboundQueue != null) {
-                if (inboundQueue instanceof FPacketQueue) {
-                    return;
-                }
-                
                 newinboundQueue.addAll(inboundQueue);
-                
                 inboundQueue.clear();
-            }
+            }*/
 
             ReflectionUtils.setFinalField(player.playerConnection.networkManager, "highPriorityQueue", newhighPriorityQueue);
-            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
-            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "inboundQueue", newinboundQueue);
+            //ReflectionUtils.setFinalField(player.playerConnection.networkManager, "lowPriorityQueue", newlowPriorityQueue);
+            //ReflectionUtils.setFinalField(player.playerConnection.networkManager, "inboundQueue", newinboundQueue);
+            
+            startTask(p, config.proximity_interval);
         }
     }
 }

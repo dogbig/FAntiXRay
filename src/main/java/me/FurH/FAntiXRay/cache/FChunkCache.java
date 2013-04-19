@@ -16,6 +16,7 @@
 
 package me.FurH.FAntiXRay.cache;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -172,6 +173,8 @@ public class FChunkCache {
             data = (FCacheData) ois.readObject();
 
             run_files++;
+        } catch (EOFException ex) {
+            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
@@ -269,6 +272,8 @@ public class FChunkCache {
             fos.flush();
 
             run_files++;
+        } catch (EOFException ex) {
+            file.delete();
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {

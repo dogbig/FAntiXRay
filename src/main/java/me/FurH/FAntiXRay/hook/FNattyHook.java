@@ -34,20 +34,20 @@ public class FNattyHook extends FHookManager {
     @Override
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
-            final EntityPlayer player = ((CraftPlayer)p).getHandle();
-            
-            startTask(p, FAntiXRay.getConfiguration().proximity_interval);
+            EntityPlayer player = ((CraftPlayer)p).getHandle();
 
             io.netty.channel.Channel channel = (io.netty.channel.Channel) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "channel");
             channel.pipeline().remove("encoder");
             channel.pipeline().addLast("encoder", new FPacketEncoder(player));
 
-            Queue<Packet> syncPackets = (Queue<Packet>) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "syncPackets");
+            /*Queue<Packet> syncPackets = (Queue<Packet>) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "syncPackets");
 
             FPacketQueue newSyncPackets = new FPacketQueue(player);
             newSyncPackets.addAll(syncPackets);
 
-            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "syncPackets", newSyncPackets);
+            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "syncPackets", newSyncPackets);*/
+            
+            startTask(p, FAntiXRay.getConfiguration().proximity_interval);
         }
     }
 }

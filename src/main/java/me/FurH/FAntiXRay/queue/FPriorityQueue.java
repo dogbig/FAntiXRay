@@ -33,7 +33,7 @@ public class FPriorityQueue extends ArrayList<Packet> {
     
     @Override
     public Packet remove(int index) {
-        
+
         Packet packet = super.remove(index);
         if (packet != null) {
             if (packet instanceof Packet56MapChunkBulk) {

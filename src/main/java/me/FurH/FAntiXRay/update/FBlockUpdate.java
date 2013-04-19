@@ -56,7 +56,7 @@ public class FBlockUpdate {
                     running = true;
                     try {
                         if (queued.isEmpty()) {
-                            sleep(1000); return;
+                            sleep(500); return;
                         }
                         
                         Location loc = queued.poll();
