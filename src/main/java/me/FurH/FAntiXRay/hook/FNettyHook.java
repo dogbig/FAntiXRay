@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 public class FNettyHook extends FHookManager {
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void hook(Player p) {
         if (!FAntiXRay.isExempt(p.getName())) {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
@@ -40,7 +41,6 @@ public class FNettyHook extends FHookManager {
             channel.pipeline().remove("encoder");
             channel.pipeline().addLast("encoder", new FPacketEncoder(player));
 
-            @SuppressWarnings("unchecked")
             Queue<Packet> syncPackets = (Queue<Packet>) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "syncPackets");
 
             FPacketQueue newSyncPackets = new FPacketQueue(player);

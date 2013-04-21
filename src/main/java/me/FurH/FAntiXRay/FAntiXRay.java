@@ -17,6 +17,7 @@
 package me.FurH.FAntiXRay;
 
 import java.util.HashSet;
+import java.util.Random;
 import me.FurH.Core.CorePlugin;
 import me.FurH.Core.updater.CoreUpdater;
 import me.FurH.Core.util.Utils;
@@ -181,6 +182,7 @@ public class FAntiXRay extends CorePlugin {
 
                     msg(sender, "&7Cleaning cache...");
                     int left = FCacheManager.clearCache();
+                    cache.cache.clear();
 
                     if (left > 0) {
                         msg(sender, "&a{0}&7 files could not be deleted!", left);
@@ -201,8 +203,22 @@ public class FAntiXRay extends CorePlugin {
                     
                     double size = FCacheManager.getCacheSize();
                     double limit = configuration.cache_size;
+                    
+                    int each = 68;
 
-                    msg(sender, "&7Current cache size: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(size),  Utils.getFormatedBytes(limit), FCacheManager.files.size());
+                    Random rnd = new Random(5);
+                    if (rnd.nextBoolean()) {
+                        each += rnd.nextInt(5);
+                    } else {
+                        each -= rnd.nextInt(5);
+                    }
+                    
+                    double m_size = cache.cache.size();
+                    double m_limit = configuration.cache_memory;
+
+                    msg(sender, "&7Disk Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(size),  Utils.getFormatedBytes(limit), FCacheManager.files.size());
+                    msg(sender, "&7Memory Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(m_size * each),  Utils.getFormatedBytes(m_limit * each), m_size);
+
                     return true;
                 } else
                 if (args[0].equalsIgnoreCase("reload")) {

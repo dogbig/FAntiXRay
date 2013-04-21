@@ -114,7 +114,7 @@ public class FConfiguration extends Configuration {
         hidden_nether       = getStringAsIntegerSet("HiddenBlocks.Nether");
 
         disabled_worlds     = new HashSet<String>(getStringList("Worlds.Disabled"));
+
+        updateConfig();
     }
-    
-    
 }
