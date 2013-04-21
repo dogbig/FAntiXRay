@@ -217,7 +217,7 @@ public class FAntiXRay extends CorePlugin {
                     double m_limit = configuration.cache_memory;
 
                     msg(sender, "&7Disk Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(size),  Utils.getFormatedBytes(limit), FCacheManager.files.size());
-                    msg(sender, "&7Memory Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(m_size * each),  Utils.getFormatedBytes(m_limit * each), m_size);
+                    msg(sender, "&7Memory Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(m_size * each * 1024),  Utils.getFormatedBytes(m_limit * each  * 1024), m_size);
 
                     return true;
                 } else
