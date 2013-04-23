@@ -38,8 +38,8 @@ public class FNettyHook extends FHookManager {
             EntityPlayer player = ((CraftPlayer)p).getHandle();
 
             io.netty.channel.Channel channel = (io.netty.channel.Channel) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "channel");
-            channel.pipeline().remove("encoder");
-            channel.pipeline().addLast("encoder", new FPacketEncoder(player));
+
+            channel.pipeline().replace("encoder", "encoder", new FPacketEncoder(player));
 
             Queue<Packet> syncPackets = (Queue<Packet>) ReflectionUtils.getPrivateField(player.playerConnection.networkManager, "syncPackets");
 
@@ -47,6 +47,7 @@ public class FNettyHook extends FHookManager {
             newSyncPackets.addAll(syncPackets);
 
             ReflectionUtils.setFinalField(player.playerConnection.networkManager, "syncPackets", newSyncPackets);
+            ReflectionUtils.setFinalField(player.playerConnection.networkManager, "channel", channel);
             
             startTask(p, FAntiXRay.getConfiguration().proximity_interval);
         }

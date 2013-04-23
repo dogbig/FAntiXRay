@@ -55,6 +55,7 @@ public class FAntiXRay extends CorePlugin {
     public CoreUpdater updater;
     
     private static HashSet<String> exempt = new HashSet<String>();
+    public static boolean netty = false;
 
     @Override
     public void onEnable() {
@@ -69,17 +70,15 @@ public class FAntiXRay extends CorePlugin {
         
         cache = new FChunkCache();
         
-        boolean natty = true;
-
         try {
             Class.forName("org.spigotmc.netty.NettyNetworkManager");
         } catch (NoClassDefFoundError ex) {
-            natty = false;
+            netty = false;
         } catch (ClassNotFoundException ex) {
-            natty = false;
+            netty = false;
         }
 
-        if (natty) {
+        if (netty) {
             hook = new FNettyHook();
             log("[TAG] Netty support enabled!");
         } else {
