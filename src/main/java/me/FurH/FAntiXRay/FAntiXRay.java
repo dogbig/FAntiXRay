@@ -55,7 +55,7 @@ public class FAntiXRay extends CorePlugin {
     public CoreUpdater updater;
     
     private static HashSet<String> exempt = new HashSet<String>();
-    public static boolean netty = false;
+    public static boolean netty = true;
 
     @Override
     public void onEnable() {
@@ -81,7 +81,7 @@ public class FAntiXRay extends CorePlugin {
         if (netty) {
             hook = new FNettyHook();
             log("[TAG] Netty support enabled!");
-            configuration.cache_enabled = false;
+            //configuration.cache_enabled = false;
         } else {
             hook = new FBukkitHook();
         }
