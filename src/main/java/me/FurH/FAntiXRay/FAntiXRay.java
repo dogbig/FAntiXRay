@@ -81,6 +81,7 @@ public class FAntiXRay extends CorePlugin {
         if (netty) {
             hook = new FNettyHook();
             log("[TAG] Netty support enabled!");
+            configuration.cache_enabled = false;
         } else {
             hook = new FBukkitHook();
         }
