@@ -49,10 +49,6 @@ public class FChunkCache {
         FConfiguration config = FAntiXRay.getConfiguration();
         cache = new CoreSafeCache<String, FCacheData>(config.cache_memory);
 
-        if (FAntiXRay.netty) {
-            return;
-        }
-        
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -143,21 +139,17 @@ public class FChunkCache {
     public byte[] read(String world, int x, int z, long hash, int engine_mode) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
-        boolean cached = cache.containsKey(toString(x, z, world));
-        if (cached) {
-            return read(cache.get(toString(x, z, world)), world, x, z, hash, engine_mode);
-        }
-
-        if (FAntiXRay.netty) {
-            return null;
-        }
-
         if (run_files >= config.cache_callgc) {
             System.runFinalization();
             System.gc();
             run_files = 0;
         }
         
+        boolean cached = cache.containsKey(toString(x, z, world));
+        if (cached) {
+            return read(cache.get(toString(x, z, world)), world, x, z, hash, engine_mode);
+        }
+
         File dir = new File(main_dir + File.separator + world + File.separator + "r." + (x >> 5) + "." + (z >> 5));
         if (!dir.exists()) { return null; }
 
@@ -216,10 +208,6 @@ public class FChunkCache {
     public void write(String world, int x, int z, byte[] obufscated, long hash, int engine_mode) {
         FCacheData data = new FCacheData(world, x, z, obufscated, hash, engine_mode);
 
-        if (FAntiXRay.netty) {
-            return;
-        }
-        
         if (data.obfuscated == null) {
             return;
         }
@@ -239,10 +227,6 @@ public class FChunkCache {
     public void write(FCacheData data) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
-        if (FAntiXRay.netty) {
-            return;
-        }
-        
         if (run_files >= config.cache_callgc) {
             System.runFinalization();
             System.gc();

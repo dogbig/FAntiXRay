@@ -25,7 +25,6 @@ import net.minecraft.server.v1_5_R2.Packet14BlockDig;
 import net.minecraft.server.v1_5_R2.Packet15Place;
 import net.minecraft.server.v1_5_R2.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
 import org.bukkit.entity.Player;
 
