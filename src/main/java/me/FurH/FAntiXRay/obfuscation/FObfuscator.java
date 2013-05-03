@@ -23,13 +23,13 @@ import me.FurH.Core.reflection.ReflectionUtils;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import net.minecraft.server.v1_5_R2.Block;
-import net.minecraft.server.v1_5_R2.Chunk;
-import net.minecraft.server.v1_5_R2.ChunkSection;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.Packet51MapChunk;
-import net.minecraft.server.v1_5_R2.Packet56MapChunkBulk;
-import net.minecraft.server.v1_5_R2.World;
+import net.minecraft.server.v1_5_R3.Block;
+import net.minecraft.server.v1_5_R3.Chunk;
+import net.minecraft.server.v1_5_R3.ChunkSection;
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_5_R3.Packet51MapChunk;
+import net.minecraft.server.v1_5_R3.Packet56MapChunkBulk;
+import net.minecraft.server.v1_5_R3.World;
 import org.bukkit.World.Environment;
 
 /**
@@ -157,7 +157,7 @@ public class FObfuscator {
 
         ChunkSection[] sections = chunk.i();
         for (int j1 = 0; j1 < sections.length; ++j1) {
-            if (sections[j1] != null && (!flag || !sections[j1].a()) && (i & 1 << j1) != 0) {
+            if (sections[j1] != null && (!flag || !sections[j1].isEmpty()) && (i & 1 << j1) != 0) {
                 obfuscated = obfuscate(sections[j1], chunk, j1, nether, p51);
 
                 System.arraycopy(obfuscated, 0, buildBuffer, index, obfuscated.length);
@@ -179,7 +179,7 @@ public class FObfuscator {
     public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l, boolean nether, boolean p51) {
         FConfiguration config = FAntiXRay.getConfiguration();
         
-        byte[] buffer = section.g().clone();
+        byte[] buffer = section.getIdArray().clone();
         
         int incrm = 5;
         int index = 0;
@@ -192,12 +192,21 @@ public class FObfuscator {
                     int y = (l << 4) + j;
                     int z = (chunk.z << 4) + k;
 
-                    int id = section.a(i, j, k);
+                    int id = section.getTypeId(i, j, k);
                     boolean air = false;
 
-                    if (!p51 && config.cave_enabled && id == 1) {
+                    if (!p51 && config.cave_enabled && id == 1 && 
+                            (y >= 50 && y < 53) || (y >= 40 && y < 43) || j == 15 || i == 1) {
                         
-                        if (rnd.nextInt(1001) <= config.cave_intensity) {
+                        if (rnd.nextInt(101) <= config.cave_intensity) {
+                            air = true;
+                        }
+                        
+                    }
+
+                    if (p51 && config.cave_enabled && id == 1) {
+
+                        if (rnd.nextInt(101) <= config.cave_intensity * 2) {
                             incrm = rnd.nextInt(5);
                         }
 
@@ -210,10 +219,8 @@ public class FObfuscator {
                     if (!p51 && config.proximity_enabled && id == 54) {
                         buffer[index] = 0;
                     } else
-                    if (air) {
-                        if (!isBlocksTransparent(chunk, x, y, z)) {
-                            buffer[index] = 0;
-                        }
+                    if (air && !nether && !isBlocksTransparent(chunk, x, y, z)) {
+                        buffer[index] = 0;
                     } else
                     if (config.engine_mode == 0) {
                         if (!p51 && isHiddenBlock(id, nether)) {

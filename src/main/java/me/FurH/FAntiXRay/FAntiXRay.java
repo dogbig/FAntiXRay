@@ -81,7 +81,7 @@ public class FAntiXRay extends CorePlugin {
         if (netty) {
             hook = new FNettyHook();
             log("[TAG] Netty support enabled!");
-            //configuration.cache_enabled = false;
+            configuration.cache_enabled = false;
         } else {
             hook = new FBukkitHook();
         }
@@ -232,7 +232,7 @@ public class FAntiXRay extends CorePlugin {
 
                     msg(sender, "&aConfiguration reloaded successully");
                     return true;
-                } 
+                }
             }
 
             msg(sender, "&a/axr cache &8-&7 Shows the current cache size");

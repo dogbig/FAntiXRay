@@ -49,10 +49,6 @@ public class FChunkCache {
         FConfiguration config = FAntiXRay.getConfiguration();
         cache = new CoreSafeCache<String, FCacheData>(config.cache_memory);
 
-        if (FAntiXRay.netty) {
-            return;
-        }
-        
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -148,10 +144,6 @@ public class FChunkCache {
             return read(cache.get(toString(x, z, world)), world, x, z, hash, engine_mode);
         }
 
-        if (FAntiXRay.netty) {
-            return null;
-        }
-
         if (run_files >= config.cache_callgc) {
             System.runFinalization();
             System.gc();
@@ -225,11 +217,7 @@ public class FChunkCache {
         }
         
         cache.put(toString(x, z, world), data);
-        
-        if (FAntiXRay.netty) {
-            return;
-        }
-        
+
         if (queue.contains(data)) {
             queue.remove(data);
         }
@@ -240,10 +228,6 @@ public class FChunkCache {
     public void write(FCacheData data) {
         FConfiguration config = FAntiXRay.getConfiguration();
 
-        if (FAntiXRay.netty) {
-            return;
-        }
-        
         if (run_files >= config.cache_callgc) {
             System.runFinalization();
             System.gc();

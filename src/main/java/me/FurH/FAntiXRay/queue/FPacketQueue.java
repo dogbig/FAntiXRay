@@ -18,10 +18,10 @@ package me.FurH.FAntiXRay.queue;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import me.FurH.FAntiXRay.update.FBlockUpdate;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.Packet;
-import net.minecraft.server.v1_5_R2.Packet14BlockDig;
-import net.minecraft.server.v1_5_R2.Packet15Place;
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_5_R3.Packet;
+import net.minecraft.server.v1_5_R3.Packet14BlockDig;
+import net.minecraft.server.v1_5_R3.Packet15Place;
 
 /**
  *

@@ -19,10 +19,10 @@ package me.FurH.FAntiXRay.hook;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.Packet;
-import net.minecraft.server.v1_5_R2.Packet51MapChunk;
-import net.minecraft.server.v1_5_R2.Packet56MapChunkBulk;
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_5_R3.Packet;
+import net.minecraft.server.v1_5_R3.Packet51MapChunk;
+import net.minecraft.server.v1_5_R3.Packet56MapChunkBulk;
 import org.spigotmc.netty.NettyNetworkManager;
 import org.spigotmc.netty.PacketEncoder;
 

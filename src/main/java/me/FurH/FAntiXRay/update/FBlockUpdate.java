@@ -20,12 +20,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
-import net.minecraft.server.v1_5_R2.EntityPlayer;
-import net.minecraft.server.v1_5_R2.Packet14BlockDig;
-import net.minecraft.server.v1_5_R2.Packet15Place;
-import net.minecraft.server.v1_5_R2.WorldServer;
+import net.minecraft.server.v1_5_R3.EntityPlayer;
+import net.minecraft.server.v1_5_R3.Packet14BlockDig;
+import net.minecraft.server.v1_5_R3.Packet15Place;
+import net.minecraft.server.v1_5_R3.WorldServer;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_5_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
 import org.bukkit.entity.Player;
 
 /**
