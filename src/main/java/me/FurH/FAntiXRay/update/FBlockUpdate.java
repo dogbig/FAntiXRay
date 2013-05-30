@@ -16,11 +16,14 @@
 
 package me.FurH.FAntiXRay.update;
 
+import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.threads.UpdateThreads.UpdateType;
 import net.minecraft.server.v1_5_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
 import org.bukkit.entity.Player;
 
@@ -51,6 +54,9 @@ public class FBlockUpdate implements Runnable {
     @Override
     public void run() {
 
+        boolean nether = world.getWorld().getEnvironment() == Environment.NETHER;
+        FConfiguration config = FAntiXRay.getConfiguration();
+        
         Location start = new Location(world.getWorld(), x, y, z);
         int notifications = 0;
 
@@ -69,9 +75,12 @@ public class FBlockUpdate implements Runnable {
                     int i = a + x;
                     int j = b + y;
                     int k = c + z;
+                    
+                    if (i == x && j == y && k == z) {
+                        continue;
+                    }
 
                     Location center = new Location(world.getWorld(), i, j, k);
-
                     if (center.distanceSquared(start) > radius) {
                         continue;
                     }
@@ -86,6 +95,12 @@ public class FBlockUpdate implements Runnable {
                     }
                     
                     if (type == UpdateType.PLAYER_TELEPORT) {
+                        continue;
+                    }
+
+                    if (!FObfuscator.isObfuscable(id, nether) && 
+                            !config.hidden_world.contains(id) && !config.hidden_nether.contains(id)) {
+
                         continue;
                     }
 
