@@ -106,7 +106,9 @@ public class FUpdateListener implements Listener {
         if (e.isCancelled() || e.getTo() == e.getFrom()) { return; }
         
         FConfiguration config = FAntiXRay.getConfiguration();
-        if (e.getTo().distanceSquared(e.getFrom()) < config.proximity_radius) {
+
+        if (e.getTo().getWorld() != e.getFrom().getWorld() || 
+                e.getTo().distanceSquared(e.getFrom()) < config.proximity_radius) {
             return;
         }
 
