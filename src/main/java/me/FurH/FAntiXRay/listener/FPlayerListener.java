@@ -18,43 +18,17 @@ package me.FurH.FAntiXRay.listener;
 
 import me.FurH.Core.util.Communicator;
 import me.FurH.FAntiXRay.FAntiXRay;
-import me.FurH.FAntiXRay.hook.FHookManager;
-import me.FurH.FAntiXRay.obfuscation.FChestThread;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  *
  * @author FurmigaHumana
  */
 public class FPlayerListener implements Listener  {
-    
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerTeleport(PlayerTeleportEvent e) {
-        if (e.isCancelled()) { return; }
-        
-        FHookManager hook = FAntiXRay.getHookManager();
-        if (hook.tasks.containsKey(e.getPlayer().getName())) {
-            FChestThread thread = hook.tasks.get(e.getPlayer().getName());
-            thread.setLastLoc(e.getFrom());
-        }
-    }
-    
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        FAntiXRay.getHookManager().unhook(e.getPlayer());
-    }
-    
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerQuit(PlayerKickEvent e) {
-        FAntiXRay.getHookManager().unhook(e.getPlayer());
-    }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -76,8 +50,6 @@ public class FPlayerListener implements Listener  {
         if (plugin.hasPerm(p, "FAntiXRay.Quiet.Deobfuscate")) {
             FAntiXRay.exempt(p.getName());
         }
-        
-        FAntiXRay.getHookManager().hook(p);
 
         if (plugin.updater.isUpdateAvailable()) {
             if (plugin.hasPerm(p, "FAntiXRay.Updates")) {

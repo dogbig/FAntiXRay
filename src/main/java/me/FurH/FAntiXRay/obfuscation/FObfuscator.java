@@ -19,6 +19,7 @@ package me.FurH.FAntiXRay.obfuscation;
 import java.util.Random;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
+import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.reflection.ReflectionUtils;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FChunkCache;
@@ -31,6 +32,8 @@ import net.minecraft.server.v1_5_R3.Packet51MapChunk;
 import net.minecraft.server.v1_5_R3.Packet56MapChunkBulk;
 import net.minecraft.server.v1_5_R3.World;
 import org.bukkit.World.Environment;
+import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -39,9 +42,29 @@ import org.bukkit.World.Environment;
 public class FObfuscator {
 
     private static Random rnd = new Random(101);
+    
+    public static Object obfuscate(Player player, Object object) {
+
+        if (object instanceof Packet56MapChunkBulk) {
+            try {
+                return obfuscate(((CraftPlayer)player).getHandle(), (Packet56MapChunkBulk) object);
+            } catch (CoreException ex) {
+                ex.printStackTrace();
+            }
+        } else
+        if (object instanceof Packet51MapChunk) {
+            try {
+                return obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
+            } catch (CoreException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return null;
+    }
    
     /* initialize the Packet56MapChunkBulk */
-    public static Packet56MapChunkBulk obfuscate(EntityPlayer player, Packet56MapChunkBulk packet) {
+    public static Packet56MapChunkBulk obfuscate(EntityPlayer player, Packet56MapChunkBulk packet) throws CoreException {
         FConfiguration config = FAntiXRay.getConfiguration();
 
         /* world is disabled, return */
@@ -49,13 +72,17 @@ public class FObfuscator {
             return packet;
         }
 
+        if (FAntiXRay.isExempt(player.name)) {
+            return packet;
+        }
+        
         int[] c = (int[]) ReflectionUtils.getPrivateField(packet, "c"); //X
         int[] d = (int[]) ReflectionUtils.getPrivateField(packet, "d"); //Z
 
         byte[][] inflatedBuffers = (byte[][]) ReflectionUtils.getPrivateField(packet, "inflatedBuffers");
         byte[] buildBuffer = (byte[]) ReflectionUtils.getPrivateField(packet, "buildBuffer");
         byte[] obfuscated; // obfuscated data
-        
+
         /* spigot compatibility */
         if (buildBuffer == null) {
             buildBuffer = new byte [ 196864 ];
@@ -68,10 +95,9 @@ public class FObfuscator {
             obfuscated = obfuscate(chunk, inflatedBuffers[i], true, packet.a[i], false);
 
             if (obfuscated == null) {
-                System.out.println("Null Packet56MapChunk Obfuscation!");
                 return packet;
             }
-            
+
             /* spigot compatibility */
             if (obfuscated.length + index > buildBuffer.length) {
                 buildBuffer = new byte [ obfuscated.length + index ];
@@ -90,7 +116,7 @@ public class FObfuscator {
     }
 
     /* initialize the Packet51MapChunk */
-    public static Packet51MapChunk obfuscate(EntityPlayer player, Packet51MapChunk packet) {
+    public static Packet51MapChunk obfuscate(EntityPlayer player, Packet51MapChunk packet) throws CoreException {
         FConfiguration config = FAntiXRay.getConfiguration();
         
         /* empty chunk?, return */
@@ -102,24 +128,37 @@ public class FObfuscator {
         if (config.disabled_worlds.contains(player.world.getWorld().getName())) {
             return packet;
         }
+        
+
+        if (FAntiXRay.isExempt(player.name)) {
+            return packet;
+        }
 
         Chunk chunk = player.world.getChunkAt(packet.a, packet.b);
         byte[] inflatedBuffer = (byte[]) ReflectionUtils.getPrivateField(packet, "inflatedBuffer");
         byte[] buffer = (byte[]) ReflectionUtils.getPrivateField(packet, "buffer");
         byte[] obfuscated = obfuscate(chunk, inflatedBuffer, packet.e, packet.c, true);
+        int size0 = (Integer) ReflectionUtils.getPrivateField(packet, "size");
 
         if (obfuscated == null) {
-            System.out.println("Null Packet51MapChunk Obfuscation!");
             return packet;
         }
-        
+
         System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
-        
-        Deflater deflater = new Deflater(0);
+
+        Deflater deflater = new Deflater(-1);
+
         try {
+
             deflater.setInput(inflatedBuffer, 0, inflatedBuffer.length);
             deflater.finish();
-            ReflectionUtils.setPrivateField(packet, "size", deflater.deflate(buffer));
+
+            buffer = new byte[ inflatedBuffer.length ];
+            int size = deflater.deflate(buffer);
+
+            ReflectionUtils.setPrivateField(packet, "size", size);
+            ReflectionUtils.setPrivateField(packet, "buffer", buffer);
+
         } finally {
             deflater.end();
         }
@@ -158,7 +197,7 @@ public class FObfuscator {
         ChunkSection[] sections = chunk.i();
         for (int j1 = 0; j1 < sections.length; ++j1) {
             if (sections[j1] != null && (!flag || !sections[j1].isEmpty()) && (i & 1 << j1) != 0) {
-                obfuscated = obfuscate(sections[j1], chunk, j1, nether, p51);
+                obfuscated = obfuscate(sections[j1], chunk, j1, nether);
 
                 System.arraycopy(obfuscated, 0, buildBuffer, index, obfuscated.length);
                 index += obfuscated.length;
@@ -176,14 +215,12 @@ public class FObfuscator {
     }
     
     /* obfuscated the chunk */
-    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l, boolean nether, boolean p51) {
+    public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l, boolean nether) {
         FConfiguration config = FAntiXRay.getConfiguration();
         
         byte[] buffer = section.getIdArray().clone();
-        
-        int incrm = 5;
         int index = 0;
-        
+
         for (int j = 0; j < 16; j++) {
             for (int k = 0; k < 16; k++) {
                 for (int i = 0; i < 16; i++) {
@@ -195,37 +232,21 @@ public class FObfuscator {
                     int id = section.getTypeId(i, j, k);
                     boolean air = false;
 
-                    if (!p51 && config.cave_enabled && id == 1 && 
+                    if (config.cave_enabled && id == 1 && 
                             (y >= 50 && y < 53) || (y >= 40 && y < 43) || j == 15 || i == 1) {
-                        
                         if (rnd.nextInt(101) <= config.cave_intensity) {
                             air = true;
                         }
-                        
                     }
 
-                    if (p51 && config.cave_enabled && id == 1) {
-
-                        if (rnd.nextInt(101) <= config.cave_intensity * 2) {
-                            incrm = rnd.nextInt(5);
-                        }
-
-                        if (incrm > 0) {
-                            air = true;
-                            incrm--;
-                        }
-                    }
-
-                    if (!p51 && config.proximity_enabled && id == 54) {
+                    if (config.proximity_enabled && id == 54) {
                         buffer[index] = 0;
                     } else
                     if (air && !nether && !isBlocksTransparent(chunk, x, y, z)) {
                         buffer[index] = 0;
                     } else
                     if (config.engine_mode == 0) {
-                        if (!p51 && isHiddenBlock(id, nether)) {
-                            buffer[index] = (byte) (nether ? 87 : 1);
-                        } else if (p51 && isToObfuscate(chunk, x, y, z)) {
+                        if (isHiddenBlock(id, nether)) {
                             buffer[index] = (byte) (nether ? 87 : 1);
                         }
                     } else
@@ -260,11 +281,7 @@ public class FObfuscator {
                                 }
                             }
                         } else if (isHiddenBlock(id, nether)) {
-                            if (p51 && !isBlocksTransparent(chunk, x, y, z)) {
-                                buffer[index] = (byte) getRandomId(nether);
-                            } else {
-                                buffer[index] = (byte) (nether ? 87 : 1);
-                            }
+                            buffer[index] = (byte) (nether ? 87 : 1);
                         }
                     }
                     
@@ -296,20 +313,20 @@ public class FObfuscator {
         return config.random_world[ (int)(Math.random() * config.random_world.length) ];
     }
     
-    public static boolean isToObfuscate(Chunk chunk, int i, int j, int k) {
+    private static boolean isToObfuscate(Chunk chunk, int i, int j, int k) {
+        return isToObfuscate(chunk.world, i, j, k);
+    }
+    
+    public static boolean isToObfuscate(World world, int i, int j, int k) {
         FConfiguration config = FAntiXRay.getConfiguration();
         if (config.engine_dark) {
-            return !isBlocksInLight(chunk, i, j, k);
+            return !isBlocksInLight(world, i, j, k);
         } else {
-            return !isBlocksTransparent(chunk, i, j, k);
+            return !isBlocksTransparent(world, i, j, k);
         }
     }
 
     /* return true if the block have light in one of its faces */
-    private static boolean isBlocksInLight(Chunk chunk, int i, int j, int k) {
-        return isBlocksInLight(chunk.world, i, j, k);
-    }
-    
     public static boolean isBlocksInLight(World world, int i, int j, int k) {
         if (world.getLightLevel(i + 1, j, k) > 0) {
             return true;
@@ -334,22 +351,26 @@ public class FObfuscator {
 
     /* return true if the block have a transparent block in one of its faces */
     private static boolean isBlocksTransparent(Chunk chunk, int i, int j, int k) {
-        if (isTransparent(chunk.world.getTypeId(i + 1, j, k))) {
+        return isBlocksTransparent(chunk.world, i, j, k);
+    }
+    
+    public static boolean isBlocksTransparent(World world, int i, int j, int k) {
+        if (isTransparent(world.getTypeId(i + 1, j, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(i - 1, j, k))) {
+        if (isTransparent(world.getTypeId(i - 1, j, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(i, j + 1, k))) {
+        if (isTransparent(world.getTypeId(i, j + 1, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(i, j - 1, k))) {
+        if (isTransparent(world.getTypeId(i, j - 1, k))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(i, j, k + 1))) {
+        if (isTransparent(world.getTypeId(i, j, k + 1))) {
             return true;
         } else
-        if (isTransparent(chunk.world.getTypeId(i, j, k - 1))) {
+        if (isTransparent(world.getTypeId(i, j, k - 1))) {
             return true;
         }
         return false;
@@ -371,10 +392,11 @@ public class FObfuscator {
     
     /* return true if the id is a transparent block */
     public static boolean isTransparent(int id) {
+
         if (id == 0) {
             return true;
         }
-        
+
         if (id == 1) {
             return false;
         }
@@ -397,11 +419,13 @@ public class FObfuscator {
     public static String toString(int x, int y, int z) {
         return (x) + "" + (y) + "" + (z);
     }
-    
+
     public static long getHash(byte[] buildBuffer) {
         CRC32 checksum = new CRC32();
+
         checksum.reset();
         checksum.update(buildBuffer, 0, buildBuffer.length);
+
         return checksum.getValue();
     }
 }

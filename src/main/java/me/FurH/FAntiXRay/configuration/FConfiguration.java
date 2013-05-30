@@ -55,11 +55,9 @@ public class FConfiguration extends Configuration {
     public boolean          update_physics      = false;
     
     public boolean          proximity_enabled   = false;
-    public int              proximity_interval  = 10;
     public int              proximity_radius    = 10;
     public int              proximity_distance  = 1;
-    public boolean          proximity_thread    = false;
-    
+
     public boolean          permission_ophas    = false;
     
     public boolean          updater_enabled     = true;
@@ -98,10 +96,8 @@ public class FConfiguration extends Configuration {
         update_physics      = getBoolean("BlockUpdate.UpdateOn.BlockPhysics");
     
         proximity_enabled   = getBoolean("BlockUpdate.Proximity.Enabled");
-        proximity_interval  = getInteger("BlockUpdate.Proximity.Interval");
         proximity_radius    = getInteger("BlockUpdate.Proximity.Radius");
         proximity_distance  = getInteger("BlockUpdate.Proximity.Distance");
-        proximity_thread    = getBoolean("BlockUpdate.Proximity.SingleThread");
     
         permission_ophas    = getBoolean("Permissions.OpHasPerm");
     

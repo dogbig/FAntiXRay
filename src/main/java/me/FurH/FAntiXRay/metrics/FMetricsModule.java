@@ -19,7 +19,6 @@ package me.FurH.FAntiXRay.metrics;
 import java.io.IOException;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.metrics.FMetrics.Graph;
-import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 
 /**
  *
@@ -58,9 +57,6 @@ public class FMetricsModule {
             
             /* setup the chest hider enabled graph */
             setupChestHider(); // -> 10
-            
-            /* setup the chest interval graph */
-            setupChestInterval(); // -> 11
             
             /* setup the chest radius graph */
             setupChestRadius(); // -> 12
@@ -172,16 +168,6 @@ public class FMetricsModule {
     private void setupChestHider() {
         Graph darkness = metrics.createGraph("Chest Hider");
         darkness.addPlotter(new FMetrics.Plotter("Enabled: " + FAntiXRay.getConfiguration().engine_chest) {
-            @Override
-            public int getValue() {
-                return 1;
-            }
-        });
-    }
-    
-    private void setupChestInterval() {
-        Graph darkness = metrics.createGraph("Chest Hider Interval");
-        darkness.addPlotter(new FMetrics.Plotter("Interval: " + FAntiXRay.getConfiguration().proximity_interval) {
             @Override
             public int getValue() {
                 return 1;

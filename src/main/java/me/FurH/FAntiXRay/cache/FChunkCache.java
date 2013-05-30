@@ -56,7 +56,7 @@ public class FChunkCache {
                     try {
                         FCacheData data = queue.poll();
                         if (data == null) {
-                            sleep(10000);
+                            sleep(1000);
                         } else {
                             
                             write(data);
@@ -68,13 +68,14 @@ public class FChunkCache {
                         }
                     } catch (Exception ex) {
                         try {
-                            sleep(10000);
+                            sleep(1000);
                         } catch (InterruptedException ex1) { }
                     }
                 }
             }
         };
         thread.setName("FAntiXRay Write Task");
+        thread.setDaemon(true);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
@@ -111,6 +112,7 @@ public class FChunkCache {
             }
         };
         thread.setName("FAntiXRay Overload Task");
+        thread.setDaemon(true);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
@@ -121,7 +123,7 @@ public class FChunkCache {
             return null;
         }
         
-        if (data.x != x || data.z != z || !data.world.equals(world)) {
+        if (data.x != x || data.z != z) {
             return null;
         }
         
@@ -130,6 +132,10 @@ public class FChunkCache {
         }
         
         if (data.hash != hash) {
+            return null;
+        }
+        
+        if (!data.world.equals(world)) {
             return null;
         }
         

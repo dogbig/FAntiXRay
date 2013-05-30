@@ -20,7 +20,7 @@ Cache:
   MemoryCache: 3600
   ## FileCallGC, the amount of files to process before suggesting a gc [prevent too many open files]
   FileCallGC: 64
-  ## SizeLimit, set the size limit of the cache folder in MB, 0 Will disable it.
+  ## SizeLimit, set the size limit of the cache folder in MB, 0 will disable it.
   SizeLimit: 5120
   ## Compression, the cache compression, 0 = No Compression (Ultra fast, higher sizes), 9 = Maximum compression (Slower, more resources needed, smaller sizes)
   Compression: 1
@@ -33,27 +33,23 @@ BlockUpdate:
     ## Enabled, if true, this function will be activated.
     Enabled: false
     ## LightRadius, the area around the block to update when the player places a light source, higher = more resource usage.
-    LightRadius: 8
+    LightRadius: 10
     ## LightSource, the block ids that will update blocks around by checking the light level.
     LightSource: 10, 11, 50, 51, 76, 89, 91
   UpdateOn:
-    ## BlockExplosion, if true, blocks will be updated on explosions [Threaded]
+    ## BlockExplosion, if true, blocks will be updated on explosions
     BlockExplosion: false
-    ## BlockPiston, if true, blocks will be updated if a piston moves it [Threaded]
+    ## BlockPiston, if true, blocks will be updated if a piston moves it
     BlockPiston: false
-    ## BlockPhysics, if true, blocks will be updated on physics [Threaded]
+    ## BlockPhysics, if true, blocks will be updated on physics
     BlockPhysics: false
   Proximity:
     ## Proximity, if true, blocks will be deobfuscated when the player gets close to it
     Enabled: false
-    ## Interval, the time in ticks per secont to update blocks around the player
-    Interval: 10
     ## Radius, the radius around the player to update the blocks
     Radius: 10
     ## Distance, the minimum distance the player has to walk to cast a new update
     Distance: 1
-    ## SingleThread, if true, all players will be updated in the same thread, if false, each player will have its own thread.
-    SingleThread: true
 
 Permissions:
   ## OpHasPerm, if true, ops will have all permissions.
@@ -79,4 +75,5 @@ Worlds:
   ## Disabled, list here, the exact name of all worlds that will not be protected by this plugin.
   Disabled:
     - world_flat
+    - world_nether
     - world_the_end

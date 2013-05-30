@@ -19,21 +19,21 @@ package me.FurH.FAntiXRay;
 import java.util.HashSet;
 import java.util.Random;
 import me.FurH.Core.CorePlugin;
+import me.FurH.Core.packets.IPacketQueue;
+import me.FurH.Core.packets.PacketManager;
 import me.FurH.Core.updater.CoreUpdater;
 import me.FurH.Core.util.Utils;
 import me.FurH.FAntiXRay.cache.FCacheManager;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import me.FurH.FAntiXRay.hook.FBukkitHook;
-import me.FurH.FAntiXRay.hook.FHookManager;
-import me.FurH.FAntiXRay.hook.FNettyHook;
-import me.FurH.FAntiXRay.listener.FBlockListener;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
+import me.FurH.FAntiXRay.listener.FUpdateListener;
 import me.FurH.FAntiXRay.metrics.FMetricsModule;
+import me.FurH.FAntiXRay.queue.PacketQueue;
+import me.FurH.FAntiXRay.threads.UpdateThreads;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -43,19 +43,19 @@ import org.bukkit.plugin.PluginManager;
  */
 public class FAntiXRay extends CorePlugin {
 
+    private static HashSet<String> exempt = new HashSet<String>();
+    private static FConfiguration configuration;
+
     public FAntiXRay() {
-        super("&8[&3FAntiXRay&8]&7:&f");
+        super("&8[&3FAntiXRay&8]&7:&f", false, true);
     }
 
     /* classes */
     private static FAntiXRay plugin;
-    private static FConfiguration configuration;
-    private static FHookManager hook;
     private static FChunkCache cache;
+
     public CoreUpdater updater;
-    
-    private static HashSet<String> exempt = new HashSet<String>();
-    public static boolean netty = true;
+    private IPacketQueue packet;
 
     @Override
     public void onEnable() {
@@ -67,31 +67,19 @@ public class FAntiXRay extends CorePlugin {
 
         configuration = new FConfiguration(this);
         configuration.load();
-        
+
         cache = new FChunkCache();
-        
+
         try {
             Class.forName("org.spigotmc.netty.NettyNetworkManager");
-        } catch (NoClassDefFoundError ex) {
-            netty = false;
-        } catch (ClassNotFoundException ex) {
-            netty = false;
-        }
-
-        if (netty) {
-            hook = new FNettyHook();
+            //configuration.cache_enabled = false;
             log("[TAG] Netty support enabled!");
-            configuration.cache_enabled = false;
-        } else {
-            hook = new FBukkitHook();
-        }
+        } catch (Exception ex) { }
+
+        packet = new PacketQueue(this);
+        UpdateThreads.setup();
 
         PluginManager pm = getServer().getPluginManager();
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            hook.unhook(p);
-            hook.hook(p);
-        }
 
         Plugin nolagg = Bukkit.getPluginManager().getPlugin("NoLagg");
         if (nolagg != null && nolagg.isEnabled()) {
@@ -100,7 +88,7 @@ public class FAntiXRay extends CorePlugin {
                 Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
                     @Override
                     public void run() {
-                        log("[TAG] NoLagg bufferedLoader enabled! X-Ray will work!");
+                        log("[TAG] NoLagg bufferedLoader enabled! \n[TAG] Your server is not protected against XRAY!");
                     }
                 }, 20 * 3, 20 * 3);
             }
@@ -108,11 +96,9 @@ public class FAntiXRay extends CorePlugin {
 
         loadCache();
 
-        log("[TAG] Registring events...");
-        FBlockListener blockListener = new FBlockListener();
+        log("[TAG] Registring events...");        
         pm.registerEvents(new FPlayerListener(), this);
-
-        blockListener.loadListeners(this);
+        pm.registerEvents(new FUpdateListener(), this);
 
         FMetricsModule metrics = new FMetricsModule();
         metrics.setupMetrics(this);
@@ -121,6 +107,9 @@ public class FAntiXRay extends CorePlugin {
             updater.setup();
         }
 
+        PacketManager.register(packet, 51);
+        PacketManager.register(packet, 56);
+        
         logEnable();
     }
 
@@ -157,7 +146,11 @@ public class FAntiXRay extends CorePlugin {
 
     @Override
     public void onDisable() {
+        
         Bukkit.getScheduler().cancelTasks(this);
+        
+        PacketManager.unregister(packet, 51);
+        PacketManager.unregister(packet, 56);
 
         cache.stop();
 
@@ -243,11 +236,7 @@ public class FAntiXRay extends CorePlugin {
         
         return true;
     }
-
-    public static FHookManager getHookManager() {
-        return hook;
-    }
-
+    
     public static FConfiguration getConfiguration() {
         return configuration;
     }
