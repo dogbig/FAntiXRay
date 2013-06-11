@@ -27,12 +27,6 @@ public class PacketQueue extends IPacketQueue {
     }
 
     @Override
-    public void handleAsyncBlockPlace(Player player, int i, int i1, int i2, int i3) { }
-
-    @Override
-    public void handleAsyncBlockBreak(Player player, int i, int i1, int i2) { }
-    
-    @Override
     public boolean handleAsyncCustomPayload(Player player, String string, int i, byte[] bytes) { return true; }
 
     @Override
@@ -40,4 +34,14 @@ public class PacketQueue extends IPacketQueue {
 
     @Override
     public boolean handleAsyncClientSettings(Player player) { return true; }
+
+    @Override
+    public Object handleSyncMapChunkBulk(Player player, Object o) {
+        return o;
+    }
+
+    @Override
+    public Object handleSyncMapChunk(Player player, Object o) {
+        return o;
+    }
 }
