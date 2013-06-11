@@ -22,6 +22,7 @@ import java.util.zip.Deflater;
 import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.reflection.ReflectionUtils;
 import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.cache.FCRC32;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import net.minecraft.server.v1_5_R3.Block;
@@ -54,8 +55,9 @@ public class FObfuscator {
         } else
         if (object instanceof Packet51MapChunk) {
             try {
-                return obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
-            } catch (CoreException ex) {
+                return object;
+                //return obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -170,20 +172,20 @@ public class FObfuscator {
 
     /* initialize the chunk */
     public static byte[] obfuscate(Chunk chunk, byte[] buildBuffer, boolean flag, int i, boolean p51) {
-        
+
         FConfiguration config = FAntiXRay.getConfiguration();
         FChunkCache cache = FAntiXRay.getCache();
-        
+
         boolean savecache = false;
         long hash = 0L;
 
         int index = 0;
         byte[] obfuscated = null;
-        
+
         if (config.cache_enabled) {
             hash = getHash(buildBuffer);
 
-            byte[] cached = cache.read(chunk.world.worldData.getName(), chunk.x, chunk.z, hash, config.engine_mode);
+            byte[] cached = cache.read(chunk.world.worldData.getName(), cacheKey(chunk.x, chunk.z), hash, config.engine_mode);
 
             if (cached != null) {
                 return cached;
@@ -205,11 +207,8 @@ public class FObfuscator {
         }
 
         if (savecache) {
-            cache.write(chunk.world.worldData.getName(), chunk.x, chunk.z, buildBuffer, hash, config.engine_mode);
+            cache.write(chunk.world.worldData.getName(), cacheKey(chunk.x, chunk.z), buildBuffer, hash, config.engine_mode);
         }
-
-        /* might be better for gc */
-        //obfuscated = null; sections = null; index = 0;
 
         return buildBuffer;
     }
@@ -217,7 +216,7 @@ public class FObfuscator {
     /* obfuscated the chunk */
     public static byte[] obfuscate(ChunkSection section, Chunk chunk, int l, boolean nether) {
         FConfiguration config = FAntiXRay.getConfiguration();
-        
+
         byte[] buffer = section.getIdArray().clone();
         int index = 0;
 
@@ -400,15 +399,15 @@ public class FObfuscator {
         if (id == 1) {
             return false;
         }
-        
+
         if (id == 12 || id == 13) {
             return true;
         }
-        
+
         if (id == 8 || id == 9 || id == 10 || id == 11) {
             return true;
         }
-        
+
         if (id == 87 || id == 112) {
             return false;
         }
@@ -420,12 +419,11 @@ public class FObfuscator {
         return (x) + "" + (y) + "" + (z);
     }
 
+    private static long cacheKey(long x, long z) {
+        return x & 4294967295L | (z & 4294967295L) << 32;
+    }
+    
     public static long getHash(byte[] buildBuffer) {
-        CRC32 checksum = new CRC32();
-
-        checksum.reset();
-        checksum.update(buildBuffer, 0, buildBuffer.length);
-
-        return checksum.getValue();
+        return FCRC32.getHash(buildBuffer);
     }
 }

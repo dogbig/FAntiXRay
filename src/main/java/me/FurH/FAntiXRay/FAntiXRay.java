@@ -19,6 +19,7 @@ package me.FurH.FAntiXRay;
 import java.util.HashSet;
 import java.util.Random;
 import me.FurH.Core.CorePlugin;
+import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.packets.IPacketQueue;
 import me.FurH.Core.packets.PacketManager;
 import me.FurH.Core.updater.CoreUpdater;
@@ -26,6 +27,7 @@ import me.FurH.Core.util.Utils;
 import me.FurH.FAntiXRay.cache.FCacheManager;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.database.FSQLDatabase;
 import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.listener.FUpdateListener;
 import me.FurH.FAntiXRay.metrics.FMetricsModule;
@@ -53,6 +55,7 @@ public class FAntiXRay extends CorePlugin {
     /* classes */
     private static FAntiXRay plugin;
     private static FChunkCache cache;
+    private static FSQLDatabase sql;
 
     public CoreUpdater updater;
     private IPacketQueue packet;
@@ -69,6 +72,26 @@ public class FAntiXRay extends CorePlugin {
         configuration.load();
 
         cache = new FChunkCache();
+        sql = new FSQLDatabase(this);
+        
+        sql.setAutoCommit(false);
+        sql.setupQueue(0.5, 3);
+
+        try {
+            sql.connect();
+        } catch (CoreException ex) {
+            error(ex);
+        }
+
+        sql.load();
+
+        try {
+            sql.commit();
+        } catch (CoreException ex) {
+            error(ex);
+        }
+        
+        sql.setAllowMainThread(false);
 
         try {
             Class.forName("org.spigotmc.netty.NettyNetworkManager");
@@ -110,6 +133,27 @@ public class FAntiXRay extends CorePlugin {
         PacketManager.register(packet, 51);
         PacketManager.register(packet, 56);
         
+        /*Random rnd = new Random();
+        int done = 0;
+        
+        for (int j1 = 0; j1 < 1000000; j1++) {
+            
+            byte[] chunk = new byte[ 65535 ];
+            rnd.nextBytes(chunk);
+            
+            try {
+                sql.setChunkData("world", rnd.nextLong(), rnd.nextLong(), 4, chunk);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            
+            done++;
+            if (done > 1000) {
+                System.out.println("DONE: " + j1 + ", OF " + 1000000); done = 0;
+            }
+            
+        }*/
+        
         logEnable();
     }
 
@@ -119,28 +163,12 @@ public class FAntiXRay extends CorePlugin {
 
     public void loadCache() {
         if (configuration.cache_enabled) {
-            cache.setup();
 
             final long limit = configuration.cache_size;
-            
-            Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
-                @Override
-                public void run() {
-                    if (limit > 0) {
-                        FCacheManager.getCacheSizeTask();
-                    }
-
-                    long size = FCacheManager.getCacheSize();
-
-                    log("[TAG] Cache Size: {0} of {1} allowed in {2} files", Utils.getFormatedBytes(size), Utils.getFormatedBytes(limit), FCacheManager.files.size());
-
-                    if (limit > 0 && size > limit) {
-                        log("[TAG] The cache is too big, cleaning up!");
-                        FCacheManager.clearCache();
-                    }
-                }
-            });
+            if (limit > 0) {
+                FCacheManager.getCacheSizeTask();
+            }
         }
     }
 
@@ -151,8 +179,12 @@ public class FAntiXRay extends CorePlugin {
         
         PacketManager.unregister(packet, 51);
         PacketManager.unregister(packet, 56);
-
-        cache.stop();
+        
+        try {
+            sql.disconnect(false);
+        } catch (CoreException ex) {
+            error(ex);
+        }
 
         logDisable();
     }
@@ -174,13 +206,8 @@ public class FAntiXRay extends CorePlugin {
                     }
 
                     msg(sender, "&7Cleaning cache...");
-                    int left = FCacheManager.clearCache();
+                    FCacheManager.clearCache();
                     cache.cache.clear();
-
-                    if (left > 0) {
-                        msg(sender, "&a{0}&7 files could not be deleted!", left);
-                        return true;
-                    }
 
                     msg(sender, "&aCache cleared successfully!");
                     return true;
@@ -209,7 +236,7 @@ public class FAntiXRay extends CorePlugin {
                     double m_size = cache.cache.size();
                     double m_limit = configuration.cache_memory;
 
-                    msg(sender, "&7Disk Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(size),  Utils.getFormatedBytes(limit), FCacheManager.files.size());
+                    msg(sender, "&7Disk Cache: &a{0}&7 of &a{1}&7 allowed", Utils.getFormatedBytes(size),  Utils.getFormatedBytes(limit));
                     msg(sender, "&7Memory Cache: &a{0}&7 of &a{1}&7 allowed in &a{2}&7 files", Utils.getFormatedBytes(m_size * each * 1024),  Utils.getFormatedBytes(m_limit * each  * 1024), m_size);
 
                     return true;
@@ -235,6 +262,10 @@ public class FAntiXRay extends CorePlugin {
         }
         
         return true;
+    }
+    
+    public static FSQLDatabase getSQLDatbase() {
+        return sql;
     }
     
     public static FConfiguration getConfiguration() {
