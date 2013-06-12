@@ -1,6 +1,6 @@
 name: FAntiXRay
 main: me.FurH.FAntiXRay.FAntiXRay
-version: 2.9
+version: 3.0
 author: FurmigaHumana
 description: Modify chunk sending to prevent xray mod.
 softdepend: ['ProtocolLib', 'NoLagg', 'FCoreLib']
