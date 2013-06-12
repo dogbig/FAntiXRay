@@ -95,7 +95,7 @@ public class FAntiXRay extends CorePlugin {
 
         try {
             Class.forName("org.spigotmc.netty.NettyNetworkManager");
-            //configuration.cache_enabled = false;
+            configuration.cache_enabled = false;
             log("[TAG] Netty support enabled!");
         } catch (Exception ex) { }
 
