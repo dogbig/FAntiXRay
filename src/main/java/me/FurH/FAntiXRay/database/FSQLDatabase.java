@@ -4,8 +4,6 @@ package me.FurH.FAntiXRay.database;
 import java.io.ByteArrayOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import me.FurH.Core.CorePlugin;
