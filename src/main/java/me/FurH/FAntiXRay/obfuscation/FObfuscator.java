@@ -17,7 +17,6 @@
 package me.FurH.FAntiXRay.obfuscation;
 
 import java.util.Random;
-import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.reflection.ReflectionUtils;
@@ -45,7 +44,7 @@ public class FObfuscator {
     private static Random rnd = new Random(101);
     
     public static Object obfuscate(Player player, Object object) {
-
+        
         if (object instanceof Packet56MapChunkBulk) {
             try {
                 return obfuscate(((CraftPlayer)player).getHandle(), (Packet56MapChunkBulk) object);
@@ -55,8 +54,7 @@ public class FObfuscator {
         } else
         if (object instanceof Packet51MapChunk) {
             try {
-                return object;
-                //return obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
+                return obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
