@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
  * All Rights Reserved unless otherwise explicitly stated.
  */
 public class PacketQueue extends IPacketQueue {
-    
+
     public PacketQueue(CorePlugin plugin) {
         super(plugin);
     }
@@ -24,24 +24,5 @@ public class PacketQueue extends IPacketQueue {
     @Override
     public Object handleAsyncMapChunk(Player player, Object o) {
         return FObfuscator.obfuscate(player, o);
-    }
-
-    @Override
-    public boolean handleAsyncCustomPayload(Player player, String string, int i, byte[] bytes) { return true; }
-
-    @Override
-    public Object handleAndSetAsyncCustomPayload(Player player, Object o) { return o; }
-
-    @Override
-    public boolean handleAsyncClientSettings(Player player) { return true; }
-
-    @Override
-    public Object handleSyncMapChunkBulk(Player player, Object o) {
-        return o;
-    }
-
-    @Override
-    public Object handleSyncMapChunk(Player player, Object o) {
-        return o;
     }
 }
