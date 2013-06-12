@@ -23,12 +23,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 
 /**
  *
  * @author FurmigaHumana
  */
 public class FPlayerListener implements Listener  {
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldLoad(WorldLoadEvent e) {
+        FAntiXRay.getSQLDatbase().load(e.getWorld());
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldInit(WorldInitEvent e) {
+        FAntiXRay.getSQLDatbase().load(e.getWorld());
+    }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
