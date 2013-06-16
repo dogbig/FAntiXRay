@@ -15,7 +15,7 @@ EngineOptions:
 
 Cache:
   ## Enabled, if true, the cache system will be activated
-  Enabled: true
+  Enabled: false
   ## MemoryCache, the size of the memory cache, this may use a lot of memory, each slot takes ~68 KB.
   MemoryCache: 3600
   ## FileCallGC, the amount of files to process before suggesting a gc [prevent too many open files]
