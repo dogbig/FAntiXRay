@@ -168,6 +168,8 @@ public class FObfuscator {
             deflater.end();
         }
 
+        System.arraycopy(obfuscated, 0, inflatedBuffer, 0, inflatedBuffer.length);
+        
         inflatedBuffer = null; buffer = null; obfuscated = null;
 
         return packet;
@@ -309,16 +311,32 @@ public class FObfuscator {
 
         return config.hidden_world.contains(id);
     }
+    
+    private static int index_nether = -1;
+    private static int index_world = -1;
 
     /* get random item */
     public static int getRandomId(boolean nether) {
         FConfiguration config = FAntiXRay.getConfiguration();
         
         if (nether) {
-            return config.random_nether[ (int)(Math.random() * config.random_nether.length) ];
+            
+            index_nether++;
+            
+            if (index_nether >= config.random_nether.length) {
+                index_nether = 0;
+            }
+            
+            return config.random_nether[ index_nether ];
         }
         
-        return config.random_world[ (int)(Math.random() * config.random_world.length) ];
+        index_world++;
+        
+        if (index_world >= config.random_world.length) {
+            index_world = 0;
+        }
+        
+        return config.random_world[ index_world ];
     }
     
     private static boolean isToObfuscate(Chunk chunk, int i, int j, int k) {
