@@ -24,6 +24,7 @@ import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCRC32;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.timings.FTimingsCore;
 import net.minecraft.server.v1_5_R3.Block;
 import net.minecraft.server.v1_5_R3.Chunk;
 import net.minecraft.server.v1_5_R3.ChunkSection;
@@ -41,6 +42,10 @@ import org.bukkit.entity.Player;
  */
 public class FObfuscator {
 
+    public static final FTimingsCore obfuscator = new FTimingsCore("FAntiXRay Obfuscation");
+    private static FTimingsCore obfuscator_cached = new FTimingsCore("FAntiXRay: Cached Obfuscation", obfuscator);
+    private static FTimingsCore obfuscator_uncached = new FTimingsCore("FAntiXRay: Uncached Obfuscation", obfuscator);
+    
     private static Random rnd = new Random(101);
     
     public static Object obfuscate(Player player, Object object) {
@@ -181,16 +186,20 @@ public class FObfuscator {
         byte[] obfuscated = null;
 
         if (config.cache_enabled) {
-            hash = getHash(buildBuffer);
+            obfuscator_cached.start();
 
+            hash = getHash(buildBuffer);
             byte[] cached = cache.read(chunk.world.worldData.getName(), cacheKey(chunk.x, chunk.z), hash, config.engine_mode);
 
+            obfuscator_cached.stop();
             if (cached != null) {
                 return cached;
             } else {
                 savecache = true;
             }
         }
+        
+        obfuscator_uncached.start();
 
         boolean nether = chunk.world.getWorld().getEnvironment() == Environment.NETHER;
 
@@ -207,6 +216,8 @@ public class FObfuscator {
         if (savecache) {
             cache.write(chunk.world.worldData.getName(), cacheKey(chunk.x, chunk.z), buildBuffer, hash, config.engine_mode);
         }
+        
+        obfuscator_uncached.stop();
 
         return buildBuffer;
     }

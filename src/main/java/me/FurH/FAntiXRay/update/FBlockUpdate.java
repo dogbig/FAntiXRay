@@ -16,10 +16,13 @@
 
 package me.FurH.FAntiXRay.update;
 
+import java.util.EnumMap;
+import java.util.Map;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.threads.UpdateThreads.UpdateType;
+import me.FurH.FAntiXRay.timings.FTimingsCore;
 import net.minecraft.server.v1_5_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -33,6 +36,10 @@ import org.bukkit.entity.Player;
  */
 public class FBlockUpdate implements Runnable {
 
+    private static Map<UpdateType, FTimingsCore> handlers = new EnumMap<UpdateType, FTimingsCore>(UpdateType.class);
+    private static FTimingsCore updater = new FTimingsCore("FAntiXRay Block Update");
+
+    private FTimingsCore timings;
     private UpdateType type;
     private Player player;
     private WorldServer world;
@@ -49,10 +56,19 @@ public class FBlockUpdate implements Runnable {
         this.z = z;
         this.radius = radius;
         this.type = type;
+
+        if (!handlers.containsKey(type)) {
+            this.timings = new FTimingsCore("FAntiXRay Update: " + type.toString().replaceAll("_", " "), updater);
+            handlers.put(type, this.timings);
+        } else {
+            this.timings = handlers.get(type);
+        }
     }
     
     @Override
     public void run() {
+
+        timings.start();
 
         boolean nether = world.getWorld().getEnvironment() == Environment.NETHER;
         FConfiguration config = FAntiXRay.getConfiguration();
@@ -112,5 +128,7 @@ public class FBlockUpdate implements Runnable {
                 }
             }
         }
+        
+        timings.stop();
     }
 }

@@ -59,6 +59,8 @@ public class FAntiXRay extends CorePlugin {
 
     public CoreUpdater updater;
     private IPacketQueue packet;
+    
+    public static boolean spigot = false;
 
     @Override
     public void onEnable() {
@@ -97,6 +99,7 @@ public class FAntiXRay extends CorePlugin {
             Class.forName("org.spigotmc.netty.NettyNetworkManager");
             configuration.cache_enabled = false;
             log("[TAG] Netty support enabled!");
+            spigot = true;
         } catch (Exception ex) { }
 
         packet = new PacketQueue(this);

@@ -22,12 +22,18 @@ import me.FurH.Core.util.Communicator;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.database.FSQLDatabase;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
+import me.FurH.FAntiXRay.timings.FTimingsCore;
 
 /**
  *
  * @author FurmigaHumana
  */
 public class FChunkCache {
+    
+    private FTimingsCore write = new FTimingsCore("Cached Write", FObfuscator.obfuscator);
+    private FTimingsCore mread = new FTimingsCore("Memory Read", FObfuscator.obfuscator);
+    private FTimingsCore read = new FTimingsCore("Disk Read", FObfuscator.obfuscator);
 
     public CoreSafeCache<String, FCacheData> cache = new CoreSafeCache<String, FCacheData>(3600);
 
@@ -43,6 +49,8 @@ public class FChunkCache {
     }
 
     public byte[] read(String world, long key, long hash, int engine_mode) {
+                
+        byte[] ret = null;
         
         Communicator com = FAntiXRay.getPlugin().getCommunicator();
         FConfiguration config = FAntiXRay.getConfiguration();
@@ -52,20 +60,15 @@ public class FChunkCache {
             
             String cacheKey = cacheKey(world, key);
             
-            if (cache.containsKey(cacheKey)) {
-                FCacheData data = cache.get(cacheKey);
-                
-                if (data.engine != engine_mode) {
-                    return null;
-                }
-                
-                if (data.hash != hash) {
-                    cache.remove(cacheKey);
-                    return null;
-                }
-                
-                return data.inflatedBuffer;
+            mread.start();
+            ret = readM(cacheKey, hash, engine_mode);
+            mread.stop();
+            
+            if (ret != null) {
+                return ret;
             }
+            
+            read.start();
             
             if (commit > config.cache_callgc) {
                 
@@ -80,22 +83,44 @@ public class FChunkCache {
             }
             
             FCacheData data = db.getDataFrom(world, key, hash, engine_mode);
+            ret = data.inflatedBuffer;
             
-            if (data != null) {
-                return data.inflatedBuffer;
-            }
-        
+            read.stop();
+            
         } catch (Exception ex) {
             com.error(ex, "Failed to write world buffer for key: " + key + ", world: " + world + ", hash: " + hash);
         } finally {
             commit++;
         }
         
-        return null;
+        return ret;
+    }
+    
+    private byte[] readM(String cacheKey, long hash, int engine_mode) {
+        byte[] ret = null;
+            
+        if (cache.containsKey(cacheKey)) {
+            FCacheData data = cache.get(cacheKey);
+
+            if (data.engine != engine_mode) {
+                return null;
+            }
+
+            if (data.hash != hash) {
+                cache.remove(cacheKey);
+                return null;
+            }
+
+            return data.inflatedBuffer;
+        }
+            
+        return ret;
     }
 
     public void write(String world, long key, byte[] inflatedBuffer, long hash, int engine_mode) {
 
+        write.start();
+        
         FSQLDatabase db = FAntiXRay.getSQLDatbase();
         FConfiguration config = FAntiXRay.getConfiguration();
         Communicator com = FAntiXRay.getPlugin().getCommunicator();
@@ -128,6 +153,8 @@ public class FChunkCache {
         } finally {
             commit++;
         }
+        
+        write.stop();
         
     }
     
