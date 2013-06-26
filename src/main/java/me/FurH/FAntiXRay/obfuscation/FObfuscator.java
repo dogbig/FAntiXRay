@@ -247,7 +247,7 @@ public class FObfuscator {
                         }
                     }
 
-                    if (config.proximity_enabled && id == 54) {
+                    if (config.engine_chest && id == 54) {
                         buffer[index] = 0;
                     } else
                     if (air && !nether && !isBlocksTransparent(chunk, x, y, z)) {
