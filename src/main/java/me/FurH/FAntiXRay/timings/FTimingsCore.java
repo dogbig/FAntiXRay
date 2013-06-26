@@ -12,10 +12,20 @@ public class FTimingsCore {
     private FTimingsCoreSpigot handler;
     
     public FTimingsCore(String name, FTimingsCore parent) {
+        
+        if (name == null) {
+            return;
+        }
+        
         if (FAntiXRay.spigot) { this.handler = new FTimingsCoreSpigot(name, parent); }
     }
     
     public FTimingsCore(String name) {
+        
+        if (name == null) {
+            return;
+        }
+        
         if (FAntiXRay.spigot) { this.handler = new FTimingsCoreSpigot(name); }
     }
     
@@ -32,13 +42,13 @@ public class FTimingsCore {
         private org.bukkit.CustomTimingsHandler handler;
 
         public FTimingsCoreSpigot(String name, FTimingsCore parent) {
-            super(name, parent);
+            super(null, null);
             
-            handler = new org.bukkit.CustomTimingsHandler(name, ((FTimingsCoreSpigot)parent).handler);
+            handler = new org.bukkit.CustomTimingsHandler(name, parent.handler.handler);
         }
 
         public FTimingsCoreSpigot(String name) {
-            super(name);
+            super(null);
             
             handler = new org.bukkit.CustomTimingsHandler(name);
         }
