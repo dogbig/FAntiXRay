@@ -83,7 +83,10 @@ public class FChunkCache {
             }
             
             FCacheData data = db.getDataFrom(world, key, hash, engine_mode);
-            ret = data.inflatedBuffer;
+            
+            if (data != null) {
+                ret = data.inflatedBuffer;
+            }
             
             read.stop();
             
