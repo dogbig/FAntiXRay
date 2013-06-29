@@ -16,7 +16,6 @@
 
 package me.FurH.FAntiXRay.obfuscation;
 
-import java.util.Random;
 import java.util.zip.Deflater;
 import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.reflection.ReflectionUtils;
@@ -45,11 +44,9 @@ public class FObfuscator {
     public static final FTimingsCore obfuscator = new FTimingsCore("FAntiXRay Obfuscation");
     private static FTimingsCore obfuscator_cached = new FTimingsCore("FAntiXRay: Cached Obfuscation", obfuscator);
     private static FTimingsCore obfuscator_uncached = new FTimingsCore("FAntiXRay: Uncached Obfuscation", obfuscator);
-    
-    private static Random rnd = new Random(101);
-    
-    public static Object obfuscate(Player player, final Object object) {
         
+    public static Object obfuscate(Player player, final Object object) {
+
         if (object instanceof Packet56MapChunkBulk) {
             try {
                 final EntityPlayer entityp = ((CraftPlayer)player).getHandle();
@@ -246,7 +243,7 @@ public class FObfuscator {
 
                     if (config.cave_enabled && id == 1 && 
                             (y >= 50 && y < 53) || (y >= 40 && y < 43) || j == 15 || i == 1) {
-                        if (rnd.nextInt(101) <= config.cave_intensity) {
+                        if (nextInt(101) <= config.cave_intensity) {
                             air = true;
                         }
                     }
@@ -278,7 +275,7 @@ public class FObfuscator {
                     } else
                     if (config.engine_mode == 3) {
                         if (isObfuscable(id, nether)) {
-                            if (rnd.nextInt(101) <= 20) {
+                            if (nextInt(101) <= 20) {
                                 if (!isBlocksTransparent(chunk, x, y, z)) {
                                     buffer[index] = (byte) getRandomId(nether);
                                 }
@@ -287,7 +284,7 @@ public class FObfuscator {
                     } else
                     if (config.engine_mode == 4) {
                         if (isObfuscable(id, nether)) {
-                            if (rnd.nextInt(101) <= 20) {
+                            if (nextInt(101) <= 20) {
                                 if (!isBlocksTransparent(chunk, x, y, z)) {
                                     buffer[index] = (byte) getRandomId(nether);
                                 }
@@ -459,5 +456,18 @@ public class FObfuscator {
     
     public static long getHash(byte[] buildBuffer) {
         return MurmurHash3.getHash(buildBuffer);
+    }
+
+    private static long last = System.nanoTime()|1;
+
+    public static int nextInt(int max) {
+        
+        last ^= (last << 21);
+        last ^= (last >>> 35);
+        last ^= (last << 4);
+
+        int out = (int) last % max;   
+
+        return (out < 0) ? -out : out;
     }
 }
