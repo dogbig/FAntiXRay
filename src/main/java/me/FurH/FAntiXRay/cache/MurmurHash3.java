@@ -4,15 +4,13 @@ package me.FurH.FAntiXRay.cache;
  *
  * @author FurmigaHumana All Rights Reserved unless otherwise explicitly stated.
  */
+@SuppressWarnings("fallthrough")
 public class MurmurHash3 {
 
     public static int getHash(byte[] buildBuffer) {
         return murmurhash3_x86_32(buildBuffer, 0, buildBuffer.length, buildBuffer.length);
     }
-    
-    /**
-     * Returns the MurmurHash3_x86_32 hash.
-     */
+
     public static int murmurhash3_x86_32(byte[] data, int offset, int len, int seed) {
 
         final int c1 = 0xcc9e2d51;
