@@ -48,7 +48,7 @@ public class UpdateThreads {
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = new Thread(r);
-                
+
                 thread.setDaemon(true);
                 thread.setPriority(Thread.MIN_PRIORITY);
                 thread.setName("FAntiXRay Light Thread #" + placeCounter);
@@ -102,90 +102,89 @@ public class UpdateThreads {
     }
     
     private static ThreadPoolExecutor getExecutor(UpdateType type) {
-
-        int executors = 1;
         
         switch (type) {
             case BLOCK_PLACE:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * placePorcentage), 1);
-
-                if (placeThread.getMaximumPoolSize() != executors) {
-                    placeThread.setMaximumPoolSize(executors);
-                }
-                
                 return placeThread;
             case BLOCK_BREAK:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * breakPorcentage), 1);
-
-                if (breakThread.getMaximumPoolSize() != executors) {
-                    breakThread.setMaximumPoolSize(executors);
-                }
-                
                 return breakThread;
             case PLAYER_MOVE:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * movesPorcentage), 1);
-
-                if (movesThread.getMaximumPoolSize() != executors) {
-                    movesThread.setMaximumPoolSize(executors);
-                }
-                
                 return movesThread;
             case PLAYER_TELEPORT:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * movesPorcentage), 1);
-
-                if (movesThread.getMaximumPoolSize() != executors) {
-                    movesThread.setMaximumPoolSize(executors);
-                }
-                
                 return movesThread;
             case PLAYER_INTERACT:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * placePorcentage), 1);
-
-                if (placeThread.getMaximumPoolSize() != executors) {
-                    placeThread.setMaximumPoolSize(executors);
-                }
-                
                 return placeThread;
             case BLOCK_PISTON:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * miscsPorcentage), 1);
-
-                if (miscsThread.getMaximumPoolSize() != executors) {
-                    miscsThread.setMaximumPoolSize(executors);
-                }
-                
                 return miscsThread;
             case BLOCK_EXPLOSION:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * miscsPorcentage), 1);
-
-                if (miscsThread.getMaximumPoolSize() != executors) {
-                    miscsThread.setMaximumPoolSize(executors);
-                }
-                
                 return miscsThread;
             default:
-                
-                executors = (int) Math.max(Math.floor(
-                        Bukkit.getOnlinePlayers().length * miscsPorcentage), 1);
-
-                if (miscsThread.getMaximumPoolSize() != executors) {
-                    miscsThread.setMaximumPoolSize(executors);
-                }
-                
                 return miscsThread;
+        }
+        
+    }
+    
+    public static void updatePools() {
+
+        int max = Math.max(Runtime.getRuntime().availableProcessors() - 1, 1);
+        int online = Bukkit.getOnlinePlayers().length;
+
+        int executors = 1;
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * placePorcentage), 1), max);
+
+        if (placeThread.getMaximumPoolSize() != executors) {
+            placeThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * breakPorcentage), 1), max);
+
+        if (breakThread.getMaximumPoolSize() != executors) {
+            breakThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * movesPorcentage), 1), max);
+
+        if (movesThread.getMaximumPoolSize() != executors) {
+            movesThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * movesPorcentage), 1), max);
+
+        if (movesThread.getMaximumPoolSize() != executors) {
+            movesThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * placePorcentage), 1), max);
+
+        if (placeThread.getMaximumPoolSize() != executors) {
+            placeThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * miscsPorcentage), 1), max);
+
+        if (miscsThread.getMaximumPoolSize() != executors) {
+            miscsThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * miscsPorcentage), 1), max);
+
+        if (miscsThread.getMaximumPoolSize() != executors) {
+            miscsThread.setMaximumPoolSize(executors);
+        }
+
+        executors = (int) Math.min(Math.max(Math.floor(
+                online * miscsPorcentage), 1), max);
+
+        if (miscsThread.getMaximumPoolSize() != executors) {
+            miscsThread.setMaximumPoolSize(executors);
         }
     }
 }

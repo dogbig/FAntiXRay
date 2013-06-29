@@ -18,11 +18,13 @@ package me.FurH.FAntiXRay.listener;
 
 import me.FurH.Core.util.Communicator;
 import me.FurH.FAntiXRay.FAntiXRay;
+import me.FurH.FAntiXRay.threads.UpdateThreads;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
@@ -68,5 +70,12 @@ public class FPlayerListener implements Listener  {
                 plugin.updater.announce(p);
             }
         }
+        
+        UpdateThreads.updatePools();
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        UpdateThreads.updatePools();
     }
 }
