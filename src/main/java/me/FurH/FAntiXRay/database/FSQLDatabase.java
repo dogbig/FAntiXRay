@@ -1,11 +1,8 @@
 package me.FurH.FAntiXRay.database;
 
 
-import java.io.ByteArrayOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 import me.FurH.Core.CorePlugin;
 import me.FurH.Core.database.CoreSQLDatabase;
 import me.FurH.Core.exceptions.CoreException;
@@ -13,9 +10,9 @@ import me.FurH.Core.file.FileUtils;
 import me.FurH.Core.util.Communicator;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FCacheData;
-import me.FurH.FAntiXRay.configuration.FConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.xerial.snappy.Snappy;
 
 /**
  *
@@ -118,45 +115,16 @@ public class FSQLDatabase extends CoreSQLDatabase {
     public byte[] compress(byte[] data) {
 
         //long start = System.currentTimeMillis();
-        
-        ByteArrayOutputStream baos = null;
-        Deflater def = null;
 
         try {
-            
-            FConfiguration config = FAntiXRay.getConfiguration();
 
-            int level = config.cache_compression;
-            if (level > Deflater.BEST_COMPRESSION) {
-                config.cache_compression = Deflater.BEST_COMPRESSION;
-            }
+            byte[] compress = Snappy.compress(data);
 
-            def = new Deflater(level);
-            def.setInput(data);
-
-            baos = new ByteArrayOutputStream(data.length);
-            def.finish();
-
-            byte[] buffer = new byte[ 128 ];
-            while (!def.finished()) {
-                int read = def.deflate(buffer);
-                baos.write(buffer, 0, read);
-            }
-
-            byte[] compress = baos.toByteArray();
-            
             //System.out.println("COMPRESS: " + (Math.abs(System.currentTimeMillis() - start)) + ", DATA: " + data.length + ", TO: " + compress.length);
             
             return compress;
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            FileUtils.closeQuietly(baos);
-            try {
-                if (def != null) {
-                    def.end();
-                }
-            } catch (Exception ex) { }
         }
         
         return null;
@@ -165,37 +133,16 @@ public class FSQLDatabase extends CoreSQLDatabase {
     public byte[] decompress(byte[] data) {
 
         //long start = System.currentTimeMillis();
-        
-        ByteArrayOutputStream baos = null;
-        Inflater inf = null;
 
         try {
 
-            inf = new Inflater();
-            inf.setInput(data);
-
-            baos = new ByteArrayOutputStream(data.length);
-            byte[] buffer = new byte[ 128 ];
-
-            while (!inf.finished()) {
-                int read = inf.inflate(buffer);
-                baos.write(buffer, 0, read);
-            }
-
-            byte[] decompress = baos.toByteArray();
+            byte[] decompress = Snappy.uncompress(data);
             
             //System.out.println("DECOMPRESS: " + (Math.abs(System.currentTimeMillis() - start)) + ", DATA: " + data.length + ", TO: " + decompress.length);
             
             return decompress;
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            FileUtils.closeQuietly(baos);
-            try {
-                if (inf != null) {
-                    inf.end();
-                }
-            } catch (Exception ex) { }
         }
 
         return null;
