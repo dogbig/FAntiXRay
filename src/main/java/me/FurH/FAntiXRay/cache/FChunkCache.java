@@ -105,6 +105,10 @@ public class FChunkCache {
         if (cache.containsKey(cacheKey)) {
             FCacheData data = cache.get(cacheKey);
 
+            if (data == null) {
+                cache.remove(cacheKey); return ret;
+            }
+            
             if (data.engine != engine_mode) {
                 return null;
             }
