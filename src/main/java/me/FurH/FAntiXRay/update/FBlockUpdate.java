@@ -104,7 +104,7 @@ public class FBlockUpdate implements Runnable {
                     }
 
                     int id = world.getTypeId(i, j, k);
-                    if (id < 1) {
+                    if (id == 0) {
                         continue;
                     }
 

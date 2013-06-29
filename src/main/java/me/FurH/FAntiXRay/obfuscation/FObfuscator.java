@@ -382,7 +382,11 @@ public class FObfuscator {
         return isBlocksTransparent(chunk.world, i, j, k);
     }
     
+    /*
+     * Think about something to improve this
+     */
     public static boolean isBlocksTransparent(World world, int i, int j, int k) {
+
         if (isTransparent(world.getTypeId(i + 1, j, k))) {
             return true;
         } else
@@ -401,6 +405,7 @@ public class FObfuscator {
         if (isTransparent(world.getTypeId(i, j, k - 1))) {
             return true;
         }
+        
         return false;
     }
 
