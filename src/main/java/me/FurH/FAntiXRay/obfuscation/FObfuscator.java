@@ -21,8 +21,8 @@ import java.util.zip.Deflater;
 import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.reflection.ReflectionUtils;
 import me.FurH.FAntiXRay.FAntiXRay;
-import me.FurH.FAntiXRay.cache.FCRC32;
 import me.FurH.FAntiXRay.cache.FChunkCache;
+import me.FurH.FAntiXRay.cache.MurmurHash3;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
 import me.FurH.FAntiXRay.timings.FTimingsCore;
 import net.minecraft.server.v1_5_R3.Block;
@@ -48,19 +48,21 @@ public class FObfuscator {
     
     private static Random rnd = new Random(101);
     
-    public static Object obfuscate(Player player, Object object) {
+    public static Object obfuscate(Player player, final Object object) {
         
         if (object instanceof Packet56MapChunkBulk) {
             try {
-                return obfuscate(((CraftPlayer)player).getHandle(), (Packet56MapChunkBulk) object);
+                final EntityPlayer entityp = ((CraftPlayer)player).getHandle();
+                return FObfuscator.obfuscate(entityp, (Packet56MapChunkBulk) object);
             } catch (CoreException ex) {
                 ex.printStackTrace();
             }
         } else
         if (object instanceof Packet51MapChunk) {
             try {
-                return obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
-            } catch (Exception ex) {
+                final EntityPlayer entityp = ((CraftPlayer)player).getHandle();
+                return FObfuscator.obfuscate(entityp, (Packet51MapChunk) object);
+            } catch (CoreException ex) {
                 ex.printStackTrace();
             }
         }
@@ -111,7 +113,7 @@ public class FObfuscator {
             System.arraycopy(obfuscated, 0, buildBuffer, index, inflatedBuffers[i].length);
             index += inflatedBuffers[i].length;
         }
-
+        
         /* might be better for gc */
         inflatedBuffers = null; buildBuffer = null; obfuscated = null; 
         index = 0; //packet.chunks.clear(); packet.chunks = null;
@@ -451,6 +453,6 @@ public class FObfuscator {
     }
     
     public static long getHash(byte[] buildBuffer) {
-        return FCRC32.getHash(buildBuffer);
+        return MurmurHash3.getHash(buildBuffer);
     }
 }
