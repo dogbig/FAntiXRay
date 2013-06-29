@@ -33,17 +33,9 @@ public class FSQLDatabase extends CoreSQLDatabase {
     }
     
     public void deleteAll() {
-        
         for (World world : Bukkit.getWorlds()) {
-            
-            try {
-                execute("DELETE * FROM `"+prefix+world.getName()+"`;"); commit();
-            } catch (CoreException ex) {
-                ex.printStackTrace();
-            }
-            
+            queue("DROP TABLE `"+prefix+world.getName()+"`;");
         }
-        
     }
     
     public void load() {
