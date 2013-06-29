@@ -186,5 +186,7 @@ public class UpdateThreads {
         if (miscsThread.getMaximumPoolSize() != executors) {
             miscsThread.setMaximumPoolSize(executors);
         }
+        
+        ObfuscationThreads.updatePools();
     }
 }

@@ -32,6 +32,7 @@ import me.FurH.FAntiXRay.listener.FPlayerListener;
 import me.FurH.FAntiXRay.listener.FUpdateListener;
 import me.FurH.FAntiXRay.metrics.FMetricsModule;
 import me.FurH.FAntiXRay.queue.PacketQueue;
+import me.FurH.FAntiXRay.threads.ObfuscationThreads;
 import me.FurH.FAntiXRay.threads.UpdateThreads;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -103,7 +104,9 @@ public class FAntiXRay extends CorePlugin {
         } catch (Exception ex) { }
 
         packet = new PacketQueue(this);
+        
         UpdateThreads.setup();
+        ObfuscationThreads.setup();
 
         PluginManager pm = getServer().getPluginManager();
 
