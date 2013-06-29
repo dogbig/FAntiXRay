@@ -1,5 +1,6 @@
 package me.FurH.FAntiXRay.threads;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -47,8 +48,11 @@ public class ObfuscationThreads {
         int executors = (int) Math.min(Math.max(Math.floor(
                 online * porcentage), 1), max);
 
-        if (thread.getMaximumPoolSize() != executors) {
-            thread.setMaximumPoolSize(executors);
+        if (thread.getCorePoolSize() != executors) {
+            thread.setCorePoolSize(executors);
         }
+
+        thread.prestartAllCoreThreads();
+
     }
 }

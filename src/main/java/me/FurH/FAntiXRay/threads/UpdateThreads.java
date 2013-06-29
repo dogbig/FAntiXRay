@@ -134,57 +134,57 @@ public class UpdateThreads {
         executors = (int) Math.min(Math.max(Math.floor(
                 online * placePorcentage), 1), max);
 
-        if (placeThread.getMaximumPoolSize() != executors) {
-            placeThread.setMaximumPoolSize(executors);
+        if (placeThread.getCorePoolSize() != executors) {
+            placeThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * breakPorcentage), 1), max);
 
-        if (breakThread.getMaximumPoolSize() != executors) {
-            breakThread.setMaximumPoolSize(executors);
+        if (breakThread.getCorePoolSize() != executors) {
+            breakThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * movesPorcentage), 1), max);
 
-        if (movesThread.getMaximumPoolSize() != executors) {
-            movesThread.setMaximumPoolSize(executors);
+        if (movesThread.getCorePoolSize() != executors) {
+            movesThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * movesPorcentage), 1), max);
 
-        if (movesThread.getMaximumPoolSize() != executors) {
-            movesThread.setMaximumPoolSize(executors);
+        if (movesThread.getCorePoolSize() != executors) {
+            movesThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * placePorcentage), 1), max);
 
-        if (placeThread.getMaximumPoolSize() != executors) {
-            placeThread.setMaximumPoolSize(executors);
+        if (placeThread.getCorePoolSize() != executors) {
+            placeThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * miscsPorcentage), 1), max);
 
-        if (miscsThread.getMaximumPoolSize() != executors) {
-            miscsThread.setMaximumPoolSize(executors);
+        if (miscsThread.getCorePoolSize() != executors) {
+            miscsThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * miscsPorcentage), 1), max);
 
-        if (miscsThread.getMaximumPoolSize() != executors) {
-            miscsThread.setMaximumPoolSize(executors);
+        if (miscsThread.getCorePoolSize() != executors) {
+            miscsThread.setCorePoolSize(executors);
         }
 
         executors = (int) Math.min(Math.max(Math.floor(
                 online * miscsPorcentage), 1), max);
 
-        if (miscsThread.getMaximumPoolSize() != executors) {
-            miscsThread.setMaximumPoolSize(executors);
+        if (miscsThread.getCorePoolSize() != executors) {
+            miscsThread.setCorePoolSize(executors);
         }
         
         ObfuscationThreads.updatePools();
