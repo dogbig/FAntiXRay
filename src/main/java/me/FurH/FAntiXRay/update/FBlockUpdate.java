@@ -97,7 +97,9 @@ public class FBlockUpdate implements Runnable {
                     }
 
                     Location center = new Location(world.getWorld(), i, j, k);
-                    if (center.distanceSquared(start) > radius) {
+                    double distance = center.distanceSquared(start);
+
+                    if (distance < 1 || distance > radius) {
                         continue;
                     }
 
