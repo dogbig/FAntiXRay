@@ -3,8 +3,10 @@ package me.FurH.FAntiXRay.listener;
 import java.util.HashMap;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.obfuscation.FObfuscator;
 import me.FurH.FAntiXRay.threads.UpdateThreads;
 import me.FurH.FAntiXRay.threads.UpdateThreads.UpdateType;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -111,6 +113,8 @@ public class FUpdateListener implements Listener {
                 e.getTo().distanceSquared(e.getFrom()) < config.proximity_radius) {
             return;
         }
+        
+        FObfuscator.teleport(e.getPlayer(), Bukkit.getViewDistance());
 
         if (config.engine_chest || config.proximity_enabled && config.proximity_radius > 0) {
             UpdateThreads.update(e.getPlayer(), e.getTo(), (config.proximity_radius * 3), UpdateType.PLAYER_TELEPORT);

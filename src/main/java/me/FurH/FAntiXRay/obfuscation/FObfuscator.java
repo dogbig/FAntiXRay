@@ -17,12 +17,16 @@
 package me.FurH.FAntiXRay.obfuscation;
 
 import java.util.zip.Deflater;
+import me.FurH.Core.cache.CoreSafeCache;
 import me.FurH.Core.exceptions.CoreException;
+import me.FurH.Core.internals.IEntityPlayer;
+import me.FurH.Core.internals.InternalManager;
 import me.FurH.Core.reflection.ReflectionUtils;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.cache.MurmurHash3;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
+import me.FurH.FAntiXRay.threads.ObfuscationThreads;
 import me.FurH.FAntiXRay.timings.FTimingsCore;
 import net.minecraft.server.v1_5_R3.Block;
 import net.minecraft.server.v1_5_R3.Chunk;
@@ -42,10 +46,79 @@ import org.bukkit.entity.Player;
 public class FObfuscator {
 
     public static final FTimingsCore obfuscator = new FTimingsCore("FAntiXRay Obfuscation");
+    
     private static FTimingsCore obfuscator_cached = new FTimingsCore("FAntiXRay: Cached Obfuscation", obfuscator);
     private static FTimingsCore obfuscator_uncached = new FTimingsCore("FAntiXRay: Uncached Obfuscation", obfuscator);
-        
+
+    private static CoreSafeCache<String, Integer> spawn_chunks = new CoreSafeCache<String, Integer>();
+
+    public static void unload_player(Player player) {
+        spawn_chunks.remove(player.getName());
+    }
+
+    public static void teleport(Player player, int view_distance) {
+        spawn_chunks.put(player.getName(), getViewChunks(view_distance));
+    }
+
     public static Object obfuscate(Player player, final Object object) {
+        
+        if (object instanceof Packet56MapChunkBulk) {
+
+            try {
+
+                final Packet56MapChunkBulk packet = (Packet56MapChunkBulk) object;
+                
+                if (!spawn_chunks.containsKey(player.getName())) {
+
+                    final IEntityPlayer entity = InternalManager.getEntityPlayer(player);
+                    final EntityPlayer entityp = ((CraftPlayer)player).getHandle();
+
+                    Runnable run = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+
+                                Packet56MapChunkBulk packet0 = FObfuscator.obfuscate(entityp, packet);
+                                entity.resendPacket(packet0);
+
+                            } catch (CoreException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    };
+                    
+                    ObfuscationThreads.getExecutor().execute(run);
+
+                    return null;
+                }
+                
+                int chunks = spawn_chunks.get(player.getName());
+                chunks -= packet.d();
+
+                if (chunks <= 0) {
+                    spawn_chunks.remove(player.getName());
+                } else {
+                    spawn_chunks.replace(player.getName(), chunks);
+                }
+
+                return FObfuscator.obfuscate(((CraftPlayer)player).getHandle(), (Packet56MapChunkBulk) object);
+            } catch (CoreException ex) {
+                ex.printStackTrace();
+            }
+            
+        } else
+        if (object instanceof Packet51MapChunk) {
+            try {
+                return FObfuscator.obfuscate(((CraftPlayer)player).getHandle(), (Packet51MapChunk) object);
+            } catch (CoreException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    /*public static Object obfuscate(Player player, final Object object) {
 
         if (object instanceof Packet56MapChunkBulk) {
             try {
@@ -65,7 +138,7 @@ public class FObfuscator {
         }
 
         return null;
-    }
+    }*/
    
     /* initialize the Packet56MapChunkBulk */
     public static Packet56MapChunkBulk obfuscate(EntityPlayer player, Packet56MapChunkBulk packet) throws CoreException {
@@ -458,7 +531,7 @@ public class FObfuscator {
         return MurmurHash3.getHash(buildBuffer);
     }
 
-    private static long last = System.nanoTime()|1;
+    private static long last = 44511928;
 
     public static int nextInt(int max) {
         
@@ -469,5 +542,9 @@ public class FObfuscator {
         int out = (int) last % max;   
 
         return (out < 0) ? -out : out;
+    }
+
+    public static int getViewChunks(int view) {
+        return (view + view + 1) * (view + view + 1);
     }
 }

@@ -62,7 +62,7 @@ public class FAntiXRay extends CorePlugin {
     private IPacketQueue packet;
     
     public static boolean spigot = false;
-
+    
     @Override
     public void onEnable() {
         plugin = this;
@@ -138,7 +138,7 @@ public class FAntiXRay extends CorePlugin {
 
         PacketManager.register(packet, 51);
         PacketManager.register(packet, 56);
-        
+
         /*Random rnd = new Random();
         int done = 0;
         
