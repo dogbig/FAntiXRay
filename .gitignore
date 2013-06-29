@@ -1,7 +1,7 @@
 /build
 /dist/lib
 /nbproject
-*.xml
+.gitignore
 *.mf
 *.txt
 /dist/
