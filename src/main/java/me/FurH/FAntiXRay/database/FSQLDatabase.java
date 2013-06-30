@@ -22,7 +22,6 @@ import org.xerial.snappy.Snappy;
 public class FSQLDatabase extends CoreSQLDatabase {
 
     private FAntiXRay plugin;
-    private String prefix = "xray_";
     
     public FSQLDatabase(CorePlugin plugin) {
         super(plugin, "xray_", "SQLite", "", "", "", "", "");

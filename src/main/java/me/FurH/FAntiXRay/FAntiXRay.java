@@ -18,6 +18,8 @@ package me.FurH.FAntiXRay;
 
 import java.util.HashSet;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.FurH.Core.CorePlugin;
 import me.FurH.Core.exceptions.CoreException;
 import me.FurH.Core.packets.IPacketQueue;
@@ -77,7 +79,12 @@ public class FAntiXRay extends CorePlugin {
         cache = new FChunkCache();
         sql = new FSQLDatabase(this);
         
-        sql.setAutoCommit(false);
+        try {
+            sql.setAutoCommit(false);
+        } catch (CoreException ex) {
+            error(ex);
+        }
+        
         sql.setupQueue(0.5, 3);
 
         try {
