@@ -103,14 +103,14 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <!--<configuration>
+                        <configuration>
                             <relocations>
                                 <relocation>
                                     <pattern>me.FurH.Core</pattern>
                                     <shadedPattern>me.FurH.${artifactId}.core</shadedPattern>
                                 </relocation>
                             </relocations>
-                        </configuration>-->
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
