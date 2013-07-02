@@ -19,24 +19,21 @@ package me.FurH.FAntiXRay.obfuscation;
 import java.util.zip.Deflater;
 import me.FurH.Core.cache.CoreSafeCache;
 import me.FurH.Core.exceptions.CoreException;
-import me.FurH.Core.internals.IEntityPlayer;
-import me.FurH.Core.internals.InternalManager;
 import me.FurH.Core.reflection.ReflectionUtils;
 import me.FurH.FAntiXRay.FAntiXRay;
 import me.FurH.FAntiXRay.cache.FChunkCache;
 import me.FurH.FAntiXRay.cache.MurmurHash3;
 import me.FurH.FAntiXRay.configuration.FConfiguration;
-import me.FurH.FAntiXRay.threads.ObfuscationThreads;
 import me.FurH.FAntiXRay.timings.FTimingsCore;
-import net.minecraft.server.v1_5_R3.Block;
-import net.minecraft.server.v1_5_R3.Chunk;
-import net.minecraft.server.v1_5_R3.ChunkSection;
-import net.minecraft.server.v1_5_R3.EntityPlayer;
-import net.minecraft.server.v1_5_R3.Packet51MapChunk;
-import net.minecraft.server.v1_5_R3.Packet56MapChunkBulk;
-import net.minecraft.server.v1_5_R3.World;
+import net.minecraft.server.v1_6_R1.Block;
+import net.minecraft.server.v1_6_R1.Chunk;
+import net.minecraft.server.v1_6_R1.ChunkSection;
+import net.minecraft.server.v1_6_R1.EntityPlayer;
+import net.minecraft.server.v1_6_R1.Packet51MapChunk;
+import net.minecraft.server.v1_6_R1.Packet56MapChunkBulk;
+import net.minecraft.server.v1_6_R1.World;
 import org.bukkit.World.Environment;
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_6_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -53,14 +50,14 @@ public class FObfuscator {
     private static CoreSafeCache<String, Integer> spawn_chunks = new CoreSafeCache<String, Integer>();
 
     public static void unload_player(Player player) {
-        spawn_chunks.remove(player.getName());
+        //spawn_chunks.remove(player.getName());
     }
 
     public static void teleport(Player player, int view_distance) {
-        spawn_chunks.put(player.getName(), getViewChunks(view_distance));
+        //spawn_chunks.put(player.getName(), getViewChunks(view_distance));
     }
 
-    public static Object obfuscate(Player player, final Object object) {
+    /*public static Object obfuscate(Player player, final Object object) {
         
         if (object instanceof Packet56MapChunkBulk) {
 
@@ -116,9 +113,9 @@ public class FObfuscator {
         }
 
         return null;
-    }
+    }*/
 
-    /*public static Object obfuscate(Player player, final Object object) {
+    public static Object obfuscate(Player player, final Object object) {
 
         if (object instanceof Packet56MapChunkBulk) {
             try {
@@ -138,7 +135,7 @@ public class FObfuscator {
         }
 
         return null;
-    }*/
+    }
    
     /* initialize the Packet56MapChunkBulk */
     public static Packet56MapChunkBulk obfuscate(EntityPlayer player, Packet56MapChunkBulk packet) throws CoreException {
@@ -149,7 +146,7 @@ public class FObfuscator {
             return packet;
         }
 
-        if (FAntiXRay.isExempt(player.name)) {
+        if (FAntiXRay.isExempt(player.getName())) {
             return packet;
         }
         
@@ -207,7 +204,7 @@ public class FObfuscator {
         }
         
 
-        if (FAntiXRay.isExempt(player.name)) {
+        if (FAntiXRay.isExempt(player.getName())) {
             return packet;
         }
 

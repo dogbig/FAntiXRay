@@ -16,16 +16,16 @@
     
     <repositories>
         <repository>
-            <id>repobo-snap</id>
-            <url>http://repo.bukkit.org/content/groups/public</url>
-        </repository>
-        <repository>
             <id>releases</id>
             <url>http://localhost:8081/nexus/content/repositories/releases</url>
         </repository>
         <repository>
             <id>releases-bkp</id>
             <url>https://dl.dropboxusercontent.com/u/55730138/sonatype-work/releases</url>
+        </repository>
+        <repository>
+            <id>bukkit-snapshots</id>
+            <url>http://repo.bukkit.org/content/repositories/snapshots/</url>
         </repository>
         <repository>
             <id>bukkit-repo</id>
@@ -50,15 +50,15 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.5.2-R1.0</version>
+            <version>1.6.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>spigotmc</artifactId>
             <version>1.5.2-R0.1</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>me.FurH</groupId>
             <artifactId>FCoreLib</artifactId>
